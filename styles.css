@@ -1,0 +1,238 @@
+@font-face {
+    font-family: 'Digital-7';
+    src: url('fonts/digital-7.woff2') format('woff2'),
+         url('fonts/digital-7.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #222;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100vh; /* Altura completa del navegador */
+}
+
+#main-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start; /* Alinea al extremo izquierdo */
+    width: 100%;
+    max-width: 90vw;
+    gap: 20px; /* Espacio entre la grilla y los botones */
+    flex-wrap: wrap; /* Permite que los elementos se envuelvan */
+}
+
+#game-container {
+    width: 90vmin; /* Máximo tamaño basado en la ventana */
+    height: 90vmin; /* Máximo tamaño basado en la ventana */
+    display: grid;
+    gap: 5px;
+    background-color: black; /* Fondo negro más neutro */
+    border: 2px solid #fff;
+    padding: 10px;
+    grid-template-rows: repeat(auto-fill, 1fr);
+    grid-template-columns: repeat(auto-fill, 1fr);
+}
+
+.cell {
+    aspect-ratio: 1 / 1; /* Relación cuadrada */
+    background-color: #222;
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+}
+
+.cell.processing {
+    pointer-events: none; /* Bloquear eventos de puntero */
+}
+
+.gris-ondas, .verde, .cyan, .puntos-blancos, .rayado, .magenta {
+    border: none; /* Eliminar bordes de las celdas coloreadas */
+}
+
+.gris-ondas {
+    background: repeating-radial-gradient(
+        circle at 50% 50%,
+        #A9A9A9, /* Gris oscuro */
+        #A9A9A9 10px,
+        #D3D3D3 10px,
+        #D3D3D3 20px /* Gris claro */
+    );
+}
+
+.verde {
+    background: repeating-linear-gradient(
+        45deg,
+        #008000, /* Color verde */
+        #008000 10px,
+        #00ff00 10px,
+        #00ff00 20px /* Color verde claro */
+    );
+}
+
+.cyan { background-color: cyan; }
+
+.puntos-blancos {
+    background: radial-gradient(#ffffff 20%, transparent 20%), /* Color blanco */
+                radial-gradient(#ffffff 20%, transparent 20%); /* Color blanco */
+    background-color: #ff0000; /* Color rojo */
+    background-position: 0 0, 10px 10px;
+    background-size: 20px 20px;
+}
+
+.rayado {
+    background: repeating-linear-gradient(
+        0deg,
+        #1E90FF, /* Dodger Blue */
+        #1E90FF 10px,
+        #4169E1 10px,
+        #4169E1 20px /* Royal Blue */
+    );
+}
+
+.magenta { background-color: magenta; }
+
+@keyframes rapidBlink {
+    0%, 33.33%, 66.66%, 100% { opacity: 1; } /* Estado completamente opaco */
+    16.66%, 50%, 83.33% { opacity: 0; } /* Estado completamente transparente */
+}
+
+@keyframes borderPulse {
+    0% { border-color: red; }
+    50% { border-color: yellow; }
+    100% { border-color: red; }
+}
+
+.cell.selected {
+    animation: borderPulse 1s infinite;
+    border-width: 3px;
+    border-style: solid;
+}
+
+.matched {
+    animation: rapidBlink 1s infinite ease-in-out; /* Duración total de 1 segundo, repitiendo infinitamente */
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#buttons-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#version-text {
+    margin-top: 20px;
+    font-size: 16px;
+    text-align: center;
+}
+
+#score-display {
+    margin-top: 20px;
+    font-size: 39px; /* Aumentar el tamaño un 30% */
+    text-align: center;
+    font-family: 'Digital-7', monospace;
+    color: #ffff00; /* Color amarillo */
+    text-shadow:
+        -1px -1px 0 #000,
+         1px -1px 0 #000,
+        -1px 1px 0 #000,
+         1px 1px 0 #000;
+}
+
+#color-samples {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Alinear las celdas de muestra a la izquierda */
+    margin-top: 20px; /* Espacio desde el puntaje hasta las celdas de muestra */
+}
+
+.cell-sample {
+    width: 30px; /* Ajustar según el tamaño deseado */
+    height: 30px; /* Ajustar según el tamaño deseado */
+    margin: 5px 0; /* Espacio vertical entre las celdas */
+    border: 1px solid #555; /* Borde para mejor visibilidad */
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Ajustar el espacio entre el texto y el porcentaje */
+    font-size: 14px;
+    color: #fff;
+}
+
+.cell-sample span {
+    color: yellow; /* Estilo amarillo para los números */
+    font-weight: bold; /* Negrita para los números */
+    margin-left: 5px; /* Espacio adicional si es necesario */
+}
+
+/* Asegurar que cada celda use los respectivos colores o patrones */
+.cell-sample.gris-ondas {
+    background: repeating-radial-gradient(
+        circle at 50% 50%,
+        #A9A9A9, /* Gris oscuro */
+        #A9A9A9 10px,
+        #D3D3D3 10px,
+        #D3D3D3 20px /* Gris claro */
+    );
+}
+
+.cell-sample.verde {
+    background: repeating-linear-gradient(
+        45deg,
+        #008000, /* Color verde */
+        #008000 10px,
+        #00ff00 10px,
+        #00ff00 20px /* Color verde claro */
+    );
+}
+
+.cell-sample.cyan { background-color: cyan; }
+
+.cell-sample.puntos-blancos {
+    background: radial-gradient(#ffffff 20%, transparent 20%), /* Color blanco */
+                radial-gradient(#ffffff 20%, transparent 20%); /* Color blanco */
+    background-color: #ff0000; /* Color rojo */
+    background-position: 0 0, 10px 10px;
+    background-size: 20px 20px;
+}
+
+.cell-sample.rayado {
+    background: repeating-linear-gradient(
+        0deg,
+        #1E90FF, /* Dodger Blue */
+        #1E90FF 10px,
+        #4169E1 10px,
+        #4169E1 20px /* Royal Blue */
+    );
+}
+
+.cell-sample.magenta { background-color: magenta; }
+
+@keyframes scoreBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.blink-score {
+    animation: scoreBlink 0.4s infinite;
+}

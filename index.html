@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grilla - Versión Sincronizada 2.3</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="main-container">
+        <div id="game-container"></div>
+        <div id="buttons-container">
+            <label for="difficulty">Seleccionar Dificultad:</label>
+            <select id="difficulty" onchange="setDifficulty()">
+                <option value="6">Fácil (6x6)</option>
+                <option value="10">Medio (10x10)</option>
+                <option value="15">Difícil (15x15)</option>
+            </select>
+            <button onclick="fillGrid()">Rellenar Celdas</button>
+            <button onclick="resetGame()">Reiniciar Juego</button>
+            <div id="version-text">
+                Grilla - Versión 2.3
+            </div>
+            <div id="score-display">Puntaje: <span id="current-score">0000000000000000</span></div>
+
+            <!-- Nueva sección añadida aquí -->
+            <div id="select-color">
+                <label for="color-choice">Elige un color/patrón para eliminar:</label>
+                <select id="color-choice">
+                    <option value="gris-ondas">Gris Ondas</option>
+                    <option value="verde">Verde</option>
+                    <option value="cyan">Cian</option>
+                    <option value="puntos-blancos">Puntos Blancos</option>
+                    <option value="rayado">Rayado</option>
+                    <option value="magenta">Magenta</option>
+                </select>
+                <button onclick="chooseColor()">Elegir</button>
+            </div>
+
+            <div id="color-samples">
+                <div class="cell-sample gris-ondas"><span>0</span></div>
+                <div class="cell-sample verde"><span>0</span></div>
+                <div class="cell-sample cyan"><span>0</span></div>
+                <div class="cell-sample puntos-blancos"><span>0</span></div>
+                <div class="cell-sample rayado"><span>0</span></div>
+                <div class="cell-sample magenta"><span>0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
