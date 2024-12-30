@@ -16,11 +16,14 @@ function checkSelections() {
     const difficulty = document.getElementById('difficulty').value;
     const colorChoice = document.getElementById('color-choice').value;
     const fillGridBtn = document.getElementById('fill-grid-btn');
+    const resetGameBtn = document.getElementById('reset-game-btn');
 
     if (difficulty && colorChoice) {
         fillGridBtn.disabled = false;
+        resetGameBtn.disabled = false;
     } else {
         fillGridBtn.disabled = true;
+        resetGameBtn.disabled = true;
     }
 }
 
@@ -59,7 +62,7 @@ function fillGrid() {
 }
 
 function handleCellClick(cell) {
-    if (isProcessing) return; // Ignorar clics mientras el efecto cascada o parpadeo están activos
+    if (isProcessing) return; // Ignorar clics mientras el efecto cascada o parpadeo está activo
 
     const row = parseInt(cell.dataset.row);
     const col = parseInt(cell.dataset.col);
@@ -203,7 +206,7 @@ function removePulsatingCells(matches) {
         }
     }
 
-    // Verificar si hay nuevas coincidencias después de la cascada
+    // Verificar si hay nuevas coincidencias después de la caída
     newMatches = checkNewMatches();
     if (newMatches.size > 0) {
         newMatches.forEach(coord => {
