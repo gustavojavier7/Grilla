@@ -344,6 +344,15 @@ function incrementScoreAnimated(incrementBy, duration, steps) {
     }, duration / steps);
 }
 
+function checkForScoreChange(finalScore) {
+    const currentScore = score;
+    setTimeout(() => {
+        if (currentScore === finalScore) {
+            applyScoreBlink(); // Aplicar parpadeo si el puntaje no ha cambiado
+        }
+    }, 1000); // Esperar 1 segundo para verificar si el puntaje no ha cambiado
+}
+
 function applyScoreBlink() {
     const scoreElement = document.getElementById('current-score');
     scoreElement.classList.add('blink-score');
