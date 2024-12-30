@@ -11,22 +11,21 @@
         <div id="game-container"></div>
         <div id="buttons-container">
             <label for="difficulty">Seleccionar Dificultad:</label>
-            <select id="difficulty" onchange="setDifficulty()">
+            <select id="difficulty" onchange="checkSelections()">
+                <option value="">--Seleccionar--</option>
                 <option value="6">Fácil (6x6)</option>
                 <option value="10">Medio (10x10)</option>
                 <option value="15">Difícil (15x15)</option>
             </select>
-            <button onclick="fillGrid()">Rellenar Celdas</button>
+            <button id="fill-grid-btn" onclick="fillGrid()" disabled>Rellenar Celdas</button>
             <button onclick="resetGame()">Reiniciar Juego</button>
-            <div id="version-text">
-                Grilla - Versión 2.3
-            </div>
+            <div id="version-text">Grilla - Versión 2.3</div>
             <div id="score-display">Puntaje: <span id="current-score">0000000000000000</span></div>
 
-            <!-- Nueva sección añadida aquí -->
             <div id="select-color">
-                <label for="color-choice">Elige un color/patrón para eliminar:</label>
-                <select id="color-choice">
+                <label for="color-choice">Elegir un color/patrón para eliminar:</label>
+                <select id="color-choice" onchange="checkSelections()">
+                    <option value="">--Seleccionar--</option>
                     <option value="gris-ondas">Gris Ondas</option>
                     <option value="verde">Verde</option>
                     <option value="cyan">Cian</option>
