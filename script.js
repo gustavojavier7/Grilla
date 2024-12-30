@@ -253,8 +253,12 @@ function removePulsatingCells(matches) {
         isProcessing = false;
         const cells = document.querySelectorAll('.cell');
         cells.forEach(cell => cell.classList.remove('processing')); // Permitir interacciones
-        applyScoreBlink(); // Aplicar parpadeo rápido al puntaje
 
+        // Aplicar parpadeo del puntaje solo después de verificar el cambio del puntaje
+        setTimeout(() => {
+            checkForScoreChange(score);
+        }, 1000);
+        
         // Actualizar el conteo de celdas de muestra
         updateColorSamples();
 
@@ -264,7 +268,6 @@ function removePulsatingCells(matches) {
         }
     }
 }
-
 function checkNewMatches() {
     const rows = board.length;
     const cols = board[0].length;
