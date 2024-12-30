@@ -12,10 +12,16 @@ let rows = 6; // Valor por defecto
 let cols = 6; // Valor por defecto
 let chosenColor = null;
 
-function setDifficulty() {
+function checkSelections() {
     const difficulty = document.getElementById('difficulty').value;
-    rows = cols = Number(difficulty);
-    resetGame();
+    const colorChoice = document.getElementById('color-choice').value;
+    const fillGridBtn = document.getElementById('fill-grid-btn');
+
+    if (difficulty && colorChoice) {
+        fillGridBtn.disabled = false;
+    } else {
+        fillGridBtn.disabled = true;
+    }
 }
 
 function createGrid(rows, cols) {
