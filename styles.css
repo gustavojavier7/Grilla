@@ -182,7 +182,7 @@ button:hover {
 .cell-sample span {
     color: yellow; /* Estilo amarillo para los números */
     font-weight: bold; /* Negrita para los números */
-    margin-left: 25px; /* Espacio adicional si es necesario */
+    margin-left: 35px; /* Espacio adicional si es necesario */
 }
 
 /* Asegurar que cada celda use los respectivos colores o patrones */
