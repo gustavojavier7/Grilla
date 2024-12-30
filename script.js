@@ -341,6 +341,7 @@ function applyScoreBlink() {
 function chooseColor() {
     chosenColor = document.getElementById('color-choice').value;
     alert(`Has elegido eliminar todas las celdas de color/patrón: ${chosenColor}`);
+    resetScore(); // Resetear el puntaje al cambiar el patrón
     checkPatterns(); // Verificar patrones inmediatamente después de elegir el color
     updateColorSamples(); // Actualizar la muestra de colores
 }
