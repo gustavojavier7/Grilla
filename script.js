@@ -336,7 +336,9 @@ function incrementScoreAnimated(incrementBy, duration, steps) {
             updateScoreDisplay();
             clearInterval(intervalId);
             if (incrementBy > 0) {
-                applyScoreBlink(); // Aplicar parpadeo solo si hay incremento de puntaje
+                setTimeout(() => {
+                    checkForScoreChange(targetScore);
+                }, 1000); // Verificar después de 1 segundo
             }
         }
     }, duration / steps);
