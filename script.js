@@ -329,12 +329,14 @@ function incrementScoreAnimated(incrementBy, duration, steps) {
     }, duration / steps);
 }
 
-function applyScoreBlink() {
-    const scoreElement = document.getElementById('current-score');
-    scoreElement.classList.add('blink-score');
-    setTimeout(() => {
-        scoreElement.classList.remove('blink-score');
-    }, 2000); // Parpadeo durante 2 segundos
+function applyScoreBlink(scoreIncrement) {
+    if (scoreIncrement > 0) {
+        const scoreElement = document.getElementById('current-score');
+        scoreElement.classList.add('blink-score');
+        setTimeout(() => {
+            scoreElement.classList.remove('blink-score');
+        }, 2000); // Parpadeo durante 2 segundos
+    }
 }
 
 // Función para manejar la elección de color/patrón
