@@ -169,8 +169,7 @@ function checkPatterns() {
         // No resetear cascadeMultiplier aquí
         isProcessing = false;
         cells.forEach(cell => cell.classList.remove('processing')); // Permitir interacciones
-        applyScoreBlink(); // Aplicar parpadeo rápido al puntaje
-
+        // No aplicar parpadeo del puntaje aquí
         // Verificar si el jugador ha ganado
         if (chosenColor && document.querySelectorAll(`.cell.${chosenColor}`).length === 0) {
             alert('¡Felicidades! Has ganado eliminando todas las celdas del color/patrón elegido.');
