@@ -242,6 +242,7 @@ function removePulsatingCells(matches) {
         // Calcular el puntaje final basado en la cascada completa
         let finalPoints = totalRemovedThisCascade * roundsInCascade;
         score += finalPoints;
+        let scoreBeforeIncrement = score - finalPoints;
         updateScoreDisplay(); // Usar la función mejorada para mostrar el puntaje con parpadeo
 
         // Resetear los contadores
@@ -253,10 +254,10 @@ function removePulsatingCells(matches) {
         const cells = document.querySelectorAll('.cell');
         cells.forEach(cell => cell.classList.remove('processing')); // Permitir interacciones
 
-        // Aplicar parpadeo del puntaje solo después de verificar el cambio del puntaje
-        setTimeout(() => {
-            checkForScoreChange(score);
-        }, 1000);
+        // Aplicar parpadeo del puntaje solo si hubo incremento
+        if (scoreBeforeIncrement < score) {
+            applyScoreBlink();
+        }
         
         // Actualizar el conteo de celdas de muestra
         updateColorSamples();
