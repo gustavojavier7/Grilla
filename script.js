@@ -359,5 +359,4 @@ function updateColorSamples() {
 
 // Inicializar con una grilla de 6x6 por defecto
 createGrid(rows, cols);
-fillGrid();
 updateColorSamples(); // Actualizar la muestra de colores al inicio del juego
