@@ -175,14 +175,14 @@ button:hover {
     display: flex;
     align-items: center;
     justify-content: space-between; /* Ajustar el espacio entre el texto y el porcentaje */
-    font-size: 14px;
+    font-size: 24px;
     color: #fff;
 }
 
 .cell-sample span {
     color: yellow; /* Estilo amarillo para los números */
     font-weight: bold; /* Negrita para los números */
-    margin-left: 5px; /* Espacio adicional si es necesario */
+    margin-left: 25px; /* Espacio adicional si es necesario */
 }
 
 /* Asegurar que cada celda use los respectivos colores o patrones */
