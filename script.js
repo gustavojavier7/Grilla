@@ -50,6 +50,16 @@ function createGrid(rows, cols) {
 function fillGrid() {
     if (isProcessing) return; // Evitar que se rellenen celdas mientras se procesa
     resetScore(); // Resetear el puntaje al rellenar celdas
+
+    // Retrieve the selected difficulty level
+    const difficulty = document.getElementById('difficulty').value;
+    if (difficulty) {
+        rows = cols = parseInt(difficulty, 10);
+    }
+
+    // Create the grid based on the difficulty level
+    createGrid(rows, cols);
+
     const cells = document.querySelectorAll('.cell');
     cells.forEach(cell => {
         const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
