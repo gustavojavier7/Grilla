@@ -171,9 +171,7 @@ function checkPatterns() {
         cells.forEach(cell => cell.classList.remove('processing')); // Permitir interacciones
         // No aplicar parpadeo del puntaje aquí
         // Verificar si el jugador ha ganado
-        if (chosenColor && document.querySelectorAll(`.cell.${chosenColor}`).length === 0) {
-            alert('¡Felicidades! Has ganado eliminando todas las celdas del color/patrón elegido.');
-        }
+        checkGameOver();
     }
 }
 
@@ -199,7 +197,7 @@ function removePulsatingCells(matches) {
                 // Mover la celda hacia abajo para llenar el espacio vacío
                 const newRow = row + emptySpaceCount;
                 board[newRow][col] = board[row][col];
-                cellReferences[newRow][col].className = `cell ${board[row][col]}`;
+                cellReferences[newRow][col].className = `cell ${board[newRow][col]}`;
 
                 // Limpiar la celda original
                 board[row][col] = null;
@@ -263,9 +261,7 @@ function removePulsatingCells(matches) {
         updateColorSamples();
 
         // Verificar si el jugador ha ganado
-        if (chosenColor && document.querySelectorAll(`.cell.${chosenColor}`).length === 0) {
-            alert('¡Felicidades! Has ganado eliminando todas las celdas del color/patrón elegido.');
-        }
+        checkGameOver();
     }
 }
 function checkNewMatches() {
