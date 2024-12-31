@@ -236,3 +236,6 @@ button:hover {
 .blink-score {
     animation: scoreBlink 0.4s infinite;
 }
+.blink-threshold {
+    animation: rapidBlink 1s infinite ease-in-out;
+}
