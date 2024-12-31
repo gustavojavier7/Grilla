@@ -380,11 +380,19 @@ function updateColorSamples() {
         cellSample.setAttribute('data-percentage', `${percent}%`);
     });
 }
+function getGameOverThreshold(rows, cols) {
+    const baseThreshold = 50;
+    const baseGridSize = 15 * 15;
+    const currentGridSize = rows * cols;
+    return Math.floor((baseThreshold / baseGridSize) * currentGridSize);
+}
+
 function checkGameOver() {
+    const threshold = getGameOverThreshold(rows, cols);
     for (const color of COLORS) {
         const count = document.querySelectorAll(`.cell.${color}`).length;
-        if (count >= 50) {
-            alert(`Game Over. El color/patrón "${color}" alcanzó 50 o más celdas.`);
+        if (count >= threshold) {
+            alert(`Game Over. El color/patrón "${color}" alcanzó ${threshold} o más celdas.`);
             return;
         }
     }
