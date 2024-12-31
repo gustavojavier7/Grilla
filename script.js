@@ -371,13 +371,21 @@ function chooseColor() {
 
 // Función para actualizar la muestra de colores
 function updateColorSamples() {
-    COLORS.forEach(color => {
+      const threshold = getGameOverThreshold(rows, cols);
+        COLORS.forEach(color => {
         const count = document.querySelectorAll(`.cell.${color}`).length;
         const totalCells = rows * cols;
         const percent = ((count / totalCells) * 100).toFixed(2);
+
         const cellSample = document.querySelector(`.cell-sample.${color}`);
         cellSample.querySelector('span').textContent = count;
         cellSample.setAttribute('data-percentage', `${percent}%`);
+        
+         if (count >= threshold) {
+            cellSample.classList.add('blink-threshold');
+        } else {
+            cellSample.classList.remove('blink-threshold');
+        }
     });
 }
 function getGameOverThreshold(rows, cols) {
