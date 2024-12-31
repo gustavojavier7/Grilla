@@ -381,24 +381,12 @@ function updateColorSamples() {
     });
 }
 function checkGameOver() {
-    const colorCounts = {};
-    let totalCells = 0;
-
-    // Contar la cantidad de celdas para cada color/patrón
-    COLORS.forEach(color => {
+    for (const color of COLORS) {
         const count = document.querySelectorAll(`.cell.${color}`).length;
-        colorCounts[color] = count;
-        totalCells += count;
-    });
-
-    // Verificar condición de victoria
-    const chosenColorCount = colorCounts[chosenColor] || 0;
-    const otherColorsExceedingCount = COLORS.some(color => color !== chosenColor && colorCounts[color] >= 50);
-  
-    if (chosenColorCount === 0 && totalCells <= 50) {
-        alert('¡Felicidades! Has ganado eliminando todas las celdas del color/patrón elegido y manteniendo el total de celdas de otros colores menor a 50.');
-    } else if (otherColorsExceedingCount) {
-        alert('Game Over. Has perdido porque uno de los colores o patrones ha alcanzado 50 celdas o más.');
+        if (count >= 50) {
+            alert(`Game Over. El color/patrón "${color}" alcanzó 50 o más celdas.`);
+            return;
+        }
     }
 }
 
