@@ -10,20 +10,17 @@ let roundsInCascade = 1; // Inicializado en 1
 let totalRemovedThisCascade = 0;
 let rows = 6; // Valor por defecto
 let cols = 6; // Valor por defecto
-let chosenColor = null;
 let cellCounts = {};
 COLORS.forEach(color => {
     cellCounts[color] = 0;
 });
 
-
 function checkSelections() {
     const difficulty = document.getElementById('difficulty').value;
-    const colorChoice = document.getElementById('color-choice').value;
     const fillGridBtn = document.getElementById('fill-grid-btn');
     const resetGameBtn = document.getElementById('reset-game-btn');
 
-    if (difficulty && colorChoice) {
+    if (difficulty) {
         fillGridBtn.disabled = false;
         resetGameBtn.disabled = false;
     } else {
@@ -281,8 +278,9 @@ function removePulsatingCells(matches) {
             applyScoreBlink();
         }
     }, 1000); // 1 segundo de parpadeo antes de eliminar las celdas
-     updateColorSamples(); 
+    updateColorSamples();
 }
+
 function checkNewMatches() {
     const rows = board.length;
     const cols = board[0].length;
@@ -346,7 +344,6 @@ function resetGame() {
     }
 }
 
-
 function incrementScoreAnimated(incrementBy, duration, steps) {
     const targetScore = score + incrementBy;
     const stepSize = Math.round(incrementBy / steps); // Truncar al entero más cercano
@@ -369,7 +366,6 @@ function incrementScoreAnimated(incrementBy, duration, steps) {
     }, duration / steps);
 }
 
-
 function applyScoreBlink() {
     if (!isProcessing) {
         const scoreElement = document.getElementById('current-score');
@@ -378,15 +374,6 @@ function applyScoreBlink() {
             scoreElement.classList.remove('blink-score');
         }, 2000); // Duración del parpadeo
     }
-}
-
-// Función para manejar la elección de color/patrón
-function chooseColor() {
-    chosenColor = document.getElementById('color-choice').value;
-    alert(`Has elegido eliminar todas las celdas de color/patrón: ${chosenColor}`);
-    resetScore(); // Resetear el puntaje al cambiar el patrón
-    checkPatterns(); // Verificar patrones inmediatamente después de elegir el color
-    updateColorSamples(); // Actualizar la muestra de colores
 }
 
 // Función para actualizar la muestra de colores
@@ -408,6 +395,7 @@ function updateColorSamples() {
         }
     });
 }
+
 function getGameOverThreshold(rows, cols) {
     const baseThreshold = 50;
     const baseGridSize = 15 * 15;
