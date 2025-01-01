@@ -318,8 +318,15 @@ function resetGame() {
     updateScoreDisplay();
     createGrid(rows, cols);
     fillGrid();
-    updateColorSamples(); // Actualizar la muestra de colores al inicio del juego
+    updateColorSamples();
+
+    // Eliminar el overlay de "GAME OVER" si existe
+    const overlay = document.getElementById('game-over-overlay');
+    if (overlay) {
+        overlay.remove();
+    }
 }
+
 
 function incrementScoreAnimated(incrementBy, duration, steps) {
     const targetScore = score + incrementBy;
