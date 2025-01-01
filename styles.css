@@ -238,7 +238,7 @@ button:hover {
 }
 
 .blink-threshold {
-    animation: rapidBlink 0.4s infinite;
+    animation: rapidBlink 0.6s infinite;
 }
 
 #game-over-overlay {
