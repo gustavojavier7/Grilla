@@ -179,22 +179,21 @@ function removePulsatingCells(matches) {
     const rows = board.length;
     const cols = board[0].length;
 
-    // Aquí, si matches contiene celdas que ya estaban marcadas como 'matched',
-    // primero quitar la clase para reiniciar la animación
+    // Primero, quitar la clase 'matched' para reiniciar la animación
     matches.forEach(coord => {
         const [row, col] = coord.split(',').map(Number);
         const cell = cellReferences[row][col];
-        cell.classList.remove('matched'); // Quitar la clase si ya estaba
+        cell.classList.remove('matched'); // Quitar la clase para reiniciar la animación
     });
 
-    // Luego, aplicar la animación
+    // Luego, aplicar la animación de parpadeo nuevamente
     matches.forEach(coord => {
         const [row, col] = coord.split(',').map(Number);
         const cell = cellReferences[row][col];
         cell.classList.add('matched'); // Añadir la clase para iniciar el parpadeo
     });
 
-    // Iniciar el destello sincronizado durante 2 segundos
+    // Iniciar el destello sincronizado durante 1 segundo
     setTimeout(() => {
         // Vaciar las celdas marcadas
         matches.forEach(coord => {
@@ -253,7 +252,7 @@ function removePulsatingCells(matches) {
 
             setTimeout(() => {
                 removePulsatingCells(newMatches);
-            }, 500); // 500ms de retraso antes de la siguiente ronda de cascada
+            }, 1000); // 1 segundo de espera antes de la siguiente ronda de cascada
         } else {
             // Calcular puntaje final y permitir interacciones
             let finalPoints = totalRemovedThisCascade * roundsInCascade;
@@ -272,9 +271,8 @@ function removePulsatingCells(matches) {
             // Aplicar parpadeo si el puntaje cambió
             applyScoreBlink();
         }
-    }, 2000); // 2 segundos de destello antes de eliminar las celdas
+    }, 1000); // 1 segundo de parpadeo antes de eliminar las celdas
 }
-
 function checkNewMatches() {
     const rows = board.length;
     const cols = board[0].length;
