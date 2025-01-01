@@ -117,7 +117,7 @@ body {
 }
 
 .matched {
-    animation: rapidBlink 0.4s infinite;
+    animation: rapidBlink 1s infinite;
 }
 
 button {
