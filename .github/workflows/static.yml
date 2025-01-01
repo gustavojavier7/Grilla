@@ -1,4 +1,4 @@
-# Simple workflow for deploying static content to GitHub Pages
+@# Simple workflow for deploying static content to GitHub Pages
 name: Deploy static content to Pages
 
 on:
@@ -69,6 +69,6 @@ jobs:
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "Despliegue exitoso en GitHub Pages"
           body: "El contenido estático ha sido desplegado exitosamente. Puedes verlo aquí: ${{ steps.deployment.outputs.page_url }}"
-          to: "tudireccion@example.com"
-          from: "GitHub Actions <tudireccion@example.com>"
+          to: "gustavojavier7@gmail.com"
+          from: @"GitHub Actions <gustavojavier7+GitHub@gmail.com>"
         
