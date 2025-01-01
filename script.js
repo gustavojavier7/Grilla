@@ -329,14 +329,15 @@ function incrementScoreAnimated(incrementBy, duration, steps) {
             score = targetScore; // Asegurar que el puntaje final sea exacto
             updateScoreDisplay();
             clearInterval(intervalId);
-            if (incrementBy > 0) {
-                setTimeout(() => {
-                    checkForScoreChange(targetScore);
-                }, 1000); // Verificar después de 1 segundo
-            }
+            // if (incrementBy > 0) {
+            //     setTimeout(() => {
+            //         checkForScoreChange(targetScore);
+            //     }, 1000); // Verificar después de 1 segundo
+            // }
         }
     }, duration / steps);
 }
+
 
 function applyScoreBlink() {
     if (!isProcessing) {
