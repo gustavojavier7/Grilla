@@ -117,18 +117,14 @@ body {
 }
 
 .matched {
-    animation: matchedBlink 2s ease-in-out infinite; 
+  animation: rapidBlink 0.333s step-end 3; 
 }
 
-/* Animación que parpadea con la misma cadencia que en el puntaje */
-@keyframes matchedBlink {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0;
-    }
+@keyframes rapidBlink {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
+
 button {
     padding: 10px 20px;
     font-size: 16px;
