@@ -164,7 +164,7 @@ function checkPatterns() {
             cell.classList.add('matched');
         });
 
-        // Iniciar el destello sincronizado durante 2 segundos
+        // Iniciar el destello sincronizado durante 1 segundo
         setTimeout(() => {
             removePulsatingCells(matches);
         }, 1000);
@@ -174,7 +174,7 @@ function checkPatterns() {
         cells.forEach(cell => cell.classList.remove('processing')); // Permitir interacciones
         // No aplicar parpadeo del puntaje aquí
         // Verificar si el jugador ha ganado
-        checkGameOver();
+        setTimeout(checkGameOver, 1000); // Esperar 1 segundo antes de verificar el fin del juego
     }
 }
 
@@ -276,6 +276,9 @@ function removePulsatingCells(matches) {
 
             // Aplicar parpadeo si el puntaje cambió
             applyScoreBlink();
+
+            // Verificar si el jugador ha ganado
+            setTimeout(checkGameOver, 1000); // Esperar 1 segundo antes de verificar el fin del juego
         }
     }, 1000); // 1 segundo de parpadeo antes de eliminar las celdas
     updateColorSamples();
