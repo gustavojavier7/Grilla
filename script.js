@@ -11,6 +11,11 @@ let totalRemovedThisCascade = 0;
 let rows = 6; // Valor por defecto
 let cols = 6; // Valor por defecto
 let chosenColor = null;
+let cellCounts = {};
+COLORS.forEach(color => {
+    cellCounts[color] = 0;
+});
+
 
 function checkSelections() {
     const difficulty = document.getElementById('difficulty').value;
@@ -67,6 +72,7 @@ function fillGrid() {
         const col = cell.dataset.col;
         board[row][col] = randomColor;
         cell.className = `cell ${randomColor}`;
+        cellCounts[randomColor]++; // Incrementar el contador del color
     });
     checkPatterns();
 }
@@ -198,8 +204,10 @@ function removePulsatingCells(matches) {
         // Vaciar las celdas marcadas
         matches.forEach(coord => {
             const [row, col] = coord.split(',').map(Number);
+            const color = board[row][col];
             board[row][col] = null; // Vaciar la celda
             cellReferences[row][col].className = 'cell'; // Limpiar la clase de la celda
+            cellCounts[color]--; // Decrementar el contador del color
         });
 
         let newMatches = new Set(); // Para almacenar nuevas coincidencias formadas durante la caída
@@ -227,6 +235,7 @@ function removePulsatingCells(matches) {
                 const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
                 board[row][col] = newColor;
                 cellReferences[row][col].className = `cell ${newColor}`;
+                cellCounts[newColor]++; // Incrementar el contador del nuevo color
             }
         }
 
@@ -381,17 +390,17 @@ function chooseColor() {
 
 // Función para actualizar la muestra de colores
 function updateColorSamples() {
-      const threshold = getGameOverThreshold(rows, cols);
-        COLORS.forEach(color => {
-        const count = document.querySelectorAll(`.cell.${color}`).length;
+    const threshold = getGameOverThreshold(rows, cols);
+    COLORS.forEach(color => {
+        const count = cellCounts[color];
         const totalCells = rows * cols;
         const percent = ((count / totalCells) * 100).toFixed(2);
 
         const cellSample = document.querySelector(`.cell-sample.${color}`);
         cellSample.querySelector('span').textContent = count;
         cellSample.setAttribute('data-percentage', `${percent}%`);
-        
-         if (count >= threshold) {
+
+        if (count >= threshold) {
             cellSample.classList.add('blink-threshold');
         } else {
             cellSample.classList.remove('blink-threshold');
@@ -408,7 +417,7 @@ function getGameOverThreshold(rows, cols) {
 function checkGameOver() {
     const threshold = getGameOverThreshold(rows, cols);
     for (const color of COLORS) {
-        const count = document.querySelectorAll(`.cell.${color}`).length;
+        const count = cellCounts[color];
         if (count >= threshold) {
             const overlay = document.createElement('div');
             overlay.id = 'game-over-overlay';
@@ -424,7 +433,6 @@ function checkGameOver() {
         }
     }
 }
-
 
 // Inicializar con una grilla de 6x6 por defecto
 createGrid(rows, cols);
