@@ -161,10 +161,10 @@ function checkPatterns() {
             cell.classList.add('matched');
         });
 
-        // Iniciar el destello sincronizado durante 1 segundo
+        // Iniciar el destello sincronizado durante 2 segundos
         setTimeout(() => {
             removePulsatingCells(matches);
-        }, 1000);
+        }, 2000);
     } else {
         // No resetear cascadeMultiplier aquí
         isProcessing = false;
