@@ -116,13 +116,13 @@ body {
     border-style: solid;
 }
 
-.matched {
-    animation: rapidBlink 2s step-end;
+@keyframes rapidBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
 }
 
-@keyframes rapidBlink {
-    from { opacity: 1; }
-    to { opacity: 0; }
+.matched {
+    animation: rapidBlink 2s step-end;
 }
 
 
