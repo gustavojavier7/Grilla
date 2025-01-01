@@ -340,11 +340,9 @@ function resetGame() {
     fillGrid();
     updateColorSamples();
 
-    // Eliminar el overlay de "GAME OVER" si existe
+    // Ocultar el overlay de GAME OVER
     const overlay = document.getElementById('game-over-overlay');
-    if (overlay) {
-        overlay.remove();
-    }
+    overlay.style.display = 'none';
 }
 
 function incrementScoreAnimated(incrementBy, duration, steps) {
@@ -411,16 +409,14 @@ function checkGameOver() {
     for (const color of COLORS) {
         const count = cellCounts[color];
         if (count >= threshold) {
-            const overlay = document.createElement('div');
-            overlay.id = 'game-over-overlay';
-            overlay.innerHTML = `
-                <div id="game-over-message">
-                    <h1>GAME OVER</h1>
-                    <p>El color/patrón "${color}" alcanzó ${threshold} o más celdas.</p>
-                    <button id="restart-button" onclick="resetGame()">Reiniciar Juego</button>
-                </div>
-            `;
-            document.body.appendChild(overlay);
+            // Mostrar el overlay de GAME OVER
+            const overlay = document.getElementById('game-over-overlay');
+            const colorElement = document.getElementById('game-over-color');
+            const thresholdElement = document.getElementById('game-over-threshold');
+
+            colorElement.textContent = color;
+            thresholdElement.textContent = threshold;
+            overlay.style.display = 'block';
             return;
         }
     }
