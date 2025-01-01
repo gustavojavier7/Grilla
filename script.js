@@ -229,41 +229,29 @@ function removePulsatingCells(matches) {
 
         // Incremento de puntaje con animación
         const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
+        incrementScoreAnimated(scoreIncrement, 2000, 20);
 
-        // Aquí podrías añadir una animación de incremento si lo deseas, similar al ejemplo anterior
-        incrementScoreAnimated(scoreIncrement, 2000, 20); // 2000ms duración total, 20 pasos
-
-        setTimeout(() => {
-            removePulsatingCells(newMatches);
-        }, 1000);
+        removePulsatingCells(newMatches); // Llamada recursiva sin retraso
     } else {
-        // Calcular el puntaje final basado en la cascada completa
+        // Calcular puntaje final y permitir interacciones
         let finalPoints = totalRemovedThisCascade * roundsInCascade;
         score += finalPoints;
-        let scoreBeforeIncrement = score - finalPoints;
-        updateScoreDisplay(); // Usar la función mejorada para mostrar el puntaje con parpadeo
+        updateScoreDisplay();
 
-        // Resetear los contadores
+        // Resetear contadores
         cascadeMultiplier = 1;
-        roundsInCascade = 1; // Resetear a 1 para la siguiente cascada
+        roundsInCascade = 1;
         totalRemovedThisCascade = 0;
 
-        isProcessing = false;
+        isProcessing = false; // Habilitar interacciones
         const cells = document.querySelectorAll('.cell');
-        cells.forEach(cell => cell.classList.remove('processing')); // Permitir interacciones
+        cells.forEach(cell => cell.classList.remove('processing'));
 
-        // Aplicar parpadeo del puntaje solo si hubo incremento
-        if (scoreBeforeIncrement < score) {
-            applyScoreBlink();
-        }
-        
-        // Actualizar el conteo de celdas de muestra
-        updateColorSamples();
-
-        // Verificar si el jugador ha ganado
-        checkGameOver();
+        // Aplicar parpadeo si el puntaje cambió
+        applyScoreBlink();
     }
 }
+
 function checkNewMatches() {
     const rows = board.length;
     const cols = board[0].length;
@@ -350,21 +338,14 @@ function incrementScoreAnimated(incrementBy, duration, steps) {
     }, duration / steps);
 }
 
-function checkForScoreChange(finalScore) {
-    const currentScore = score;
-    setTimeout(() => {
-        if (currentScore === finalScore) {
-            applyScoreBlink(); // Aplicar parpadeo si el puntaje no ha cambiado
-        }
-    }, 1000); // Esperar 1 segundo para verificar si el puntaje no ha cambiado
-}
-
 function applyScoreBlink() {
-    const scoreElement = document.getElementById('current-score');
-    scoreElement.classList.add('blink-score');
-    setTimeout(() => {
-        scoreElement.classList.remove('blink-score');
-    }, 2000); // Parpadeo durante 2 segundos
+    if (!isProcessing) {
+        const scoreElement = document.getElementById('current-score');
+        scoreElement.classList.add('blink-score');
+        setTimeout(() => {
+            scoreElement.classList.remove('blink-score');
+        }, 2000); // Duración del parpadeo
+    }
 }
 
 // Función para manejar la elección de color/patrón
