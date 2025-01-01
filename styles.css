@@ -239,3 +239,44 @@ button:hover {
 .blink-threshold {
     animation: rapidBlink 1s infinite ease-in-out;
 }
+#game-over-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8); /* Fondo negro semitransparente */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Asegura que esté sobre todo */
+}
+
+#game-over-message {
+    text-align: center;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    background: rgba(255, 255, 255, 0.1); /* Fondo claro semitransparente */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+#game-over-message h1 {
+    font-size: 48px;
+    margin: 0 0 20px;
+}
+
+#restart-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#restart-button:hover {
+    background-color: #0056b3;
+}
