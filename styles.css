@@ -100,8 +100,8 @@ body {
 .magenta { background-color: magenta; }
 
 @keyframes rapidBlink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+    0%, 33.33%, 66.66%, 100% { opacity: 1; } /* Estado completamente opaco */
+    16.66%, 50%, 83.33% { opacity: 0; } /* Estado completamente transparente */
 }
 
 @keyframes borderPulse {
