@@ -400,11 +400,21 @@ function checkGameOver() {
     for (const color of COLORS) {
         const count = document.querySelectorAll(`.cell.${color}`).length;
         if (count >= threshold) {
-            alert(`Game Over. El color/patrón "${color}" alcanzó ${threshold} o más celdas.`);
+            const overlay = document.createElement('div');
+            overlay.id = 'game-over-overlay';
+            overlay.innerHTML = `
+                <div id="game-over-message">
+                    <h1>GAME OVER</h1>
+                    <p>El color/patrón "${color}" alcanzó ${threshold} o más celdas.</p>
+                    <button id="restart-button" onclick="resetGame()">Reiniciar Juego</button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
             return;
         }
     }
 }
+
 
 // Inicializar con una grilla de 6x6 por defecto
 createGrid(rows, cols);
