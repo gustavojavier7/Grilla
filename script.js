@@ -164,7 +164,7 @@ function checkPatterns() {
         // Iniciar el destello sincronizado durante 1 segundo
         setTimeout(() => {
             removePulsatingCells(matches);
-        }, 1000);
+        }, 0);
     } else {
         // No resetear cascadeMultiplier aquí
         isProcessing = false;
