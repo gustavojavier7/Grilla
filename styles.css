@@ -117,11 +117,7 @@ body {
 }
 
 .matched {
-    animation: rapidBlink 1s infinite ease-in-out; /* Duración total de 1 segundo, repitiendo infinitamente */
-}
-@keyframes rapidBlink {
-    0%, 100% { opacity: 1; }
-    50%      { opacity: 0; }
+    animation: rapidBlink 1.5s infinite ease-in-out; /* Duración total de 1 segundo, repitiendo infinitamente */
 }
 button {
     padding: 10px 20px;
