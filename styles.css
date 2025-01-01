@@ -117,13 +117,14 @@ body {
 }
 
 .matched {
-  animation: rapidBlink 0.333s step-end 3; 
+    animation: rapidBlink 2s step-end;
 }
 
 @keyframes rapidBlink {
-  from { opacity: 1; }
-  to   { opacity: 0; }
+    from { opacity: 1; }
+    to { opacity: 0; }
 }
+
 
 button {
     padding: 10px 20px;
