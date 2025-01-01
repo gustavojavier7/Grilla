@@ -216,22 +216,26 @@ function removePulsatingCells(matches) {
     // Verificar si hay nuevas coincidencias después de la caída
     newMatches = checkNewMatches();
     if (newMatches.size > 0) {
-        newMatches.forEach(coord => {
-            const [row, col] = coord.split(',').map(Number);
-            const cell = cellReferences[row][col];
-            cell.classList.add('matched');
-        });
+        // Aquí se añade el retraso para hacer la cascada más perceptible
+        setTimeout(() => {
+            newMatches.forEach(coord => {
+                const [row, col] = coord.split(',').map(Number);
+                const cell = cellReferences[row][col];
+                cell.classList.add('matched');
+            });
 
-        // Incrementar exponencialmente roundsInCascade
-        const n = Math.log2(roundsInCascade) + 1;
-        roundsInCascade = Math.pow(2, n);
-        totalRemovedThisCascade += newMatches.size;
+            // Incrementar exponencialmente roundsInCascade
+            const n = Math.log2(roundsInCascade) + 1;
+            roundsInCascade = Math.pow(2, n);
+            totalRemovedThisCascade += newMatches.size;
 
-        // Incremento de puntaje con animación
-        const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
-        incrementScoreAnimated(scoreIncrement, 2000, 20);
+            // Incremento de puntaje con animación
+            const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
+            incrementScoreAnimated(scoreIncrement, 2000, 20);
 
-        removePulsatingCells(newMatches); // Llamada recursiva sin retraso
+            // Llamada recursiva con el retraso
+            removePulsatingCells(newMatches);
+        }, 500); // 500ms de retraso antes de la siguiente ronda de cascada
     } else {
         // Calcular puntaje final y permitir interacciones
         let finalPoints = totalRemovedThisCascade * roundsInCascade;
@@ -251,7 +255,6 @@ function removePulsatingCells(matches) {
         applyScoreBlink();
     }
 }
-
 function checkNewMatches() {
     const rows = board.length;
     const cols = board[0].length;
