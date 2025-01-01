@@ -179,49 +179,67 @@ function removePulsatingCells(matches) {
     const rows = board.length;
     const cols = board[0].length;
 
+    // Aquí, si matches contiene celdas que ya estaban marcadas como 'matched',
+    // primero quitar la clase para reiniciar la animación
     matches.forEach(coord => {
         const [row, col] = coord.split(',').map(Number);
-        board[row][col] = null; // Vaciar la celda
-        cellReferences[row][col].className = 'cell'; // Limpiar la clase de la celda
+        const cell = cellReferences[row][col];
+        cell.classList.remove('matched'); // Quitar la clase si ya estaba
     });
 
-    let newMatches = new Set(); // Para almacenar nuevas coincidencias formadas durante la caída
+    // Luego, aplicar la animación
+    matches.forEach(coord => {
+        const [row, col] = coord.split(',').map(Number);
+        const cell = cellReferences[row][col];
+        cell.classList.add('matched'); // Añadir la clase para iniciar el parpadeo
+    });
 
-    for (let col = 0; col < cols; col++) {
-        let emptySpaceCount = 0;
+    // Iniciar el destello sincronizado durante 2 segundos
+    setTimeout(() => {
+        // Vaciar las celdas marcadas
+        matches.forEach(coord => {
+            const [row, col] = coord.split(',').map(Number);
+            board[row][col] = null; // Vaciar la celda
+            cellReferences[row][col].className = 'cell'; // Limpiar la clase de la celda
+        });
 
-        for (let row = rows - 1; row >= 0; row--) {
-            if (board[row][col] === null) {
-                emptySpaceCount++;
-            } else if (emptySpaceCount > 0) {
-                // Mover la celda hacia abajo para llenar el espacio vacío
-                const newRow = row + emptySpaceCount;
-                board[newRow][col] = board[row][col];
-                cellReferences[newRow][col].className = `cell ${board[newRow][col]}`;
+        let newMatches = new Set(); // Para almacenar nuevas coincidencias formadas durante la caída
 
-                // Limpiar la celda original
-                board[row][col] = null;
-                cellReferences[row][col].className = 'cell';
+        for (let col = 0; col < cols; col++) {
+            let emptySpaceCount = 0;
+
+            for (let row = rows - 1; row >= 0; row--) {
+                if (board[row][col] === null) {
+                    emptySpaceCount++;
+                } else if (emptySpaceCount > 0) {
+                    // Mover la celda hacia abajo para llenar el espacio vacío
+                    const newRow = row + emptySpaceCount;
+                    board[newRow][col] = board[row][col];
+                    cellReferences[newRow][col].className = `cell ${board[newRow][col]}`;
+
+                    // Limpiar la celda original
+                    board[row][col] = null;
+                    cellReferences[row][col].className = 'cell';
+                }
+            }
+
+            // Llenar las celdas superiores que ahora están vacías
+            for (let row = 0; emptySpaceCount > 0; row++, emptySpaceCount--) {
+                const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+                board[row][col] = newColor;
+                cellReferences[row][col].className = `cell ${newColor}`;
             }
         }
 
-        // Llenar las celdas superiores que ahora están vacías
-        for (let row = 0; emptySpaceCount > 0; row++, emptySpaceCount--) {
-            const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-            board[row][col] = newColor;
-            cellReferences[row][col].className = `cell ${newColor}`;
-        }
-    }
-
-    // Verificar si hay nuevas coincidencias después de la caída
-    newMatches = checkNewMatches();
-    if (newMatches.size > 0) {
-        // Aquí se añade el retraso para hacer la cascada más perceptible
-        setTimeout(() => {
+        // Verificar si hay nuevas coincidencias después de la caída
+        newMatches = checkNewMatches();
+        if (newMatches.size > 0) {
+            // Aquí, aplicar el mismo procedimiento para nuevas coincidencias
             newMatches.forEach(coord => {
                 const [row, col] = coord.split(',').map(Number);
                 const cell = cellReferences[row][col];
-                cell.classList.add('matched');
+                cell.classList.remove('matched'); // Quitar la clase para reiniciar la animación
+                cell.classList.add('matched'); // Añadir la clase para iniciar el parpadeo
             });
 
             // Incrementar exponencialmente roundsInCascade
@@ -233,28 +251,30 @@ function removePulsatingCells(matches) {
             const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
             incrementScoreAnimated(scoreIncrement, 2000, 20);
 
-            // Llamada recursiva con el retraso
-            removePulsatingCells(newMatches);
-        }, 500); // 500ms de retraso antes de la siguiente ronda de cascada
-    } else {
-        // Calcular puntaje final y permitir interacciones
-        let finalPoints = totalRemovedThisCascade * roundsInCascade;
-        score += finalPoints;
-        updateScoreDisplay();
+            setTimeout(() => {
+                removePulsatingCells(newMatches);
+            }, 500); // 500ms de retraso antes de la siguiente ronda de cascada
+        } else {
+            // Calcular puntaje final y permitir interacciones
+            let finalPoints = totalRemovedThisCascade * roundsInCascade;
+            score += finalPoints;
+            updateScoreDisplay();
 
-        // Resetear contadores
-        cascadeMultiplier = 1;
-        roundsInCascade = 1;
-        totalRemovedThisCascade = 0;
+            // Resetear contadores
+            cascadeMultiplier = 1;
+            roundsInCascade = 1;
+            totalRemovedThisCascade = 0;
 
-        isProcessing = false; // Habilitar interacciones
-        const cells = document.querySelectorAll('.cell');
-        cells.forEach(cell => cell.classList.remove('processing'));
+            isProcessing = false; // Habilitar interacciones
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => cell.classList.remove('processing'));
 
-        // Aplicar parpadeo si el puntaje cambió
-        applyScoreBlink();
-    }
+            // Aplicar parpadeo si el puntaje cambió
+            applyScoreBlink();
+        }
+    }, 2000); // 2 segundos de destello antes de eliminar las celdas
 }
+
 function checkNewMatches() {
     const rows = board.length;
     const cols = board[0].length;
