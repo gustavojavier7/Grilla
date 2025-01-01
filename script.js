@@ -281,6 +281,7 @@ function removePulsatingCells(matches) {
             applyScoreBlink();
         }
     }, 1000); // 1 segundo de parpadeo antes de eliminar las celdas
+     updateColorSamples(); 
 }
 function checkNewMatches() {
     const rows = board.length;
