@@ -9,6 +9,19 @@
         button:disabled {
             opacity: 0.5;
         }
+        #game-over-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding-top: 20%;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
@@ -35,6 +48,15 @@
                 <div class="cell-sample rayado"><span>0</span></div>
                 <div class="cell-sample magenta"><span>0</span></div>
             </div>
+        </div>
+    </div>
+
+    <!-- Cartel de GAME OVER ya presente y oculto -->
+    <div id="game-over-overlay">
+        <div id="game-over-message">
+            <h1>GAME OVER</h1>
+            <p>El color/patrón "<span id="game-over-color"></span>" alcanzó <span id="game-over-threshold"></span> o más celdas.</p>
+            <button id="restart-button" onclick="resetGame()">Reiniciar Juego</button>
         </div>
     </div>
 
