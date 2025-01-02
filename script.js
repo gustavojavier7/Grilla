@@ -335,6 +335,13 @@ function resetGame() {
     cascadeMultiplier = 1;
     roundsInCascade = 1;
     totalRemovedThisCascade = 0;
+    
+    // Reiniciar los contadores de celdas
+    cellCounts = {};
+    COLORS.forEach(color => {
+        cellCounts[color] = 0;
+    });
+
     updateScoreDisplay();
     createGrid(rows, cols);
     fillGrid();
@@ -342,9 +349,10 @@ function resetGame() {
 
     // Ocultar el overlay de GAME OVER
     const overlay = document.getElementById('game-over-overlay');
-    overlay.style.display = 'none';
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
 }
-
 function incrementScoreAnimated(incrementBy, duration, steps) {
     const targetScore = score + incrementBy;
     const stepSize = Math.round(incrementBy / steps); // Truncar al entero más cercano
