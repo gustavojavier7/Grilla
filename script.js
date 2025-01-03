@@ -410,9 +410,16 @@ function updateColorSamples() {
 function getGameOverThreshold(rows, cols) {
     const baseThreshold = 50;
     const baseGridSize = 15 * 15;
+
+    // No umbral para 6x6 y 10x10
+    if ((rows === 6 && cols === 6) || (rows === 10 && cols === 10)) {
+        return Infinity; // O cualquier valor muy alto para asegurar que nunca se alcance
+    }
+
     const currentGridSize = rows * cols;
     return Math.floor((baseThreshold / baseGridSize) * currentGridSize);
 }
+
 function showGameOver(color, threshold) {
     // Mostrar el overlay de GAME OVER
     const overlay = document.getElementById('game-over-overlay');
