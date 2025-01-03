@@ -51,14 +51,10 @@ function createGrid(rows, cols) {
 }
 
 function fillGrid() {
-    function fillGrid() {
     if (isProcessing) return;
     resetScore();
     totalCellsRemoved = 0;  // Resetear el contador
     updateCellsRemovedDisplay();  // Actualizar la vista
-
-    if (isProcessing) return; // Evitar que se rellenen celdas mientras se procesa
-    resetScore(); // Resetear el puntaje al rellenar celdas
 
     // Retrieve the selected difficulty level
     const difficulty = document.getElementById('difficulty').value;
@@ -80,7 +76,6 @@ function fillGrid() {
     });
     checkPatterns();
 }
-
 function handleCellClick(cell) {
     if (isProcessing) return; // Ignorar clics mientras el efecto cascada o parpadeo está activo
 
