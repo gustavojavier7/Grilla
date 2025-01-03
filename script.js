@@ -398,6 +398,9 @@ function updateColorSamples() {
 
         if (count >= threshold) {
             cellSample.classList.add('blink-threshold');
+            
+            // Aquí se activa el fin del juego inmediatamente si se alcanza el umbral
+            showGameOver(color, threshold);
         } else {
             cellSample.classList.remove('blink-threshold');
         }
@@ -410,23 +413,20 @@ function getGameOverThreshold(rows, cols) {
     const currentGridSize = rows * cols;
     return Math.floor((baseThreshold / baseGridSize) * currentGridSize);
 }
+function showGameOver(color, threshold) {
+    // Mostrar el overlay de GAME OVER
+    const overlay = document.getElementById('game-over-overlay');
+    const colorElement = document.getElementById('game-over-color');
+    const thresholdElement = document.getElementById('game-over-threshold');
 
-function checkGameOver() {
-    const threshold = getGameOverThreshold(rows, cols);
-    for (const color of COLORS) {
-        const count = cellCounts[color];
-        if (count >= threshold) {
-            // Mostrar el overlay de GAME OVER
-            const overlay = document.getElementById('game-over-overlay');
-            const colorElement = document.getElementById('game-over-color');
-            const thresholdElement = document.getElementById('game-over-threshold');
-
-            colorElement.textContent = color;
-            thresholdElement.textContent = threshold;
-            overlay.style.display = 'block';
-            return;
-        }
-    }
+    colorElement.textContent = color;
+    thresholdElement.textContent = threshold;
+    overlay.style.display = 'block';
+    
+    // Pausar el juego o hacer que no sea interactivo
+    isProcessing = true;
+    const cells = document.querySelectorAll('.cell');
+    cells.forEach(cell => cell.classList.add('processing'));
 }
 
 // Inicializar con una grilla de 6x6 por defecto
