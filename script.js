@@ -11,6 +11,7 @@ let totalRemovedThisCascade = 0;
 let rows = 6; // Valor por defecto
 let cols = 6; // Valor por defecto
 let cellCounts = {};
+let totalCellsRemoved = 0;
 COLORS.forEach(color => {
     cellCounts[color] = 0;
 });
@@ -181,6 +182,15 @@ function checkPatterns() {
 function removePulsatingCells(matches) {
     const rows = board.length;
     const cols = board[0].length;
+
+     matches.forEach(coord => {
+        const [row, col] = coord.split(',').map(Number);
+        const color = board[row][col];
+        board[row][col] = null; // Vaciar la celda
+        cellReferences[row][col].className = 'cell'; // Limpiar la clase de la celda
+        cellCounts[color]--; // Decrementar el contador del color
+        totalCellsRemoved++; // Incrementar el contador de celdas eliminadas
+    });
 
     // Primero, quitar la clase 'matched' para reiniciar la animación
     matches.forEach(coord => {
