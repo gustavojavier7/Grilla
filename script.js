@@ -184,16 +184,6 @@ function removePulsatingCells(matches) {
     const rows = board.length;
     const cols = board[0].length;
 
-     matches.forEach(coord => {
-        const [row, col] = coord.split(',').map(Number);
-        const color = board[row][col];
-        board[row][col] = null; // Vaciar la celda
-        cellReferences[row][col].className = 'cell'; // Limpiar la clase de la celda
-        cellCounts[color]--; // Decrementar el contador del color
-        totalCellsRemoved++; // Incrementar el contador de celdas eliminadas
-    });
-     updateCellsRemovedDisplay();
-
     // Primero, quitar la clase 'matched' para reiniciar la animación
     matches.forEach(coord => {
         const [row, col] = coord.split(',').map(Number);
@@ -217,7 +207,9 @@ function removePulsatingCells(matches) {
             board[row][col] = null; // Vaciar la celda
             cellReferences[row][col].className = 'cell'; // Limpiar la clase de la celda
             cellCounts[color]--; // Decrementar el contador del color
+            totalCellsRemoved++; // Incrementar el contador de celdas eliminadas
         });
+        updateCellsRemovedDisplay(); // Actualizar el contador visible
 
         let newMatches = new Set(); // Para almacenar nuevas coincidencias formadas durante la caída
 
