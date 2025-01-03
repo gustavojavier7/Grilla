@@ -51,6 +51,12 @@ function createGrid(rows, cols) {
 }
 
 function fillGrid() {
+    function fillGrid() {
+    if (isProcessing) return;
+    resetScore();
+    totalCellsRemoved = 0;  // Resetear el contador
+    updateCellsRemovedDisplay();  // Actualizar la vista
+
     if (isProcessing) return; // Evitar que se rellenen celdas mientras se procesa
     resetScore(); // Resetear el puntaje al rellenar celdas
 
@@ -191,6 +197,7 @@ function removePulsatingCells(matches) {
         cellCounts[color]--; // Decrementar el contador del color
         totalCellsRemoved++; // Incrementar el contador de celdas eliminadas
     });
+     updateCellsRemovedDisplay();
 
     // Primero, quitar la clase 'matched' para reiniciar la animación
     matches.forEach(coord => {
@@ -344,6 +351,8 @@ function resetGame() {
     cascadeMultiplier = 1;
     roundsInCascade = 1;
     totalRemovedThisCascade = 0;
+    totalCellsRemoved = 0;  // Resetear el contador
+    updateCellsRemovedDisplay();
     
     // Reiniciar los contadores de celdas
     cellCounts = {};
@@ -445,7 +454,9 @@ function showGameOver(color, threshold) {
     const cells = document.querySelectorAll('.cell');
     cells.forEach(cell => cell.classList.add('processing'));
 }
-
+function updateCellsRemovedDisplay() {
+    document.getElementById('cells-removed').textContent = totalCellsRemoved;
+}
 // Inicializar con una grilla de 6x6 por defecto
 createGrid(rows, cols);
 updateColorSamples(); // Actualizar la muestra de colores al inicio del juego
