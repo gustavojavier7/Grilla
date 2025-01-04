@@ -48,8 +48,6 @@ function manageClock() {
         // Si isProcessing es false, iniciamos o reanudamos el reloj
         clockIntervalId = setInterval(updateClock, 1000);
     }
-    // Actualizar la visibilidad de los separadores
-    updateClock();
 }
 
 function checkSelections() {
