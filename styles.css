@@ -240,7 +240,9 @@ button:hover {
 .blink-threshold {
     animation: rapidBlink 0.6s infinite;
 }
-
+.blink-cells-removed {
+    animation: blink 1s infinite;
+}
 #game-over-overlay {
     position: fixed;
     top: 0;
