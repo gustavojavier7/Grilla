@@ -281,13 +281,12 @@ button:hover {
 }
 
 #cells-removed {
-    font-size: 25px;
-    font-weight: bold;
-    color: #ffffff;
-    background-color: #333333;
-    padding: 10px;
-    border-radius: 5px;
-    text-align: center;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    transition: all 0.3s ease;
+    font-size: 25px; /* Para que coincida con el tamaño de fuente unificado */
+    font-family: 'Digital-7', monospace; /* Para que coincida con la fuente unificada */
+    color: #ffff00; /* Para que coincida con el color unificado */
+    text-shadow:
+        -1px -1px 0 #000,
+         1px -1px 0 #000,
+        -1px 1px 0 #000,
+         1px 1px 0 #000; /* Para que coincida con la sombra unificada */
 }
