@@ -4,7 +4,7 @@ let board = [];
 let clockIntervalId;
 let cellReferences = [];
 let firstSelected = null;
-let isProcessing = false; // Indica si el efecto cascada o parpadeo está en proceso
+let isProcessing = false; // Indica si el efecto cascada o blinkedo está en proceso
 let score = 0;
 let cascadeMultiplier = 1;
 let roundsInCascade = 1; // Inicializado en 1
@@ -18,6 +18,7 @@ COLORS.forEach(color => {
 });
 
 function updateClock() {
+    // Solo actualizamos el tiempo, no manejamos la animación aquí
     const now = new Date();
     let hours = now.getHours().toString().padStart(2, '0');
     let minutes = now.getMinutes().toString().padStart(2, '0');
@@ -30,6 +31,7 @@ function updateClock() {
 
 function manageClock() {
     if (isProcessing) {
+        // Si isProcessing es true, pausamos el reloj y detenemos la animación de los separadores inmediatamente
         if (clockIntervalId) {
             clearInterval(clockIntervalId);
             clockIntervalId = null;
@@ -39,10 +41,15 @@ function manageClock() {
             separator.classList.remove('blink');
         });
     } else {
+        // Si isProcessing es false, iniciamos o reanudamos el reloj y la animación de los separadores
         if (!clockIntervalId) {
             clockIntervalId = setInterval(updateClock, 1000);
-            updateClock(); // Llamada inmediata para asegurar que los separadores vuelvan a parpadear al reanudar
+            updateClock(); // Llamada inmediata para asegurar que el tiempo mostrado es correcto al reanudar
         }
+        const separators = document.querySelectorAll('.separador');
+        separators.forEach(separator => {
+            separator.classList.add('blink');
+        });
     }
 }
 
@@ -106,8 +113,9 @@ function fillGrid() {
     });
     checkPatterns();
 }
+
 function handleCellClick(cell) {
-    if (isProcessing) return; // Ignorar clics mientras el efecto cascada o parpadeo está activo
+    if (isProcessing) return; // Ignorar clics mientras el efecto cascada o blinkedo está activo
 
     const row = parseInt(cell.dataset.row);
     const col = parseInt(cell.dataset.col);
@@ -204,7 +212,7 @@ function checkPatterns() {
         // No resetear cascadeMultiplier aquí
         isProcessing = false;
         cells.forEach(cell => cell.classList.remove('processing')); // Permitir interacciones
-         }
+    }
 }
 
 function removePulsatingCells(matches) {
@@ -225,93 +233,94 @@ function removePulsatingCells(matches) {
         cell.classList.add('matched'); // Añadir la clase para iniciar el blinkedo
     });
 
-    // Iniciar el destello sincronizado durante 1 segundo
-    setTimeout(() => {
-        // Vaciar las celdas marcadas
-        matches.forEach(coord => {
-            const [row, col] = coord.split(',').map(Number);
-            const color = board[row][col];
-            board[row][col] = null; // Vaciar la celda
-            cellReferences[row][col].className = 'cell'; // Limpiar la clase de la celda
-            cellCounts[color]--; // Decrementar el contador del color
-            totalCellsRemoved++; // Incrementar el contador de celdas eliminadas
-        });
-        updateCellsRemovedDisplay(); // Actualizar el contador visible
+            // Iniciar el destello sincronizado durante 1 segundo
+        setTimeout(() => {
+            // Vaciar las celdas marcadas
+            matches.forEach(coord => {
+                const [row, col] = coord.split(',').map(Number);
+                const color = board[row][col];
+                board[row][col] = null; // Vaciar la celda
+                cellReferences[row][col].className = 'cell'; // Limpiar la clase de la celda
+                cellCounts[color]--; // Decrementar el contador del color
+                totalCellsRemoved++; // Incrementar el contador de celdas eliminadas
+            });
+            updateCellsRemovedDisplay(); // Actualizar el contador visible
 
-        let newMatches = new Set(); // Para almacenar nuevas coincidencias formadas durante la caída
+            let newMatches = new Set(); // Para almacenar nuevas coincidencias formadas durante la caída
 
-        for (let col = 0; col < cols; col++) {
-            let emptySpaceCount = 0;
+            for (let col = 0; col < cols; col++) {
+                let emptySpaceCount = 0;
 
-            for (let row = rows - 1; row >= 0; row--) {
-                if (board[row][col] === null) {
-                    emptySpaceCount++;
-                } else if (emptySpaceCount > 0) {
-                    // Mover la celda hacia abajo para llenar el espacio vacío
-                    const newRow = row + emptySpaceCount;
-                    board[newRow][col] = board[row][col];
-                    cellReferences[newRow][col].className = `cell ${board[newRow][col]}`;
+                for (let row = rows - 1; row >= 0; row--) {
+                    if (board[row][col] === null) {
+                        emptySpaceCount++;
+                    } else if (emptySpaceCount > 0) {
+                        // Mover la celda hacia abajo para llenar el espacio vacío
+                        const newRow = row + emptySpaceCount;
+                        board[newRow][col] = board[row][col];
+                        cellReferences[newRow][col].className = `cell ${board[newRow][col]}`;
 
-                    // Limpiar la celda original
-                    board[row][col] = null;
-                    cellReferences[row][col].className = 'cell';
+                        // Limpiar la celda original
+                        board[row][col] = null;
+                        cellReferences[row][col].className = 'cell';
+                    }
+                }
+
+                // Llenar las celdas superiores que ahora están vacías
+                for (let row = 0; emptySpaceCount > 0; row++, emptySpaceCount--) {
+                    const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+                    board[row][col] = newColor;
+                    cellReferences[row][col].className = `cell ${newColor}`;
+                    cellCounts[newColor]++; // Incrementar el contador del nuevo color
                 }
             }
 
-            // Llenar las celdas superiores que ahora están vacías
-            for (let row = 0; emptySpaceCount > 0; row++, emptySpaceCount--) {
-                const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-                board[row][col] = newColor;
-                cellReferences[row][col].className = `cell ${newColor}`;
-                cellCounts[newColor]++; // Incrementar el contador del nuevo color
+            // Verificar si hay nuevas coincidencias después de la caída
+            newMatches = checkNewMatches();
+            if (newMatches.size > 0) {
+                // Aquí, aplicar el mismo procedimiento para nuevas coincidencias
+                newMatches.forEach(coord => {
+                    const [row, col] = coord.split(',').map(Number);
+                    const cell = cellReferences[row][col];
+                    cell.classList.remove('matched'); // Quitar la clase para reiniciar la animación
+                    cell.classList.add('matched'); // Añadir la clase para iniciar el blinkedo
+                });
+
+                // Incrementar exponencialmente roundsInCascade
+                const n = Math.log2(roundsInCascade) + 1;
+                roundsInCascade = Math.pow(2, n);
+                totalRemovedThisCascade += newMatches.size;
+
+                // Incremento de puntaje con animación
+                const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
+                incrementScoreAnimated(scoreIncrement, 2000, 20);
+
+                setTimeout(() => {
+                    removePulsatingCells(newMatches);
+                }, 1000); // 1 segundo de espera antes de la siguiente ronda de cascada
+            } else {
+                isProcessing = false; // Habilitar interacciones
+                manageClock(); // Reanudar el reloj y actualizar los separadores
+                let finalPoints = totalRemovedThisCascade * roundsInCascade;
+                score += finalPoints;
+                updateScoreDisplay();
+
+                // Resetear contadores
+                cascadeMultiplier = 1;
+                roundsInCascade = 1;
+                totalRemovedThisCascade = 0;
+
+                                isProcessing = false; // Habilitar interacciones
+                manageClock(); // Llamada para reanudar el reloj
+                const cells = document.querySelectorAll('.cell');
+                cells.forEach(cell => cell.classList.remove('processing'));
+
+                // Aplicar blinkedo si el puntaje cambió
+                applyScoreBlink();
             }
-        }
-
-        // Verificar si hay nuevas coincidencias después de la caída
-        newMatches = checkNewMatches();
-        if (newMatches.size > 0) {
-            // Aquí, aplicar el mismo procedimiento para nuevas coincidencias
-            newMatches.forEach(coord => {
-                const [row, col] = coord.split(',').map(Number);
-                const cell = cellReferences[row][col];
-                cell.classList.remove('matched'); // Quitar la clase para reiniciar la animación
-                cell.classList.add('matched'); // Añadir la clase para iniciar el blinkedo
-            });
-
-            // Incrementar exponencialmente roundsInCascade
-            const n = Math.log2(roundsInCascade) + 1;
-            roundsInCascade = Math.pow(2, n);
-            totalRemovedThisCascade += newMatches.size;
-
-            // Incremento de puntaje con animación
-            const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
-            incrementScoreAnimated(scoreIncrement, 2000, 20);
-
-            setTimeout(() => {
-                removePulsatingCells(newMatches);
-            }, 1000); // 1 segundo de espera antes de la siguiente ronda de cascada
-        } else {
-            isProcessing = false; // Habilitar interacciones
-            manageClock(); // Reanudar el reloj y actualizar los separadores
-            let finalPoints = totalRemovedThisCascade * roundsInCascade;
-            score += finalPoints;
-            updateScoreDisplay();
-
-            // Resetear contadores
-            cascadeMultiplier = 1;
-            roundsInCascade = 1;
-            totalRemovedThisCascade = 0;
-
-            isProcessing = false; // Habilitar interacciones
-            manageClock(); // Llamada para reanudar el reloj
-            const cells = document.querySelectorAll('.cell');
-            cells.forEach(cell => cell.classList.remove('processing'));
-
-            // Aplicar blinkedo si el puntaje cambió
-            applyScoreBlink();
-        }
-    }, 1000); // 1 segundo de blinkedo antes de eliminar las celdas
-    updateColorSamples();
+        }, 1000); // 1 segundo de blinkedo antes de eliminar las celdas
+        updateColorSamples();
+    }
 }
 
 function checkNewMatches() {
@@ -391,6 +400,7 @@ function resetGame() {
         overlay.style.display = 'none';
     }
 }
+
 function incrementScoreAnimated(incrementBy, duration, steps) {
     const targetScore = score + incrementBy;
     const stepSize = Math.round(incrementBy / steps); // Truncar al entero más cercano
@@ -404,11 +414,6 @@ function incrementScoreAnimated(incrementBy, duration, steps) {
             score = targetScore; // Asegurar que el puntaje final sea exacto
             updateScoreDisplay();
             clearInterval(intervalId);
-            // if (incrementBy > 0) {
-            //     setTimeout(() => {
-            //         checkForScoreChange(targetScore);
-            //     }, 1000); // Verificar después de 1 segundo
-            // }
         }
     }, duration / steps);
 }
@@ -419,7 +424,7 @@ function applyScoreBlink() {
         scoreElement.classList.add('blink-score');
         setTimeout(() => {
             scoreElement.classList.remove('blink-score');
-        }, 2000); // Duración del parpadeo
+        }, 2000); // Duración del blinkedo
     }
 }
 
@@ -474,18 +479,20 @@ function showGameOver(color, threshold) {
     const cells = document.querySelectorAll('.cell');
     cells.forEach(cell => cell.classList.add('processing'));
 }
+
 function updateCellsRemovedDisplay() {
     const cellsRemovedElement = document.getElementById('cells-removed');
     cellsRemovedElement.textContent = totalCellsRemoved;
 
-    // Aplicar el efecto de parpadeo
+    // Aplicar el efecto de blinkedo
     cellsRemovedElement.classList.add('blink-cells-removed');
     setTimeout(() => {
         cellsRemovedElement.classList.remove('blink-cells-removed');
-    }, 1000); // Duración del parpadeo (1 segundo)
+    }, 1000); // Duración del blinkedo (1 segundo)
 }
+
 // Inicializar con una grilla de 6x6 por defecto
 createGrid(rows, cols);
 updateColorSamples(); // Actualizar la muestra de colores al inicio del juego
 // Iniciar el reloj
-clockIntervalId = setInterval(updateClock, 1000); //
+manageClock(); // Se usa manageClock para iniciar el reloj en lugar de setInterval directamente
