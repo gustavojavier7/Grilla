@@ -42,11 +42,16 @@ function updateClock() {
 
 function manageClock() {
     if (isProcessing) {
-        // Si isProcessing es true, pausamos el reloj
+        // Si isProcessing es true, pausamos el reloj y detenemos la animación de los separadores inmediatamente
         clearInterval(clockIntervalId);
+        const separators = document.querySelectorAll('.separador');
+        separators.forEach(separator => {
+            separator.classList.remove('blink');
+        });
     } else {
-        // Si isProcessing es false, iniciamos o reanudamos el reloj
+        // Si isProcessing es false, iniciamos o reanudamos el reloj y la animación de los separadores
         clockIntervalId = setInterval(updateClock, 1000);
+        updateClock(); // Llamada inmediata para asegurar que los separadores vuelvan a parpadear al reanudar
     }
 }
 
