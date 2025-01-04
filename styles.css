@@ -100,8 +100,16 @@ body {
 }
 
 #score-display, #cells-removed-counter {
-    font-size: 18px;
-    font-weight: bold;
+    margin-top: 20px;
+    font-size: 39px;
+    text-align: left; /* Alinea el texto a la izquierda */
+    font-family: Arial, sans-serif; /* Cambia la fuente a Arial */
+    color: #ffff00; /* Mantiene el color amarillo */
+    text-shadow:
+        -1px -1px 0 #000,
+         1px -1px 0 #000,
+        -1px 1px 0 #000,
+         1px 1px 0 #000;
 }
 
 #color-samples {
