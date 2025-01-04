@@ -78,7 +78,7 @@ body {
     cursor: not-allowed;
 }
 
-#reloj, #score-display, cells-removed-counter {
+#reloj, #score-display, #cells-removed-counter {
     font-size: 25px;
     font-family: 'Digital-7', monospace;
     color: #ffff00; /* Color amarillo */
