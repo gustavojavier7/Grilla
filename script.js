@@ -491,5 +491,4 @@ function updateCellsRemovedDisplay() {
 createGrid(rows, cols);
 updateColorSamples(); // Actualizar la muestra de colores al inicio del juego
 // Iniciar el reloj
-updateClock(); // Llamada inicial para establecer el tiempo
 clockIntervalId = setInterval(updateClock, 1000); //
