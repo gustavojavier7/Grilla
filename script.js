@@ -27,20 +27,17 @@ function updateClock() {
     document.getElementById('minutos').textContent = minutes;
     document.getElementById('segundos').textContent = seconds;
 
-    // Manejar la visibilidad de los separadores basado en el estado de isProcessing
+    // Manejar la animación de los separadores basado en el estado de isProcessing
     const separators = document.querySelectorAll('.separador');
-    if (isProcessing) {
-        // Si isProcessing es true, aseguramos que los separadores sean visibles
-        separators.forEach(separator => {
-            separator.classList.remove('oculto'); // Asegura que no esté oculto
-            separator.style.visibility = 'visible'; // Hacemos visible el separador
-        });
-    } else {
-        // Si isProcessing es false, volvemos al comportamiento original de blinkedo
-        separators.forEach(separator => {
-            separator.classList.toggle('oculto'); // Alternar la visibilidad para el efecto blinkedo
-        });
-    }
+    separators.forEach(separator => {
+        if (isProcessing) {
+            // Si isProcessing es true, quitamos la animación de blinkedo
+            separator.style.animation = 'none';
+        } else {
+            // Si isProcessing es false, restauramos la animación de blinkedo
+            separator.style.animation = 'blink-animation 1s steps(2, start) infinite';
+        }
+    });
 }
 
 function manageClock() {
