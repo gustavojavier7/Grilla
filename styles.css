@@ -78,7 +78,7 @@ body {
     cursor: not-allowed;
 }
 
-#reloj, #score-display, #cells-removed-counter {
+#reloj, #score-display {
     font-size: 25px;
     font-family: 'Digital-7', monospace;
     color: #ffff00; /* Color amarillo */
@@ -88,6 +88,22 @@ body {
         -1px 1px 0 #000,
          1px 1px 0 #000;
     margin-top: 10px;
+}
+
+#cells-removed-counter {
+    font-size: 25px;
+    font-family: 'Digital-7', monospace;
+    color: #ffff00; /* Color amarillo */
+    text-shadow:
+        -1px -1px 0 #000,
+         1px -1px 0 #000,
+        -1px 1px 0 #000,
+         1px 1px 0 #000;
+    margin-top: 10px;
+    /* Ajustes para hacer el contenedor más compacto */
+    width: auto; /* Ajusta automáticamente el ancho al contenido */
+    white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
+    display: inline-block; /* Permite que el contenedor se ajuste al contenido */
 }
 
 #reloj .separador {
