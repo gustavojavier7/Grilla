@@ -18,20 +18,27 @@ COLORS.forEach(color => {
 });
 
 function updateClock() {
-    if (!isProcessing) {
-        const now = new Date();
-        let hours = now.getHours().toString().padStart(2, '0');
-        let minutes = now.getMinutes().toString().padStart(2, '0');
-        let seconds = now.getSeconds().toString().padStart(2, '0');
-        
-        document.getElementById('horas').textContent = hours;
-        document.getElementById('minutos').textContent = minutes;
-        document.getElementById('segundos').textContent = seconds;
+    const now = new Date();
+    let hours = now.getHours().toString().padStart(2, '0');
+    let minutes = now.getMinutes().toString().padStart(2, '0');
+    let seconds = now.getSeconds().toString().padStart(2, '0');
+    
+    document.getElementById('horas').textContent = hours;
+    document.getElementById('minutos').textContent = minutes;
+    document.getElementById('segundos').textContent = seconds;
 
-        // Alternar la visibilidad de los separadores
-        const separators = document.querySelectorAll('.separador');
+    // Manejar la visibilidad de los separadores basado en el estado de isProcessing
+    const separators = document.querySelectorAll('.separador');
+    if (isProcessing) {
+        // Si isProcessing es true, aseguramos que los separadores sean visibles
         separators.forEach(separator => {
-            separator.classList.toggle('oculto');
+            separator.classList.remove('oculto'); // Asegura que no esté oculto
+            separator.style.visibility = 'visible'; // Hacemos visible el separador
+        });
+    } else {
+        // Si isProcessing es false, volvemos al comportamiento original de blinkedo
+        separators.forEach(separator => {
+            separator.classList.toggle('oculto'); // Alternar la visibilidad para el efecto blinkedo
         });
     }
 }
