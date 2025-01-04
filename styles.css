@@ -36,8 +36,8 @@ body {
 }
 
 @keyframes blink-animation {
-    0%, 20%, 40%, 60%, 80%, 100% { visibility: visible; } /* Ajustamos los porcentajes para que sea visible menos tiempo */
-    10%, 30%, 50%, 70%, 90% { visibility: hidden; }
+    0%, 20%, 40%, 60% { visibility: visible; } /* Ajustamos los porcentajes para que sea visible menos tiempo */
+    70%, 90% { visibility: hidden; }
 }
 
 #main-container {
