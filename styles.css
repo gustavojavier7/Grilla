@@ -1,3 +1,14 @@
+:root {
+    --primary-bg-color: #222;
+    --text-color: #fff;
+    --highlight-color: #ffff00;
+    --font-size-large: 25px;
+    --font-stack: 'Digital-7', monospace;
+    --border-color: #fff;
+    --button-bg-color: #007BFF;
+    --button-hover-bg-color: #0056b3;
+}
+
 @font-face {
     font-family: 'Digital-7';
     src: url('fonts/digital-7.woff2') format('woff2'),
@@ -8,46 +19,46 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #222;
-    color: #fff;
+    background-color: var(--primary-bg-color);
+    color: var(--text-color);
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Alinea el contenido al inicio (izquierda) */
+    align-items: flex-start;
     justify-content: flex-start;
-    height: 100vh; /* Altura completa del navegador */
+    height: 100vh;
 }
 
 #main-container {
-    display: flex; /* Usamos flexbox para alinear los elementos hijos */
-    flex-direction: row; /* Alineamos los elementos en fila */
-    width: 100%; /* Asegura que ocupe todo el ancho disponible */
-    max-width: 100vw; /* Evita que se desborde del viewport */
-    gap: 10px; /* Espacio entre la grilla y los controles */
-    padding: 20px; /* Añadimos padding para separar del borde del viewport */
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 100vw;
+    gap: 10px;
+    padding: 20px;
 }
 
 #game-container {
-    width: 90vmin; /* Máximo tamaño basado en la ventana */
-    height: 90vmin; /* Máximo tamaño basado en la ventana */
+    width: 90vmin;
+    height: 90vmin;
     display: grid;
     gap: 5px;
     background-color: black;
-    border: 2px solid #fff;
+    border: 2px solid var(--border-color);
     padding: 10px;
     grid-template-rows: repeat(auto-fill, 1fr);
     grid-template-columns: repeat(auto-fill, 1fr);
-    flex-shrink: 0; /* Evita que se encoja */
+    flex-shrink: 0;
 }
 
 #controls-container {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Alinea los controles al inicio (izquierda) */
+    align-items: flex-start;
     justify-content: flex-start;
-    flex-grow: 1; /* Permite que este contenedor crezca para ocupar el espacio restante */
-    max-width: 700px; /* Limita el ancho máximo de los controles */
+    flex-grow: 1;
+    max-width: 700px;
 }
 
 #buttons-container {
@@ -68,8 +79,8 @@ body {
 }
 
 #buttons-container button {
-    background-color: #007bff;
-    color: white;
+    background-color: var(--button-bg-color);
+    color: var(--text-color);
     cursor: pointer;
 }
 
@@ -79,29 +90,29 @@ body {
 }
 
 #reloj, #score-display, #cells-removed-counter {
-    font-size: 25px; /* Unifica el tamaño de la fuente */
-    font-family: 'Digital-7', monospace; /* Unifica la fuente */
-    color: #ffff00; /* Unifica el color de la fuente a amarillo */
+    font-size: var(--font-size-large);
+    font-family: var(--font-stack);
+    color: var(--highlight-color);
     text-shadow:
         -1px -1px 0 #000,
          1px -1px 0 #000,
         -1px 1px 0 #000,
-         1px 1px 0 #000; /* Unifica la sombra del texto */
-    margin-top: 10px; /* Asegura un margen superior consistente */
-    text-align: left; /* Alinea el texto a la izquierda para consistencia */
+         1px 1px 0 #000;
+    margin-top: 10px;
+    text-align: left;
 }
 
 .separador {
-    visibility: visible; /* Asegura que el separador esté siempre visible */
+    visibility: visible;
 }
 
 .separador.blink {
-    animation: blink-animation 1s steps(2, start) infinite; /* Aplica la animación de parpadeo */
+    animation: blink-animation 1s steps(2, start) infinite;
 }
 
 @keyframes blink-animation {
-    0%, 50% { visibility: visible; } /* Visible durante el 50% del ciclo */
-    51%, 100% { visibility: hidden; } /* Oculto durante el 50% del ciclo */
+    0%, 50% { visibility: visible; }
+    51%, 100% { visibility: hidden; }
 }
 
 #color-samples {
@@ -121,47 +132,47 @@ body {
 }
 
 .cell {
-    aspect-ratio: 1 / 1; /* Relación cuadrada */
-    background-color: #222;
+    aspect-ratio: 1 / 1;
+    background-color: var(--primary-bg-color);
     border-radius: 5px;
     cursor: pointer;
     position: relative;
 }
 
 .cell.processing {
-    pointer-events: none; /* Bloquear eventos de puntero */
+    pointer-events: none;
 }
 
 .gris-ondas, .verde, .cyan, .puntos-blancos, .rayado, .magenta {
-    border: none; /* Eliminar bordes de las celdas coloreadas */
+    border: none;
 }
 
 .gris-ondas {
     background: repeating-radial-gradient(
         circle at 50% 50%,
-        #A9A9A9, /* Gris oscuro */
+        #A9A9A9,
         #A9A9A9 10px,
         #D3D3D3 10px,
-        #D3D3D3 20px /* Gris claro */
+        #D3D3D3 20px
     );
 }
 
 .verde {
     background: repeating-linear-gradient(
         45deg,
-        #008000, /* Color verde */
+        #008000,
         #008000 10px,
         #00ff00 10px,
-        #00ff00 20px /* Color verde claro */
+        #00ff00 20px
     );
 }
 
 .cyan { background-color: cyan; }
 
 .puntos-blancos {
-    background: radial-gradient(#ffffff 20%, transparent 20%), /* Color blanco */
-               radial-gradient(#ffffff 20%, transparent 20%); /* Color blanco */
-    background-color: #ff0000; /* Color rojo */
+    background: radial-gradient(#ffffff 20%, transparent 20%),
+               radial-gradient(#ffffff 20%, transparent 20%);
+    background-color: #ff0000;
     background-position: 0 0, 10px 10px;
     background-size: 20px 20px;
 }
@@ -169,18 +180,18 @@ body {
 .rayado {
     background: repeating-linear-gradient(
         0deg,
-        #1E90FF, /* Dodger Blue */
+        #1E90FF,
         #1E90FF 10px,
         #4169E1 10px,
-        #4169E1 20px /* Royal Blue */
+        #4169E1 20px
     );
 }
 
 .magenta { background-color: magenta; }
 
 @keyframes rapidBlink {
-    0%, 33.33%, 66.66%, 100% { opacity: 1; } /* Estado completamente opaco */
-    16.66%, 50%, 83.33% { opacity: 0; } /* Estado completamente transparente */
+    0%, 33.33%, 66.66%, 100% { opacity: 1; }
+    16.66%, 50%, 83.33% { opacity: 0; }
 }
 
 @keyframes borderPulse {
@@ -202,8 +213,8 @@ body {
 button {
     padding: 10px 20px;
     font-size: 16px;
-    color: #fff;
-    background-color: #007BFF;
+    color: var(--text-color);
+    background-color: var(--button-bg-color);
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -211,7 +222,7 @@ button {
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: var(--button-hover-bg-color);
 }
 
 #version-text {
@@ -248,18 +259,18 @@ button:hover {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.8); /* Fondo negro semitransparente */
+    background-color: rgba(0, 0, 0, 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000; /* Asegura que esté sobre todo */
+    z-index: 1000;
 }
 
 #game-over-message {
     text-align: center;
-    color: #fff;
+    color: var(--text-color);
     font-family: Arial, sans-serif;
-    background: rgba(255, 255, 255, 0.1); /* Fondo claro semitransparente */
+    background: rgba(255, 255, 255, 0.1);
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
@@ -273,24 +284,24 @@ button:hover {
 #restart-button {
     padding: 10px 20px;
     font-size: 16px;
-    color: #fff;
-    background-color: #007BFF;
+    color: var(--text-color);
+    background-color: var(--button-bg-color);
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 
 #restart-button:hover {
-    background-color: #0056b3;
+    background-color: var(--button-hover-bg-color);
 }
 
 #cells-removed {
-    font-size: 25px; /* Para que coincida con el tamaño de fuente unificado */
-    font-family: 'Digital-7', monospace; /* Para que coincida con la fuente unificada */
-    color: #ffff00; /* Para que coincida con el color unificado */
+    font-size: var(--font-size-large);
+    font-family: var(--font-stack);
+    color: var(--highlight-color);
     text-shadow:
         -1px -1px 0 #000,
          1px -1px 0 #000,
         -1px 1px 0 #000,
-         1px 1px 0 #000; /* Para que coincida con la sombra unificada */
+         1px 1px 0 #000;
 }
