@@ -78,32 +78,17 @@ body {
     cursor: not-allowed;
 }
 
-#reloj, #score-display {
-    font-size: 25px;
-    font-family: 'Digital-7', monospace;
-    color: #ffff00; /* Color amarillo */
+#reloj, #score-display, #cells-removed-counter {
+    font-size: 25px; /* Unifica el tamaño de la fuente */
+    font-family: 'Digital-7', monospace; /* Unifica la fuente */
+    color: #ffff00; /* Unifica el color de la fuente a amarillo */
     text-shadow:
         -1px -1px 0 #000,
          1px -1px 0 #000,
         -1px 1px 0 #000,
-         1px 1px 0 #000;
-    margin-top: 10px;
-}
-
-#cells-removed-counter {
-    font-size: 25px;
-    font-family: 'Digital-7', monospace;
-    color: #ffff00; /* Color amarillo */
-    text-shadow:
-        -1px -1px 0 #000,
-         1px -1px 0 #000,
-        -1px 1px 0 #000,
-         1px 1px 0 #000;
-    margin-top: 10px;
-    /* Ajustes para hacer el contenedor más compacto */
-    width: auto; /* Ajusta automáticamente el ancho al contenido */
-    white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
-    display: inline-block; /* Permite que el contenedor se ajuste al contenido */
+         1px 1px 0 #000; /* Unifica la sombra del texto */
+    margin-top: 10px; /* Asegura un margen superior consistente */
+    text-align: left; /* Alinea el texto a la izquierda para consistencia */
 }
 
 #reloj .separador {
