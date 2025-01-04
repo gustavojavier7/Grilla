@@ -335,8 +335,14 @@ function checkNewMatches() {
 }
 
 function updateScoreDisplay() {
+    // Convertimos el puntaje a una cadena y lo rellenamos con ceros a la izquierda hasta 16 dígitos
+    let scoreString = score.toString().padStart(16, '0');
+    
+    // Dividimos la cadena en grupos de 4 y los unimos con guiones
+    let formattedScore = scoreString.match(/.{1,4}/g).join('-');
+    
     const scoreElement = document.getElementById('current-score');
-    scoreElement.textContent = score.toString().padStart(16, '0'); // Formatear el puntaje a 16 cifras
+    scoreElement.textContent = formattedScore; // Actualizamos el contenido del elemento con el puntaje formateado
 }
 
 function resetScore() {
