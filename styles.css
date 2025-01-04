@@ -32,12 +32,12 @@ body {
 }
 
 #current-time .blink {
-    animation: blink-animation 1s steps(10, start) infinite; /* Aumentamos el número de pasos */
+    animation: blink-animation 1s steps(2, start) infinite; /* 2 pasos para un ciclo de 1 segundo */
 }
 
 @keyframes blink-animation {
-    0%, 20%, 40%, 60% { visibility: visible; } /* Ajustamos los porcentajes para que sea visible menos tiempo */
-    70%, 90% { visibility: hidden; }
+    0%, 50% { visibility: visible; } /* Visible durante el 50% del ciclo */
+    51%, 100% { visibility: hidden; } /* Oculto durante el 50% del ciclo */
 }
 
 #main-container {
