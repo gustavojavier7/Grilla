@@ -16,6 +16,18 @@ COLORS.forEach(color => {
     cellCounts[color] = 0;
 });
 
+function updateClock() {
+    const now = new Date();
+    let hours = now.getHours().toString().padStart(2, '0');
+    let minutes = now.getMinutes().toString().padStart(2, '0');
+    let seconds = now.getSeconds().toString().padStart(2, '0');
+    
+    const timeElement = document.getElementById('current-time');
+    if (timeElement) {
+        timeElement.innerHTML = `${hours}<span class="blink">:</span>${minutes}<span class="blink">:</span>${seconds}`;
+    }
+}
+
 function checkSelections() {
     const difficulty = document.getElementById('difficulty').value;
     const fillGridBtn = document.getElementById('fill-grid-btn');
@@ -448,3 +460,6 @@ function updateCellsRemovedDisplay() {
 // Inicializar con una grilla de 6x6 por defecto
 createGrid(rows, cols);
 updateColorSamples(); // Actualizar la muestra de colores al inicio del juego
+// Iniciar el reloj
+updateClock(); // Llamada inicial para establecer el tiempo
+setInterval(updateClock, 1000); // Actualizar el reloj cada segundo
