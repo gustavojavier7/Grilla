@@ -8,28 +8,38 @@
 </head>
 <body>
     <div id="main-container">
+        <!-- Grilla en el extremo izquierdo -->
         <div id="game-container"></div>
-        <div id="buttons-container">
-            <label for="difficulty">Seleccionar Dificultad:</label>
-            <select id="difficulty" onchange="checkSelections()">
-                <option value="">--Seleccionar--</option>
-                <option value="6">Fácil Infinito (6x6)</option>
-                <option value="10">Medio Infinito (10x10)</option>
-                <option value="15">Difícil (15x15)</option>
-            </select>
-            <button id="fill-grid-btn" onclick="fillGrid()" disabled>Rellenar Celdas</button>
-            <button id="reset-game-btn" onclick="resetGame()" disabled>Reiniciar Juego</button>
-            <div id="version-text">Grilla - Versión 3.3.1</div>
+
+        <!-- Contenedor de botones y controles a la derecha -->
+        <div id="controls-container">
+            <div id="buttons-container">
+                <label for="difficulty">Seleccionar Dificultad:</label>
+                <select id="difficulty" onchange="checkSelections()">
+                    <option value="">--Seleccionar--</option>
+                    <option value="6">Fácil Infinito (6x6)</option>
+                    <option value="10">Medio Infinito (10x10)</option>
+                    <option value="15">Difícil (15x15)</option>
+                </select>
+                <button id="fill-grid-btn" onclick="fillGrid()" disabled>Rellenar Celdas</button>
+                <button id="reset-game-btn" onclick="resetGame()" disabled>Reiniciar Juego</button>
+                <div id="version-text">Grilla - Versión 3.3.1</div>
+            </div>
+
+            <!-- Reloj -->
             <div id="reloj">
-    <span id="horas"></span>
-    <span class="separador">:</span>
-    <span id="minutos"></span>
-    <span class="separador">:</span>
-    <span id="segundos"></span>
-</div>
+                <span id="horas"></span>
+                <span class="separador">:</span>
+                <span id="minutos"></span>
+                <span class="separador">:</span>
+                <span id="segundos"></span>
+            </div>
+
+            <!-- Puntaje y celdas eliminadas -->
             <div id="score-display">Puntaje: <span id="current-score">0000000000000000</span></div>
             <div id="cells-removed-counter">Celdas Eliminadas: <span id="cells-removed">0</span></div>
 
+            <!-- Muestra de colores -->
             <div id="color-samples">
                 <div class="cell-sample gris-ondas"><span>0</span></div>
                 <div class="cell-sample verde"><span>0</span></div>
