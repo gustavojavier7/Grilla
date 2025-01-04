@@ -233,6 +233,7 @@ button:hover {
 
 #score-display {
     text-align: left;
+    margin-bottom: 10px;
 }
 
 @keyframes scoreBlink {
