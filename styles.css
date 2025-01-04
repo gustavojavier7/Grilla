@@ -19,6 +19,28 @@ body {
     height: 100vh; /* Altura completa del navegador */
 }
 
+#current-time {
+    font-size: 25px;
+    font-family: 'Digital-7', monospace;
+    color: #ffff00; /* Color amarillo para el reloj */
+    text-shadow:
+        -1px -1px 0 #000,
+         1px -1px 0 #000,
+        -1px 1px 0 #000,
+         1px 1px 0 #000;
+    margin-top: 10px;
+}
+
+#current-time .blink {
+    animation: blink-animation 1s steps(5, start) infinite;
+}
+
+@keyframes blink-animation {
+    to {
+        visibility: hidden;
+    }
+}
+
 #main-container {
     display: flex;
     align-items: flex-start;
