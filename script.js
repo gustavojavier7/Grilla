@@ -280,10 +280,7 @@ function removePulsatingCells(matches) {
 
             // Aplicar parpadeo si el puntaje cambió
             applyScoreBlink();
-
-            // Verificar si el jugador ha ganado ahora que todo está quieto
-            checkGameOver(); // Llama a checkGameOver aquí, justo después de que el juego vuelva a ser interactivo
-        }
+            }
     }, 1000); // 1 segundo de parpadeo antes de eliminar las celdas
     updateColorSamples();
 }
