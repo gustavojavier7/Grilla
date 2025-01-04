@@ -100,8 +100,8 @@ body {
 }
 
 #score-display, #cells-removed-counter {
-    margin-top: 20px;
-    font-size: 39px;
+    margin-top: 10px;
+    font-size: 25px;
     text-align: left; /* Alinea el texto a la izquierda */
     font-family: Arial, sans-serif; /* Cambia la fuente a Arial */
     color: #ffff00; /* Mantiene el color amarillo */
@@ -229,8 +229,8 @@ button:hover {
 }
 
 #score-display {
-    margin-top: 20px;
-    font-size: 39px; /* Aumentar el tamaño un 30% */
+    margin-top: 10px;
+    font-size: 25px; 
     text-align: center;
     font-family: 'Digital-7', monospace;
     color: #ffff00; /* Color amarillo */
