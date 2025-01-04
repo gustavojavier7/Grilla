@@ -26,18 +26,6 @@ function updateClock() {
     document.getElementById('horas').textContent = hours;
     document.getElementById('minutos').textContent = minutes;
     document.getElementById('segundos').textContent = seconds;
-
-    // Manejar la animación de los separadores basado en el estado de isProcessing
-    const separators = document.querySelectorAll('.separador');
-    separators.forEach(separator => {
-        if (isProcessing) {
-            // Si isProcessing es true, quitamos la animación (eliminamos la clase .blink)
-            separator.classList.remove('blink');
-        } else {
-            // Si isProcessing es false, restauramos la animación (añadimos la clase .blink)
-            separator.classList.add('blink');
-        }
-    });
 }
 
 function manageClock() {
