@@ -103,17 +103,25 @@ body {
 }
 
 .separador {
-    visibility: visible;
+    width: 5px; /* Ajusta el tamaño si es necesario */
+    height: 20px; /* Ajusta el tamaño si es necesario */
+    background-color: yellow; /* Color inicial */
 }
 
-.separador.blink {
-    animation: blink-animation 1s steps(2, start) infinite;
+.separador.active {
+    animation: colorSwap 1s infinite;
 }
 
-@keyframes blink-animation {
-    0%, 50% { visibility: visible; }
-    51%, 100% { visibility: hidden; }
+
+@keyframes colorSwap {
+    0%, 50% {
+        background-color: yellow; /* Amarillo */
+    }
+    51%, 100% {
+        background-color: black; /* Negro */
+    }
 }
+
 
 #color-samples {
     display: flex;
