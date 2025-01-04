@@ -29,15 +29,14 @@ function updateClock() {
 
     // Manejar la animación de los separadores basado en el estado de isProcessing
     const separators = document.querySelectorAll('.separador');
-separators.forEach(separator => {
-    if (isProcessing) {
-        // Si isProcessing es true, quitamos la animación y forzamos la visibilidad
-        separator.style.animation = 'none';
-        separator.style.visibility = 'visible'; // Forzar visibilidad
-    } else {
-        // Si isProcessing es false, restauramos la animación
-        separator.style.animation = 'blink-animation 1s steps(2, start) infinite';
-    }
+    separators.forEach(separator => {
+        if (isProcessing) {
+            // Si isProcessing es true, quitamos la animación (eliminamos la clase .blink)
+            separator.classList.remove('blink');
+        } else {
+            // Si isProcessing es false, restauramos la animación (añadimos la clase .blink)
+            separator.classList.add('blink');
+        }
     });
 }
 
