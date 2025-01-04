@@ -30,25 +30,17 @@ function updateClock() {
 }
 
 function manageClock() {
+    const separators = document.querySelectorAll('.separador');
     if (isProcessing) {
-        // Si isProcessing es true, pausamos el reloj y detenemos la animación de los separadores inmediatamente
-        if (clockIntervalId) {
-            clearInterval(clockIntervalId);
-            clockIntervalId = null;
-        }
-        const separators = document.querySelectorAll('.separador');
+        // Detener el parpadeo cambiando el color a negro
         separators.forEach(separator => {
-            separator.classList.remove('blink');
+            separator.classList.remove('active');
+            separator.style.backgroundColor = 'black'; // Estado fijo
         });
     } else {
-        // Si isProcessing es false, iniciamos o reanudamos el reloj y la animación de los separadores
-        if (!clockIntervalId) {
-            clockIntervalId = setInterval(updateClock, 1000);
-            updateClock(); // Llamada inmediata para asegurar que el tiempo mostrado es correcto al reanudar
-        }
-        const separators = document.querySelectorAll('.separador');
+        // Reanudar el parpadeo
         separators.forEach(separator => {
-            separator.classList.add('blink');
+            separator.classList.add('active');
         });
     }
 }
