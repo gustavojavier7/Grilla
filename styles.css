@@ -91,13 +91,17 @@ body {
     text-align: left; /* Alinea el texto a la izquierda para consistencia */
 }
 
-#reloj .separador {
-    animation: blink-animation 1s steps(2, start) infinite;
+.separador {
+    visibility: visible; /* Asegura que el separador esté siempre visible */
+}
+
+.separador.blink {
+    animation: blink-animation 1s steps(2, start) infinite; /* Aplica la animación de parpadeo */
 }
 
 @keyframes blink-animation {
-    0%, 50% { visibility: visible; }
-    51%, 100% { visibility: hidden; }
+    0%, 50% { visibility: visible; } /* Visible durante el 50% del ciclo */
+    51%, 100% { visibility: hidden; } /* Oculto durante el 50% del ciclo */
 }
 
 #color-samples {
