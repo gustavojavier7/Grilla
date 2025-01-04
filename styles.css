@@ -124,6 +124,10 @@ body {
     position: relative;
 }
 
+.oculto {
+    visibility: hidden;
+}
+
 .cell.processing {
     pointer-events: none; /* Bloquear eventos de puntero */
 }
