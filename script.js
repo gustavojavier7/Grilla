@@ -442,7 +442,14 @@ function showGameOver(color, threshold) {
     cells.forEach(cell => cell.classList.add('processing'));
 }
 function updateCellsRemovedDisplay() {
-    document.getElementById('cells-removed').textContent = totalCellsRemoved;
+    const cellsRemovedElement = document.getElementById('cells-removed');
+    cellsRemovedElement.textContent = totalCellsRemoved;
+
+    // Aplicar el efecto de parpadeo
+    cellsRemovedElement.classList.add('blink-cells-removed');
+    setTimeout(() => {
+        cellsRemovedElement.classList.remove('blink-cells-removed');
+    }, 1000); // Duración del parpadeo (1 segundo)
 }
 // Inicializar con una grilla de 6x6 por defecto
 createGrid(rows, cols);
