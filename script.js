@@ -48,6 +48,8 @@ function manageClock() {
         // Si isProcessing es false, iniciamos o reanudamos el reloj
         clockIntervalId = setInterval(updateClock, 1000);
     }
+    // Actualizar la visibilidad de los separadores
+    updateClock();
 }
 
 function checkSelections() {
@@ -295,7 +297,8 @@ function removePulsatingCells(matches) {
                 removePulsatingCells(newMatches);
             }, 1000); // 1 segundo de espera antes de la siguiente ronda de cascada
         } else {
-            // Calcular puntaje final y permitir interacciones
+            isProcessing = false; // Habilitar interacciones
+            manageClock(); // Reanudar el reloj y actualizar los separadores
             let finalPoints = totalRemovedThisCascade * roundsInCascade;
             score += finalPoints;
             updateScoreDisplay();
