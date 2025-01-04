@@ -174,10 +174,7 @@ function checkPatterns() {
         // No resetear cascadeMultiplier aquí
         isProcessing = false;
         cells.forEach(cell => cell.classList.remove('processing')); // Permitir interacciones
-        // No aplicar parpadeo del puntaje aquí
-        // Verificar si el jugador ha ganado
-        // setTimeout(checkGameOver, 1000); // Eliminar esta línea
-    }
+         }
 }
 
 function removePulsatingCells(matches) {
