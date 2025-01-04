@@ -31,23 +31,25 @@ body {
     margin-top: 10px;
 }
 
-#current-time .blink {
-    animation: blink-animation 2s steps(2, start) infinite; /* 2 pasos para un ciclo de 1 segundo */
+#reloj {
+    font-size: 4em;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+    display: flex; /* Para alinear los elementos del reloj en línea */
+    align-items: center; /* Alineación vertical */
+    justify-content: center; /* Alineación horizontal */
 }
 
-@keyframes blink-animation {
-    0%, 50% { visibility: visible; } /* Visible durante el 50% del ciclo */
-    51%, 100% { visibility: hidden; } /* Oculto durante el 50% del ciclo */
+.separador {
+    opacity: 1; /* Inicialmente visibles */
+    transition: opacity 0.5s ease-in-out; /* Transición suave */
 }
 
-#main-container {
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start; /* Alinea al extremo izquierdo */
-    width: 100%;
-    max-width: 90vw;
-    gap: 20px; /* Espacio entre la grilla y los botones */
-    flex-wrap: wrap; /* Permite que los elementos se envuelvan */
+.oculto {
+    opacity: 0; /* Ocultos durante el blinkedo */
 }
 
 #game-container {
