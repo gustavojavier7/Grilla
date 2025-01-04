@@ -24,7 +24,7 @@ body {
     flex-direction: row; /* Alineamos los elementos en fila */
     width: 100%; /* Asegura que ocupe todo el ancho disponible */
     max-width: 100vw; /* Evita que se desborde del viewport */
-    gap: 20px; /* Espacio entre la grilla y los controles */
+    gap: 10px; /* Espacio entre la grilla y los controles */
     padding: 20px; /* Añadimos padding para separar del borde del viewport */
 }
 
@@ -47,7 +47,7 @@ body {
     align-items: flex-start; /* Alinea los controles al inicio (izquierda) */
     justify-content: flex-start;
     flex-grow: 1; /* Permite que este contenedor crezca para ocupar el espacio restante */
-    max-width: 300px; /* Limita el ancho máximo de los controles */
+    max-width: 500px; /* Limita el ancho máximo de los controles */
 }
 
 #buttons-container {
