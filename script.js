@@ -22,10 +22,15 @@ function updateClock() {
     let minutes = now.getMinutes().toString().padStart(2, '0');
     let seconds = now.getSeconds().toString().padStart(2, '0');
     
-    const timeElement = document.getElementById('current-time');
-    if (timeElement) {
-        timeElement.innerHTML = `${hours}<span class="blink">:</span>${minutes}<span class="blink">:</span>${seconds}`;
-    }
+    document.getElementById('horas').textContent = hours;
+    document.getElementById('minutos').textContent = minutes;
+    document.getElementById('segundos').textContent = seconds;
+
+    // Alternar la visibilidad de los separadores
+    const separators = document.querySelectorAll('.separador');
+    separators.forEach(separator => {
+        separator.classList.toggle('oculto');
+    });
 }
 
 function checkSelections() {
