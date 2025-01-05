@@ -9,14 +9,6 @@
     --button-hover-bg-color: #0056b3;
 }
 
-@font-face {
-    font-family: 'Digital-7';
-    src: url('fonts/digital-7.woff2') format('woff2'),
-         url('fonts/digital-7.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
-
 body {
     font-family: Arial, sans-serif;
     background-color: var(--primary-bg-color);
