@@ -1,5 +1,4 @@
 const COLORS = ['gris-ondas', 'verde', 'cyan', 'puntos-blancos', 'rayado', 'magenta'];
-window.resetGame = resetGame;
 let gameContainer = document.getElementById('game-container');
 let board = [];
 let clockIntervalId;
@@ -393,6 +392,8 @@ function resetGame() {
         overlay.style.display = 'none';
     }
 }
+window.resetGame = resetGame;
+console.log('resetGame definida:', window.resetGame !== undefined);
 
 function incrementScoreAnimated(incrementBy, duration, steps) {
     const targetScore = score + incrementBy;
