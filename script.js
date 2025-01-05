@@ -449,9 +449,9 @@ function getGameOverThreshold(rows, cols) {
     const baseThreshold = 50;
     const baseGridSize = 15 * 15;
 
-    // No umbral para 6x6 y 10x10
+    // No se establece condición para 6x6 y 10x10
     if ((rows === 6 && cols === 6) || (rows === 10 && cols === 10)) {
-        return Infinity; // O cualquier valor muy alto para asegurar que nunca se alcance
+        return null; // Retornamos null para indicar que no hay condición de fin de juego
     }
 
     const currentGridSize = rows * cols;
