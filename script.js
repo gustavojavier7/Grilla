@@ -422,7 +422,6 @@ function applyScoreBlink() {
     }
 }
 
-// Función para actualizar la muestra de colores
 function updateColorSamples() {
     const threshold = getGameOverThreshold(rows, cols);
     COLORS.forEach(color => {
@@ -436,19 +435,14 @@ function updateColorSamples() {
 
         if (threshold !== null && count >= threshold) {
             cellSample.classList.add('blink-threshold');
-            
-            if (threshold !== null && count >= threshold) {
-    console.log('Color que alcanzó el umbral:', color);
-    console.log('Umbral alcanzado:', threshold);
-    showGameOver(color, threshold);
-}
+            console.log('Color que alcanzó el umbral:', color);
+            console.log('Umbral alcanzado:', threshold);
             showGameOver(color, threshold);
         } else {
             cellSample.classList.remove('blink-threshold');
         }
     });
 }
-
 function getGameOverThreshold(rows, cols) {
     const baseThreshold = 50;
     const baseGridSize = 15 * 15;
