@@ -434,10 +434,14 @@ function updateColorSamples() {
         cellSample.querySelector('span').textContent = count;
         cellSample.setAttribute('data-percentage', `${percent}%`);
 
-        if (count >= threshold) {
+        if (threshold !== null && count >= threshold) {
             cellSample.classList.add('blink-threshold');
             
-            // Aquí se activa el fin del juego inmediatamente si se alcanza el umbral
+            if (threshold !== null && count >= threshold) {
+    console.log('Color que alcanzó el umbral:', color);
+    console.log('Umbral alcanzado:', threshold);
+    showGameOver(color, threshold);
+}
             showGameOver(color, threshold);
         } else {
             cellSample.classList.remove('blink-threshold');
