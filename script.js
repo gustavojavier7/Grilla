@@ -464,7 +464,7 @@ function showGameOver(color, threshold) {
 
     colorElement.textContent = color;
     thresholdElement.textContent = threshold;
-    overlay.style.display = 'block';
+    overlay.style.display = 'flex'; // Se muestra el overlay;
     
     // Pausar el juego o hacer que no sea interactivo
     isProcessing = true;
