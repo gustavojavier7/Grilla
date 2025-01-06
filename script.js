@@ -1,7 +1,7 @@
 const COLORS = ['gris-ondas', 'verde', 'cyan', 'puntos-blancos', 'rayado', 'magenta'];
 let gameContainer = document.getElementById('game-container');
 let board = [];
-let clockIntervalId;
+let clockIntervalId = null;
 let cellReferences = [];
 let firstSelected = null;
 let isProcessing = false; // Indica si el efecto cascada o blinkedo está en proceso
@@ -31,17 +31,32 @@ function updateClock() {
 
 function manageClock() {
     const separators = document.querySelectorAll('.separador');
+    
     if (isProcessing) {
-        // Detener el parpadeo cambiando el color a negro
+        // Detener parpadeo
         separators.forEach(separator => {
             separator.classList.remove('active');
-            separator.style.backgroundColor = 'black'; // Estado fijo
+            separator.style.backgroundColor = 'black'; // Queda estático
         });
+
+        // Detener la actualización del reloj
+        if (clockIntervalId) {
+            clearInterval(clockIntervalId);
+            clockIntervalId = null;
+        }
+        // El reloj queda mostrando la última hora actualizada.
+
     } else {
-        // Reanudar el parpadeo
+        // Activar parpadeo
         separators.forEach(separator => {
             separator.classList.add('active');
         });
+
+        // Iniciar la actualización del reloj solo si no existe ya un intervalo
+        if (!clockIntervalId) {
+            updateClock(); // Llamada inmediata para que aparezca la hora actual al instante
+            clockIntervalId = setInterval(updateClock, 1000); // Actualización cada 1s
+        }
     }
 }
 
