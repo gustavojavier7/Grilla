@@ -14,6 +14,8 @@ let cellCounts = {};
 let totalCellsRemoved = 0;
 let globalClock = { hours: '00', minutes: '00', seconds: '00' };
 let separatorVisible = true;
+let primarySeparatorVisible = true;
+let secondarySeparatorVisible = true;
 let lastUpdateTime = 0;
 const updateInterval = 1000; // 1s
 
@@ -41,21 +43,22 @@ function renderClocks() {
 }
 
 function toggleSeparators() {
-    separatorVisible = !separatorVisible;
-    document.querySelectorAll('.separador, .separador-sec').forEach(separator => {
-        separator.style.backgroundColor = separatorVisible ? 'yellow' : 'black';
+    primarySeparatorVisible = !primarySeparatorVisible;
+    document.querySelectorAll('.separador').forEach(separator => {
+        separator.style.backgroundColor = primarySeparatorVisible ? 'yellow' : 'black';
     });
 }
 
+// Función actualizada para manejar solo separadores secundarios
 function toggleSeparatorsSecondaryOnly() {
-    separatorVisible = !separatorVisible;
+    secondarySeparatorVisible = !secondarySeparatorVisible;
     document.querySelectorAll('.separador-sec').forEach(separator => {
-        separator.style.backgroundColor = separatorVisible ? 'yellow' : 'black';
+        separator.style.backgroundColor = secondarySeparatorVisible ? 'yellow' : 'black';
     });
-    // Aquí no se actualiza el separador del reloj primario durante el procesamiento
 }
 
 function manageClock() {
+    // Manejo del reloj primario
     document.querySelectorAll('#reloj .separador').forEach(separator => {
         if (isProcessing) {
             separator.classList.add('paused');
@@ -64,7 +67,7 @@ function manageClock() {
         }
     });
 
-    // No pausar el separador del reloj secundario
+    // El reloj secundario nunca se pausa
     document.querySelectorAll('#reloj-sec .separador-sec').forEach(separator => {
         separator.classList.remove('paused');
     });
@@ -467,18 +470,22 @@ function animate() {
     if (now - lastUpdateTime > updateInterval) {
         updateClockMaster();
         renderClocks();
+        
+        // Manejo separado de los separadores según el estado de procesamiento
         if (isProcessing) {
-            // Solo el separador del reloj secundario parpadea cuando isProcessing es true
+            // Solo el separador del reloj secundario parpadea
             toggleSeparatorsSecondaryOnly();
         } else {
-            // Ambos separadores parpadean cuando isProcessing es false
+            // El separador del reloj primario parpadea
             toggleSeparators();
+            // También hacemos parpadear el secundario de manera independiente
+            toggleSeparatorsSecondaryOnly();
         }
+        
         lastUpdateTime = now;
     }
     requestAnimationFrame(animate);
 }
-
 
 document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(animate);
