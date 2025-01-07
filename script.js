@@ -55,9 +55,8 @@ function manageClock() {
             separator.classList.remove('paused');
         }
     });
-    // No hacer nada con los separadores secundarios aquí, dejándolos parpadear siempre.
+    // El reloj secundario no se pausa aquí, pero su parpadeo se controla por toggleSeparators() cuando no está procesando
 }
-
 function checkSelections() {
     const difficulty = document.getElementById('difficulty').value;
     document.getElementById('fill-grid-btn').disabled = !difficulty;
@@ -460,7 +459,6 @@ function animate() {
         }
         lastUpdateTime = now;
     }
-    // Usar requestAnimationFrame para el siguiente ciclo, pero no para cada actualización
     requestAnimationFrame(animate);
 }
 
