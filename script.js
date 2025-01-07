@@ -345,7 +345,7 @@ function resetScore() {
 function resetGame() {
     score = 0;
     countdown = 60;
-    countdownStarted = false; // Resetear el estado del conteo regresivo
+    countdownStarted = false;
     cascadeMultiplier = 1;
     roundsInCascade = 1;
     totalRemovedThisCascade = 0;
@@ -358,8 +358,8 @@ function resetGame() {
     });
 
     updateScoreDisplay();
-    createGrid(rows, cols); // Asegúrate de crear la cuadrícula, no solo llenarla
-    fillGrid(); // Llenar la cuadrícula
+    createGrid(rows, cols);
+    fillGrid();
     updateColorSamples();
 
     const overlay = document.getElementById('game-over-overlay');
@@ -367,7 +367,10 @@ function resetGame() {
         overlay.style.display = 'none';
     }
 
-    // Asegúrate de que los botones estén correctamente habilitados/deshabilitados
+    // Asegúrate de que el juego puede ser jugado de nuevo
+    isProcessing = false;
+
+    // Habilita botones basados en la selección de dificultad
     checkSelections();
 }
 
