@@ -358,14 +358,19 @@ function resetGame() {
     });
 
     updateScoreDisplay();
-    fillGrid();
+    createGrid(rows, cols); // Asegúrate de crear la cuadrícula, no solo llenarla
+    fillGrid(); // Llenar la cuadrícula
     updateColorSamples();
 
     const overlay = document.getElementById('game-over-overlay');
     if (overlay) {
         overlay.style.display = 'none';
     }
+
+    // Asegúrate de que los botones estén correctamente habilitados/deshabilitados
+    checkSelections();
 }
+
 window.resetGame = resetGame;
 
 function incrementScoreAnimated(incrementBy, duration, steps) {
@@ -433,26 +438,17 @@ function showGameOver(reason, threshold = null) {
     const gameOverReason = document.getElementById('game-over-reason');
     const gameOverThreshold = document.getElementById('game-over-threshold');
 
-    if (!gameOverReason || !gameOverThreshold) {
-        console.error('Elementos de Game Over no encontrados en el DOM.');
-        return;
-    }
-
-    // Limpiar el contenido anterior para evitar sobreescrituras
-    gameOverReason.textContent = '';
-    gameOverThreshold.textContent = '';
-
     if (reason === 'Tiempo agotado') {
         gameOverReason.textContent = '¡Se acabó el tiempo!';
-        gameOverThreshold.style.display = 'none'; // Ocultar el elemento de umbral
+        gameOverThreshold.style.display = 'none';
     } else {
         gameOverReason.textContent = `El color/patrón "${reason}" alcanzó`;
         gameOverThreshold.textContent = `${threshold} o más celdas.`;
-        gameOverThreshold.style.display = 'inline'; // Mostrar el umbral
+        gameOverThreshold.style.display = 'inline';
     }
 
     overlay.style.display = 'flex';
-    isProcessing = true;
+    isProcessing = true; // Asegúrate de que esto está en true para evitar nuevas interacciones
     document.querySelectorAll('.cell').forEach(cell => cell.classList.add('processing'));
 }
 
