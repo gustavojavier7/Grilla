@@ -81,7 +81,7 @@ body {
     cursor: not-allowed;
 }
 
-#reloj, #score-display, #cells-removed-counter {
+#reloj, #secondary-clock, #score-display, #cells-removed-counter {
     font-size: var(--font-size-large);
     font-family: var(--font-stack);
     color: var(--highlight-color);
@@ -94,46 +94,21 @@ body {
     text-align: left;
 }
 
-.separador {
-    width: 5px; /* Ajusta el tamaño si es necesario */
-    height: 20px; /* Ajusta el tamaño si es necesario */
-    background-color: yellow; /* Color inicial */
-}
-
-.separador.active {
+.separador, .separador-sec {
+    width: 5px;
+    height: 20px;
+    background-color: yellow;
     animation: colorSwap 1s infinite;
 }
-
 
 @keyframes colorSwap {
     0%, 50% {
-        background-color: yellow; /* Amarillo */
+        background-color: yellow;
     }
     51%, 100% {
-        background-color: black; /* Negro */
+        background-color: black;
     }
 }
-
-#secondary-clock {
-    font-size: var(--font-size-large);
-    font-family: var(--font-stack);
-    color: var(--highlight-color);
-    text-shadow:
-        -1px -1px 0 #000,
-         1px -1px 0 #000,
-        -1px 1px 0 #000,
-         1px 1px 0 #000;
-    margin-top: 10px;
-    text-align: left;
-}
-
-.secondary-separador {
-    width: 5px; /* Ajusta el tamaño si es necesario */
-    height: 20px; /* Ajusta el tamaño si es necesario */
-    background-color: yellow; /* Color inicial */
-    animation: colorSwap 1s infinite;
-}
-
 
 #color-samples {
     display: flex;
@@ -249,11 +224,6 @@ button:hover {
     margin-top: 20px;
     font-size: 16px;
     text-align: center;
-}
-
-#score-display {
-    text-align: left;
-    margin-bottom: 10px;
 }
 
 @keyframes scoreBlink {
