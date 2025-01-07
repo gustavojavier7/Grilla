@@ -15,6 +15,8 @@ let secondarySeparatorVisible = true;
 let lastUpdateTime = 0;
 let countdown = 60; // 1 minuto en segundos
 let countdownStarted = false;
+let cascadeHistory = []; // Historial de cascadas
+let currentCascadeCount = 0; // Contador de cascadas en la ronda actual
 const updateInterval = 1000; // 1s
 const SEPARATOR_COLORS = {
     ON: 'yellow',
@@ -224,71 +226,84 @@ function removePulsatingCells(matches) {
         });
         updateCellsRemovedDisplay();
 
-        let newMatches = new Set();
+      let newMatches = new Set();
 
-        for (let col = 0; col < cols; col++) {
-            let emptySpaceCount = 0;
+for (let col = 0; col < cols; col++) {
+    let emptySpaceCount = 0;
 
-            for (let row = rows - 1; row >= 0; row--) {
-                if (board[row][col] === null) {
-                    emptySpaceCount++;
-                } else if (emptySpaceCount > 0) {
-                    const newRow = row + emptySpaceCount;
-                    board[newRow][col] = board[row][col];
-                    cellReferences[newRow][col].className = `cell ${board[newRow][col]}`;
-                    board[row][col] = null;
-                    cellReferences[row][col].className = 'cell';
-                }
-            }
-
-            for (let row = 0; emptySpaceCount > 0; row++, emptySpaceCount--) {
-                const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-                board[row][col] = newColor;
-                cellReferences[row][col].className = `cell ${newColor}`;
-                cellCounts[newColor]++;
-            }
+    for (let row = rows - 1; row >= 0; row--) {
+        if (board[row][col] === null) {
+            emptySpaceCount++;
+        } else if (emptySpaceCount > 0) {
+            const newRow = row + emptySpaceCount;
+            board[newRow][col] = board[row][col];
+            cellReferences[newRow][col].className = `cell ${board[newRow][col]}`;
+            board[row][col] = null;
+            cellReferences[row][col].className = 'cell';
         }
+    }
 
-        newMatches = checkNewMatches();
-        if (newMatches.size > 0) {
-            newMatches.forEach(coord => {
-                const [row, col] = coord.split(',').map(Number);
-                const cell = cellReferences[row][col];
-                cell.classList.remove('matched');
-                cell.classList.add('matched');
-            });
+    for (let row = 0; emptySpaceCount > 0; row++, emptySpaceCount--) {
+        const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+        board[row][col] = newColor;
+        cellReferences[row][col].className = `cell ${newColor}`;
+        cellCounts[newColor]++;
+    }
+}
 
-            const n = Math.log2(roundsInCascade) + 1;
-            roundsInCascade = Math.pow(2, n);
-            totalRemovedThisCascade += newMatches.size;
+newMatches = checkNewMatches();
+if (newMatches.size > 0) {
+    newMatches.forEach(coord => {
+        const [row, col] = coord.split(',').map(Number);
+        const cell = cellReferences[row][col];
+        cell.classList.remove('matched');
+        cell.classList.add('matched');
+    });
 
-            const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
-            incrementScoreAnimated(scoreIncrement, 2000, 20);
+    const n = Math.log2(roundsInCascade) + 1;
+roundsInCascade = Math.pow(2, n);
+totalRemovedThisCascade += newMatches.size;
 
-            setTimeout(() => {
-                removePulsatingCells(newMatches);
-            }, 1000);
-        } else {
-            isProcessing = false;
-            manageClock();
-            let finalPoints = totalRemovedThisCascade * roundsInCascade;
-            score += finalPoints;
-            updateScoreDisplay();
-            
-            // Extender el tiempo de juego
-            if (roundsInCascade > 1) { // Solo si hubo más de una ronda de cascada
-                const extraTime = (roundsInCascade - 1) * 2; // Multiplicar por 2 el número de rondas menos la primera
-                countdown += extraTime;
-                console.log(`Tiempo extendido por ${extraTime} segundos. Nuevo tiempo: ${countdown} segundos.`);
-            }
+const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
+incrementScoreAnimated(scoreIncrement, 2000, 20);
 
-            roundsInCascade = 1;
-            totalRemovedThisCascade = 0;
-            isProcessing = false;
-            manageClock();
-            document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('processing'));
-            applyScoreBlink();
+setTimeout(() => {
+    removePulsatingCells(newMatches);
+}, 1000);
+} else {
+    isProcessing = false;
+    manageClock();
+    let finalPoints = totalRemovedThisCascade * roundsInCascade;
+    score += finalPoints;
+    updateScoreDisplay();
+    
+    // Actualizar el historial de cascadas y calcular extensión de tiempo
+    let currentCascadeCount = roundsInCascade;
+    cascadeHistory.push(currentCascadeCount);
+    if (cascadeHistory.length > 5) {
+        cascadeHistory.shift(); // Mantener solo las 5 últimas rondas
+    }
+
+    // Calcular promedio de cascadas si hay más de una ronda
+    if (cascadeHistory.length > 1) {
+        const averageCascades = cascadeHistory.reduce((sum, value) => sum + value, 0) / cascadeHistory.length;
+        if (currentCascadeCount > averageCascades) {
+            // Añadir tiempo extra basado en la diferencia con el promedio
+            const timeToAdd = 2 * (currentCascadeCount - averageCascades);
+            countdown += Math.ceil(timeToAdd); // Redondear hacia arriba para no perder segundos
+            console.log(`Tiempo extendido por ${Math.ceil(timeToAdd)} segundos. Nuevo tiempo: ${countdown} segundos.`);
         }
+    }
+
+   roundsInCascade = 1;
+totalRemovedThisCascade = 0;
+isProcessing = false;
+manageClock();
+document.querySelectorAll('.cell').forEach(cell => {
+    cell.classList.remove('processing');
+});
+applyScoreBlink();
+}
     }, 1000);
     updateColorSamples();
 }
