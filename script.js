@@ -294,8 +294,15 @@ setTimeout(() => {
             console.log(`Tiempo extendido por ${Math.ceil(timeToAdd)} segundos. Nuevo tiempo: ${countdown} segundos.`);
         }
     }
-
-   roundsInCascade = 1;
+// Actualizar el promedio de cascadas en el DOM
+            if (cascadeHistory.length > 0) {
+                const averageCascades = cascadeHistory.reduce((sum, value) => sum + value, 0) / cascadeHistory.length;
+                document.getElementById('current-average').textContent = averageCascades.toFixed(2);
+            } else {
+                document.getElementById('current-average').textContent = '0.00';
+            }
+    
+roundsInCascade = 1;
 totalRemovedThisCascade = 0;
 isProcessing = false;
 manageClock();
