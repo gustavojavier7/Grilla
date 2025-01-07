@@ -15,7 +15,7 @@ let totalCellsRemoved = 0;
 let globalClock = { hours: '00', minutes: '00', seconds: '00' };
 let separatorVisible = true;
 let lastUpdateTime = 0;
-const updateInterval = 500; // 500 milisegundos
+const updateInterval = 1000; // 1s
 
 
 COLORS.forEach(color => {
