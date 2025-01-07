@@ -30,6 +30,12 @@ function updateClock() {
     document.getElementById('segundos').textContent = seconds;
 }
 
+function getMsUntilNextSecond() {
+    const now = new Date();
+    // Obtiene los milisegundos actuales y resta de 1000
+    return 1000 - now.getMilliseconds();
+}
+
 function updateSecondaryClock() {
     const now = new Date();
     let hours = now.getHours().toString().padStart(2, '0');
@@ -56,18 +62,46 @@ function manageSecondarySeparators() {
     });
 }
 
+function resumeClockSynced() {
+    // 1. Calcula cuánto falta para el siguiente segundo
+    const msToNextSecond = getMsUntilNextSecond();
 
+    // 2. Esperamos ese tiempo y luego reanudamos
+    setTimeout(() => {
+        // (A) Actualizamos el reloj secundario para tener la hora exacta del "segundo maestro"
+        updateSecondaryClock();
+
+        // (B) Copiamos los valores del secundario al principal (si quieres forzar que sean idénticos)
+        const horasSec = document.getElementById('horas-sec').textContent;
+        const minutosSec = document.getElementById('minutos-sec').textContent;
+        const segundosSec = document.getElementById('segundos-sec').textContent;
+        document.getElementById('horas').textContent = horasSec;
+        document.getElementById('minutos').textContent = minutosSec;
+        document.getElementById('segundos').textContent = segundosSec;
+
+        // (C) Llamamos a la lógica de reanudación normal: parpadeo y setInterval
+        separators.forEach(separator => {
+            separator.classList.remove('paused');
+            separator.classList.add('active');
+        });
+        if (!clockIntervalId) {
+            updateClock(); // Muestra la hora (que ya hemos forzado a coincidir)
+            clockIntervalId = setInterval(updateClock, 1000);
+        }
+    }, msToNextSecond);
+}
 
 // Llamada inicial para manejar el parpadeo de los separadores del reloj secundario
 manageSecondarySeparators();
+
 function manageClock() {
     const separators = document.querySelectorAll('.separador');
-    
+
     if (isProcessing) {
         // Detener parpadeo y activar estado pausado
         separators.forEach(separator => {
             separator.classList.remove('active'); // Detener animación
-            separator.classList.add('paused'); // Marcar como pausado
+            separator.classList.add('paused');    // Marcar como pausado
         });
 
         // Detener la actualización del reloj
@@ -75,18 +109,11 @@ function manageClock() {
             clearInterval(clockIntervalId);
             clockIntervalId = null;
         }
-    } else {
-        // Reactivar el parpadeo y quitar estado pausado
-        separators.forEach(separator => {
-            separator.classList.remove('paused'); // Quitar estado pausado
-            separator.classList.add('active'); // Reactivar animación
-        });
 
-        // Iniciar la actualización del reloj si no hay intervalo
-        if (!clockIntervalId) {
-            updateClock(); // Mostrar la hora actual
-            clockIntervalId = setInterval(updateClock, 1000); // Actualizar cada 1 segundo
-        }
+    } else {
+        // Aquí, en vez de reanudar de inmediato,
+        // llamamos a la función para esperar al siguiente segundo
+        resumeClockSynced();
     }
 }
 
