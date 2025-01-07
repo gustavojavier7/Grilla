@@ -101,6 +101,22 @@ body {
     gap: 10px;
 }
 
+.separador, .separador-sec {
+    width: 5px; /* Ajusta según necesites */
+    height: 20px; /* Ajusta según necesites */
+    background-color: yellow; /* Color inicial */
+}
+
+/* Si necesitas controlar el parpadeo con CSS */
+@keyframes colorSwap {
+    0%, 50% {
+        background-color: yellow;
+    }
+    51%, 100% {
+        background-color: black;
+    }
+}
+
 .cell-sample {
     width: 50px;
     height: 50px;
