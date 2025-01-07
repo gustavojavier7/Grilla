@@ -29,6 +29,17 @@ COLORS.forEach(color => {
     cellCounts[color] = 0;
 });
 
+function checkSelections() {
+    const difficulty = document.getElementById('difficulty').value;
+    console.log("Dificultad seleccionada:", difficulty);
+    document.getElementById('fill-grid-btn').disabled = !difficulty;
+    document.getElementById('reset-game-btn').disabled = !difficulty;
+}
+
+// Hacer que la función sea global
+window.checkSelections = checkSelections;
+
+
 function initializeSeparators() {
     document.querySelectorAll('.separador').forEach(separator => {
         separator.style.backgroundColor = SEPARATOR_COLORS.ON;
