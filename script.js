@@ -41,9 +41,11 @@ function updateSecondaryClock() {
 }
 
 
-// Iniciar la actualización del reloj secundario
-setInterval(updateSecondaryClock, 1000);
-updateSecondaryClock(); // Llamada inicial para mostrar la hora inmediatamente
+document.addEventListener('DOMContentLoaded', () => {
+    setInterval(updateSecondaryClock, 1000);
+    updateSecondaryClock(); // Llamada inicial
+});
+
 
 // Función para manejar el parpadeo de los separadores del reloj secundario
 function manageSecondarySeparators() {
