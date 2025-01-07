@@ -498,9 +498,20 @@ function animate() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Vincular el evento 'change' al selector de dificultad
+    const difficultySelect = document.getElementById('difficulty');
+    difficultySelect.addEventListener('change', () => {
+        const difficulty = difficultySelect.value;
+        console.log("Dificultad seleccionada:", difficulty);
+        document.getElementById('fill-grid-btn').disabled = !difficulty;
+        document.getElementById('reset-game-btn').disabled = !difficulty;
+    });
+
+    // Inicializa el juego
+    resetGame();
     requestAnimationFrame(animate);
-    resetGame(); // Esto solo si quieres que el juego inicie automáticamente
 });
+
 
 createGrid(rows, cols);
 updateColorSamples();
