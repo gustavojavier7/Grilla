@@ -1,4 +1,5 @@
 const COLORS = ['gris-ondas', 'verde', 'cyan', 'puntos-blancos', 'rayado', 'magenta'];
+const separators = document.querySelectorAll('.separador');
 let gameContainer = document.getElementById('game-container');
 let board = [];
 let clockIntervalId = null;
