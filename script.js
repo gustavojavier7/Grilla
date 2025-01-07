@@ -435,8 +435,13 @@ function showGameOver(color, threshold) {
     const colorElement = document.getElementById('game-over-color');
     const thresholdElement = document.getElementById('game-over-threshold');
 
-    colorElement.textContent = color;
-    thresholdElement.textContent = threshold;
+    if (color === 'Tiempo agotado') {
+        colorElement.textContent = color;
+        thresholdElement.textContent = ''; // Limpiar el umbral ya que no aplica para tiempo agotado
+    } else {
+        colorElement.textContent = color;
+        thresholdElement.textContent = threshold;
+    }
     overlay.style.display = 'flex';
 
     isProcessing = true;
