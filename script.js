@@ -14,44 +14,47 @@ let rows = 6; // Valor por defecto
 let cols = 6; // Valor por defecto
 let cellCounts = {};
 let totalCellsRemoved = 0;
+let globalClock = { hours: '00', minutes: '00', seconds: '00' };
 COLORS.forEach(color => {
     cellCounts[color] = 0;
 });
 
-function updateClock() {
-    // Solo actualizamos el tiempo, no manejamos la animación aquí
+function updateClockMaster() {
     const now = new Date();
-    let hours = now.getHours().toString().padStart(2, '0');
-    let minutes = now.getMinutes().toString().padStart(2, '0');
-    let seconds = now.getSeconds().toString().padStart(2, '0');
-    
-    document.getElementById('horas').textContent = hours;
-    document.getElementById('minutos').textContent = minutes;
-    document.getElementById('segundos').textContent = seconds;
-}
-
-function getMsUntilNextSecond() {
-    const now = new Date();
-    // Obtiene los milisegundos actuales y resta de 1000
-    return 1000 - now.getMilliseconds();
-}
-
-function updateSecondaryClock() {
-    const now = new Date();
-    let hours = now.getHours().toString().padStart(2, '0');
-    let minutes = now.getMinutes().toString().padStart(2, '0');
-    let seconds = now.getSeconds().toString().padStart(2, '0');
-
-    document.getElementById('horas-sec').textContent = hours;
-    document.getElementById('minutos-sec').textContent = minutes;
-    document.getElementById('segundos-sec').textContent = seconds;
+    globalClock.hours = now.getHours().toString().padStart(2, '0');
+    globalClock.minutes = now.getMinutes().toString().padStart(2, '0');
+    globalClock.seconds = now.getSeconds().toString().padStart(2, '0');
 }
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    setInterval(updateSecondaryClock, 1000);
-    updateSecondaryClock(); // Llamada inicial
+    // Actualizar la hora maestra cada segundo
+    setInterval(() => {
+        updateClockMaster();   // Calcula la hora
+        renderPrimaryClock();  // Pinta la hora en el “reloj principal” si no está pausado
+        renderSecondaryClock(); // Pinta la hora siempre en el “reloj secundario”
+    }, 1000);
+    // Llamadas iniciales para arrancar
+    updateClockMaster();
+    renderPrimaryClock();
+    renderSecondaryClock();
 });
+
+function renderPrimaryClock() {
+    if (!isProcessing) {
+        // Sólo pintar si isProcessing es false
+        document.getElementById('horas').textContent = globalClock.hours;
+        document.getElementById('minutos').textContent = globalClock.minutes;
+        document.getElementById('segundos').textContent = globalClock.seconds;
+    }
+}
+
+function renderSecondaryClock() {
+    // Pintar siempre, independientemente de isProcessing
+    document.getElementById('horas-sec').textContent = globalClock.hours;
+    document.getElementById('minutos-sec').textContent = globalClock.minutes;
+    document.getElementById('segundos-sec').textContent = globalClock.seconds;
+}
 
 
 // Función para manejar el parpadeo de los separadores del reloj secundario
@@ -62,34 +65,6 @@ function manageSecondarySeparators() {
     });
 }
 
-function resumeClockSynced() {
-    // 1. Calcula cuánto falta para el siguiente segundo
-    const msToNextSecond = getMsUntilNextSecond();
-
-    // 2. Esperamos ese tiempo y luego reanudamos
-    setTimeout(() => {
-        // (A) Actualizamos el reloj secundario para tener la hora exacta del "segundo maestro"
-        updateSecondaryClock();
-
-        // (B) Copiamos los valores del secundario al principal (si quieres forzar que sean idénticos)
-        const horasSec = document.getElementById('horas-sec').textContent;
-        const minutosSec = document.getElementById('minutos-sec').textContent;
-        const segundosSec = document.getElementById('segundos-sec').textContent;
-        document.getElementById('horas').textContent = horasSec;
-        document.getElementById('minutos').textContent = minutosSec;
-        document.getElementById('segundos').textContent = segundosSec;
-
-        // (C) Llamamos a la lógica de reanudación normal: parpadeo y setInterval
-        separators.forEach(separator => {
-            separator.classList.remove('paused');
-            separator.classList.add('active');
-        });
-        if (!clockIntervalId) {
-            updateClock(); // Muestra la hora (que ya hemos forzado a coincidir)
-            clockIntervalId = setInterval(updateClock, 1000);
-        }
-    }, msToNextSecond);
-}
 
 // Llamada inicial para manejar el parpadeo de los separadores del reloj secundario
 manageSecondarySeparators();
@@ -111,10 +86,8 @@ function manageClock() {
         }
 
     } else {
-        // Aquí, en vez de reanudar de inmediato,
-        // llamamos a la función para esperar al siguiente segundo
-        resumeClockSynced();
-    }
+        
+         }
 }
 
 function checkSelections() {
@@ -557,5 +530,4 @@ function updateCellsRemovedDisplay() {
 // Inicializar con una grilla de 6x6 por defecto
 createGrid(rows, cols);
 updateColorSamples(); // Actualizar la muestra de colores al inicio del juego
-// Iniciar el reloj
-manageClock(); // Se usa manageClock para iniciar el reloj en lugar de setInterval directamente
+
