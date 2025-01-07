@@ -95,28 +95,6 @@ body {
     text-align: left;
 }
 
-.separador, .separador-sec {
-    width: 5px;
-    height: 20px;
-    background-color: yellow;
-    animation: colorSwap 1s infinite;
-}
-
-.separador.paused {
-    background-color: black !important;
-    animation: none;
-}
-
-
-@keyframes colorSwap {
-    0%, 50% {
-        background-color: yellow;
-    }
-    51%, 100% {
-        background-color: black;
-    }
-}
-
 #color-samples {
     display: flex;
     flex-wrap: wrap;
