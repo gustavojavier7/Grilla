@@ -17,6 +17,8 @@ let separatorVisible = true;
 let primarySeparatorVisible = true;
 let secondarySeparatorVisible = true;
 let lastUpdateTime = 0;
+let countdown = 60; // 1 minuto en segundos
+let countdownInterval = 1000; // Actualizar cada segundo
 const updateInterval = 1000; // 1s
 const SEPARATOR_COLORS = {
     ON: 'yellow',
@@ -36,49 +38,21 @@ function initializeSeparators() {
     });
 }
 
-function updateClockMaster() {
-    const now = new Date();
-    globalClock.hours = now.getHours().toString().padStart(2, '0');
-    globalClock.minutes = now.getMinutes().toString().padStart(2, '0');
-    globalClock.seconds = now.getSeconds().toString().padStart(2, '0');
-}
-
-function renderClocks() {
-    if (!isProcessing) {
-        document.getElementById('horas').textContent = globalClock.hours;
-        document.getElementById('minutos').textContent = globalClock.minutes;
-        document.getElementById('segundos').textContent = globalClock.seconds;
-    }
-    document.getElementById('horas-sec').textContent = globalClock.hours;
-    document.getElementById('minutos-sec').textContent = globalClock.minutes;
-    document.getElementById('segundos-sec').textContent = globalClock.seconds;
-}
-
 function toggleSeparators() {
-    primarySeparatorVisible = !primarySeparatorVisible;
-    document.querySelectorAll('.separador').forEach(separator => {
-        separator.style.backgroundColor = primarySeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
-    });
-}
-
-// Función actualizada para manejar separadores secundarios
-function toggleSeparatorsSecondaryOnly() {
     secondarySeparatorVisible = !secondarySeparatorVisible;
     document.querySelectorAll('.separador-sec').forEach(separator => {
         separator.style.backgroundColor = secondarySeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
     });
 }
 
-
 function manageClock() {
-    // Manejo del reloj primario
-    document.querySelectorAll('#reloj .separador').forEach(separator => {
+    // Solo manejamos el reloj secundario ahora
+    document.querySelectorAll('#reloj-sec .separador-sec').forEach(separator => {
         if (isProcessing) {
-            separator.classList.add('paused');
-        } else {
-            separator.classList.remove('paused');
+            separator.classList.remove('paused'); // Mantener el parpadeo del secundario
         }
     });
+}
 
     // El reloj secundario nunca se pausa
     document.querySelectorAll('#reloj-sec .separador-sec').forEach(separator => {
@@ -373,6 +347,7 @@ function resetScore() {
 
 function resetGame() {
     score = 0;
+    countdown = 60;
     cascadeMultiplier = 1;
     roundsInCascade = 1;
     totalRemovedThisCascade = 0;
@@ -481,25 +456,27 @@ function updateCellsRemovedDisplay() {
 function animate() {
     const now = performance.now();
     if (now - lastUpdateTime > updateInterval) {
-        updateClockMaster();
-        
-        // Separar la renderización del reloj secundario
-        // El reloj secundario siempre se actualiza
-        document.getElementById('horas-sec').textContent = globalClock.hours;
-        document.getElementById('minutos-sec').textContent = globalClock.minutes;
-        document.getElementById('segundos-sec').textContent = globalClock.seconds;
-        
-        // El reloj primario solo se actualiza si no está procesando
-        if (!isProcessing) {
-            document.getElementById('horas').textContent = globalClock.hours;
-            document.getElementById('minutos').textContent = globalClock.minutes;
-            document.getElementById('segundos').textContent = globalClock.seconds;
-            toggleSeparators();
+        // Actualizar el conteo regresivo
+        if (countdown > 0 && !isProcessing) {
+            countdown--;
+            const minutes = Math.floor(countdown / 60).toString().padStart(2, '0');
+            const seconds = (countdown % 60).toString().padStart(2, '0');
+            document.getElementById('minutos').textContent = minutes;
+            document.getElementById('segundos').textContent = seconds;
         }
-        
-        // El separador secundario siempre parpadea
-        toggleSeparatorsSecondaryOnly();
-        
+        if (countdown === 0) {
+            // Aquí puedes manejar lo que sucede cuando el tiempo se acaba, por ejemplo:
+            // gameOver();
+        }
+
+        // El reloj secundario sigue funcionando como antes
+        document.getElementById('horas-sec').textContent = new Date().getHours().toString().padStart(2, '0');
+        document.getElementById('minutos-sec').textContent = new Date().getMinutes().toString().padStart(2, '0');
+        document.getElementById('segundos-sec').textContent = new Date().getSeconds().toString().padStart(2, '0');
+
+        // Solo parpadea el reloj secundario
+        toggleSeparators();
+
         lastUpdateTime = now;
     }
     requestAnimationFrame(animate);
@@ -507,6 +484,7 @@ function animate() {
 
 document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(animate);
+    resetGame(); // Esto solo si quieres que el juego inicie automáticamente
 });
 
 createGrid(rows, cols);
