@@ -1,20 +1,19 @@
 const COLORS = ['gris-ondas', 'verde', 'cyan', 'puntos-blancos', 'rayado', 'magenta'];
-const separators = document.querySelectorAll('.separador');
 let gameContainer = document.getElementById('game-container');
 let board = [];
-let clockIntervalId = null;
 let cellReferences = [];
 let firstSelected = null;
-let isProcessing = false; // Indica si el efecto cascada o blinkedo está en proceso
+let isProcessing = false;
 let score = 0;
 let cascadeMultiplier = 1;
-let roundsInCascade = 1; // Inicializado en 1
+let roundsInCascade = 1;
 let totalRemovedThisCascade = 0;
-let rows = 6; // Valor por defecto
-let cols = 6; // Valor por defecto
+let rows = 6;
+let cols = 6;
 let cellCounts = {};
 let totalCellsRemoved = 0;
 let globalClock = { hours: '00', minutes: '00', seconds: '00' };
+
 COLORS.forEach(color => {
     cellCounts[color] = 0;
 });
@@ -26,23 +25,16 @@ function updateClockMaster() {
     globalClock.seconds = now.getSeconds().toString().padStart(2, '0');
 }
 
-
 document.addEventListener('DOMContentLoaded', () => {
-    // Actualizar la hora maestra cada segundo
-    setInterval(() => {
-        updateClockMaster();   // Calcula la hora
-        renderPrimaryClock();  // Pinta la hora en el “reloj principal” si no está pausado
-        renderSecondaryClock(); // Pinta la hora siempre en el “reloj secundario”
-    }, 1000);
-    // Llamadas iniciales para arrancar
+    setInterval(updateClockMaster, 1000);
     updateClockMaster();
     renderPrimaryClock();
     renderSecondaryClock();
+    manageSecondarySeparators();
 });
 
 function renderPrimaryClock() {
     if (!isProcessing) {
-        // Sólo pintar si isProcessing es false
         document.getElementById('horas').textContent = globalClock.hours;
         document.getElementById('minutos').textContent = globalClock.minutes;
         document.getElementById('segundos').textContent = globalClock.seconds;
@@ -50,27 +42,21 @@ function renderPrimaryClock() {
 }
 
 function renderSecondaryClock() {
-    // Pintar siempre, independientemente de isProcessing
     document.getElementById('horas-sec').textContent = globalClock.hours;
     document.getElementById('minutos-sec').textContent = globalClock.minutes;
     document.getElementById('segundos-sec').textContent = globalClock.seconds;
 }
 
-
-// Función para manejar el parpadeo de los separadores del reloj secundario
 function manageSecondarySeparators() {
-    const separators = document.querySelectorAll('.separador-sec');
-    separators.forEach(separator => {
+    document.querySelectorAll('.separador-sec').forEach(separator => {
         separator.classList.add('active');
     });
 }
 
 function resumeMainBlinking() {
     const msToNextSecond = getMsUntilNextSecond();
-
     setTimeout(() => {
-        const primarySeparators = document.querySelectorAll('.separador');
-        primarySeparators.forEach(separator => {
+        document.querySelectorAll('.separador').forEach(separator => {
             separator.classList.remove('paused');
             separator.classList.add('active');
         });
@@ -82,41 +68,22 @@ function getMsUntilNextSecond() {
     return 1000 - now.getMilliseconds();
 }
 
-
-// Llamada inicial para manejar el parpadeo de los separadores del reloj secundario
-manageSecondarySeparators();
-
 function manageClock() {
     const separators = document.querySelectorAll('.separador');
-
     if (isProcessing) {
-        // Detener parpadeo y activar estado pausado
         separators.forEach(separator => {
-            separator.classList.remove('active'); // Detener animación
-            separator.classList.add('paused');    // Marcar como pausado
+            separator.classList.remove('active');
+            separator.classList.add('paused');
         });
-
-        // (Si fuera necesario) lógica de detención de intervalos se eliminaría aquí.
     } else {
-        // En vez de reanudar inmediatamente, sincronizamos el parpadeo
         resumeMainBlinking();
     }
 }
 
-
-
 function checkSelections() {
     const difficulty = document.getElementById('difficulty').value;
-    const fillGridBtn = document.getElementById('fill-grid-btn');
-    const resetGameBtn = document.getElementById('reset-game-btn');
-
-    if (difficulty) {
-        fillGridBtn.disabled = false;
-        resetGameBtn.disabled = false;
-    } else {
-        fillGridBtn.disabled = true;
-        resetGameBtn.disabled = true;
-    }
+    document.getElementById('fill-grid-btn').disabled = !difficulty;
+    document.getElementById('reset-game-btn').disabled = !difficulty;
 }
 
 function createGrid(rows, cols) {
@@ -142,32 +109,29 @@ function createGrid(rows, cols) {
 function fillGrid() {
     if (isProcessing) return;
     resetScore();
-    totalCellsRemoved = 0;  // Resetear el contador
-    updateCellsRemovedDisplay();  // Actualizar la vista
+    totalCellsRemoved = 0;
+    updateCellsRemovedDisplay();
 
-    // Retrieve the selected difficulty level
     const difficulty = document.getElementById('difficulty').value;
     if (difficulty) {
         rows = cols = parseInt(difficulty, 10);
     }
 
-    // Create the grid based on the difficulty level
     createGrid(rows, cols);
 
-    const cells = document.querySelectorAll('.cell');
-    cells.forEach(cell => {
+    document.querySelectorAll('.cell').forEach(cell => {
         const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
         const row = cell.dataset.row;
         const col = cell.dataset.col;
         board[row][col] = randomColor;
         cell.className = `cell ${randomColor}`;
-        cellCounts[randomColor]++; // Incrementar el contador del color
+        cellCounts[randomColor]++;
     });
     checkPatterns();
 }
 
 function handleCellClick(cell) {
-    if (isProcessing) return; // Ignorar clics mientras el efecto cascada o blinkedo está activo
+    if (isProcessing) return;
 
     const row = parseInt(cell.dataset.row);
     const col = parseInt(cell.dataset.col);
@@ -177,7 +141,7 @@ function handleCellClick(cell) {
         cell.classList.add('selected');
     } else {
         const isAdjacent = (row === firstSelected.row && Math.abs(col - firstSelected.col) === 1) ||
-                             (col === firstSelected.col && Math.abs(row - firstSelected.row) === 1);
+                           (col === firstSelected.col && Math.abs(row - firstSelected.row) === 1);
 
         if (isAdjacent) {
             swapColors(firstSelected, { row, col, element: cell });
@@ -211,9 +175,8 @@ function checkLine(startRow, startCol, deltaRow, deltaCol) {
 function checkPatterns() {
     if (isProcessing) return;
     isProcessing = true;
-    manageClock(); // Llamada para pausar el reloj
+    manageClock();
     const cells = document.querySelectorAll('.cell');
-
     const rows = board.length;
     const cols = board[0].length;
     const matches = new Set();
@@ -221,7 +184,6 @@ function checkPatterns() {
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
             if (board[row][col]) {
-                // Mantener la lógica existente para encontrar patrones
                 if (col < cols - 2 && checkLine(row, col, 0, 1)) {
                     matches.add(`${row},${col}`);
                     matches.add(`${row},${col + 1}`);
@@ -247,7 +209,7 @@ function checkPatterns() {
     }
 
     if (matches.size > 0) {
-        roundsInCascade = 1; // Inicializar roundsInCascade en la primera ronda
+        roundsInCascade = 1;
         totalRemovedThisCascade += matches.size;
 
         matches.forEach(coord => {
@@ -256,14 +218,12 @@ function checkPatterns() {
             cell.classList.add('matched');
         });
 
-        // Iniciar el destello sincronizado durante 1 segundo
         setTimeout(() => {
             removePulsatingCells(matches);
         }, 1000);
     } else {
-        // No resetear cascadeMultiplier aquí
         isProcessing = false;
-        cells.forEach(cell => cell.classList.remove('processing')); // Permitir interacciones
+        cells.forEach(cell => cell.classList.remove('processing'));
     }
 }
 
@@ -271,108 +231,93 @@ function removePulsatingCells(matches) {
     const rows = board.length;
     const cols = board[0].length;
 
-    // Primero, quitar la clase 'matched' para reiniciar la animación
     matches.forEach(coord => {
         const [row, col] = coord.split(',').map(Number);
         const cell = cellReferences[row][col];
-        cell.classList.remove('matched'); // Quitar la clase para reiniciar la animación
+        cell.classList.remove('matched');
     });
 
-    // Luego, aplicar la animación de blinkedo nuevamente
     matches.forEach(coord => {
         const [row, col] = coord.split(',').map(Number);
         const cell = cellReferences[row][col];
-        cell.classList.add('matched'); // Añadir la clase para iniciar el blinkedo
+        cell.classList.add('matched');
     });
 
-            // Iniciar el destello sincronizado durante 1 segundo
-        setTimeout(() => {
-            // Vaciar las celdas marcadas
-            matches.forEach(coord => {
+    setTimeout(() => {
+        matches.forEach(coord => {
+            const [row, col] = coord.split(',').map(Number);
+            const color = board[row][col];
+            board[row][col] = null;
+            cellReferences[row][col].className = 'cell';
+            cellCounts[color]--;
+            totalCellsRemoved++;
+        });
+        updateCellsRemovedDisplay();
+
+        let newMatches = new Set();
+
+        for (let col = 0; col < cols; col++) {
+            let emptySpaceCount = 0;
+
+            for (let row = rows - 1; row >= 0; row--) {
+                if (board[row][col] === null) {
+                    emptySpaceCount++;
+                } else if (emptySpaceCount > 0) {
+                    const newRow = row + emptySpaceCount;
+                    board[newRow][col] = board[row][col];
+                    cellReferences[newRow][col].className = `cell ${board[newRow][col]}`;
+                    board[row][col] = null;
+                    cellReferences[row][col].className = 'cell';
+                }
+            }
+
+            for (let row = 0; emptySpaceCount > 0; row++, emptySpaceCount--) {
+                const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+                board[row][col] = newColor;
+                cellReferences[row][col].className = `cell ${newColor}`;
+                cellCounts[newColor]++;
+            }
+        }
+
+        newMatches = checkNewMatches();
+        if (newMatches.size > 0) {
+            newMatches.forEach(coord => {
                 const [row, col] = coord.split(',').map(Number);
-                const color = board[row][col];
-                board[row][col] = null; // Vaciar la celda
-                cellReferences[row][col].className = 'cell'; // Limpiar la clase de la celda
-                cellCounts[color]--; // Decrementar el contador del color
-                totalCellsRemoved++; // Incrementar el contador de celdas eliminadas
+                const cell = cellReferences[row][col];
+                cell.classList.remove('matched');
+                cell.classList.add('matched');
             });
-            updateCellsRemovedDisplay(); // Actualizar el contador visible
 
-            let newMatches = new Set(); // Para almacenar nuevas coincidencias formadas durante la caída
+            const n = Math.log2(roundsInCascade) + 1;
+            roundsInCascade = Math.pow(2, n);
+            totalRemovedThisCascade += newMatches.size;
 
-            for (let col = 0; col < cols; col++) {
-                let emptySpaceCount = 0;
+            const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
+            incrementScoreAnimated(scoreIncrement, 2000, 20);
 
-                for (let row = rows - 1; row >= 0; row--) {
-                    if (board[row][col] === null) {
-                        emptySpaceCount++;
-                    } else if (emptySpaceCount > 0) {
-                        // Mover la celda hacia abajo para llenar el espacio vacío
-                        const newRow = row + emptySpaceCount;
-                        board[newRow][col] = board[row][col];
-                        cellReferences[newRow][col].className = `cell ${board[newRow][col]}`;
+            setTimeout(() => {
+                removePulsatingCells(newMatches);
+            }, 1000);
+        } else {
+            isProcessing = false;
+            manageClock();
+            let finalPoints = totalRemovedThisCascade * roundsInCascade;
+            score += finalPoints;
+            updateScoreDisplay();
 
-                        // Limpiar la celda original
-                        board[row][col] = null;
-                        cellReferences[row][col].className = 'cell';
-                    }
-                }
+            cascadeMultiplier = 1;
+            roundsInCascade = 1;
+            totalRemovedThisCascade = 0;
 
-                // Llenar las celdas superiores que ahora están vacías
-                for (let row = 0; emptySpaceCount > 0; row++, emptySpaceCount--) {
-                    const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-                    board[row][col] = newColor;
-                    cellReferences[row][col].className = `cell ${newColor}`;
-                    cellCounts[newColor]++; // Incrementar el contador del nuevo color
-                }
-            }
+            isProcessing = false;
+            manageClock();
+            document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('processing'));
 
-            // Verificar si hay nuevas coincidencias después de la caída
-            newMatches = checkNewMatches();
-            if (newMatches.size > 0) {
-                // Aquí, aplicar el mismo procedimiento para nuevas coincidencias
-                newMatches.forEach(coord => {
-                    const [row, col] = coord.split(',').map(Number);
-                    const cell = cellReferences[row][col];
-                    cell.classList.remove('matched'); // Quitar la clase para reiniciar la animación
-                    cell.classList.add('matched'); // Añadir la clase para iniciar el blinkedo
-                });
-
-                // Incrementar exponencialmente roundsInCascade
-                const n = Math.log2(roundsInCascade) + 1;
-                roundsInCascade = Math.pow(2, n);
-                totalRemovedThisCascade += newMatches.size;
-
-                // Incremento de puntaje con animación
-                const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
-                incrementScoreAnimated(scoreIncrement, 2000, 20);
-
-                setTimeout(() => {
-                    removePulsatingCells(newMatches);
-                }, 1000); // 1 segundo de espera antes de la siguiente ronda de cascada
-            } else {
-                isProcessing = false; // Habilitar interacciones
-                manageClock(); // Reanudar el reloj y actualizar los separadores
-                let finalPoints = totalRemovedThisCascade * roundsInCascade;
-                score += finalPoints;
-                updateScoreDisplay();
-
-                // Resetear contadores
-                cascadeMultiplier = 1;
-                roundsInCascade = 1;
-                totalRemovedThisCascade = 0;
-
-                                isProcessing = false; // Habilitar interacciones
-                manageClock(); // Llamada para reanudar el reloj
-                const cells = document.querySelectorAll('.cell');
-                cells.forEach(cell => cell.classList.remove('processing'));
-
-                // Aplicar blinkedo si el puntaje cambió
-                applyScoreBlink();
-            }
-        }, 1000); // 1 segundo de blinkedo antes de eliminar las celdas
-        updateColorSamples();
-   }
+            applyScoreBlink();
+        }
+    }, 1000);
+    updateColorSamples();
+}
 
 function checkNewMatches() {
     const rows = board.length;
@@ -382,7 +327,6 @@ function checkNewMatches() {
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
             if (board[row][col]) {
-                // Mantener la lógica existente para encontrar patrones
                 if (col < cols - 2 && checkLine(row, col, 0, 1)) {
                     newMatches.add(`${row},${col}`);
                     newMatches.add(`${row},${col + 1}`);
@@ -411,14 +355,9 @@ function checkNewMatches() {
 }
 
 function updateScoreDisplay() {
-    // Convertimos el puntaje a una cadena y lo rellenamos con ceros a la izquierda hasta 16 dígitos
     let scoreString = score.toString().padStart(16, '0');
-    
-    // Dividimos la cadena en grupos de 4 y los unimos con guiones
     let formattedScore = scoreString.match(/.{1,4}/g).join('-');
-    
-    const scoreElement = document.getElementById('current-score');
-    scoreElement.textContent = formattedScore; // Actualizamos el contenido del elemento con el puntaje formateado
+    document.getElementById('current-score').textContent = formattedScore;
 }
 
 function resetScore() {
@@ -431,10 +370,9 @@ function resetGame() {
     cascadeMultiplier = 1;
     roundsInCascade = 1;
     totalRemovedThisCascade = 0;
-    totalCellsRemoved = 0;  // Resetear el contador
+    totalCellsRemoved = 0;
     updateCellsRemovedDisplay();
-    
-    // Reiniciar los contadores de celdas
+
     cellCounts = {};
     COLORS.forEach(color => {
         cellCounts[color] = 0;
@@ -445,26 +383,24 @@ function resetGame() {
     fillGrid();
     updateColorSamples();
 
-    // Ocultar el overlay de GAME OVER
     const overlay = document.getElementById('game-over-overlay');
     if (overlay) {
         overlay.style.display = 'none';
     }
 }
 window.resetGame = resetGame;
-console.log('resetGame definida:', window.resetGame !== undefined);
 
 function incrementScoreAnimated(incrementBy, duration, steps) {
     const targetScore = score + incrementBy;
-    const stepSize = Math.round(incrementBy / steps); // Truncar al entero más cercano
+    const stepSize = Math.round(incrementBy / steps);
     let stepsCompleted = 0;
     const intervalId = setInterval(() => {
         if (stepsCompleted < steps - 1) {
             score += stepSize;
-            updateScoreDisplay(); // Actualizar el puntaje visible
+            updateScoreDisplay();
             stepsCompleted++;
         } else {
-            score = targetScore; // Asegurar que el puntaje final sea exacto
+            score = targetScore;
             updateScoreDisplay();
             clearInterval(intervalId);
         }
@@ -477,7 +413,7 @@ function applyScoreBlink() {
         scoreElement.classList.add('blink-score');
         setTimeout(() => {
             scoreElement.classList.remove('blink-score');
-        }, 2000); // Duración del blinkedo
+        }, 2000);
     }
 }
 
@@ -494,21 +430,19 @@ function updateColorSamples() {
 
         if (threshold !== null && count >= threshold) {
             cellSample.classList.add('blink-threshold');
-            console.log('Color que alcanzó el umbral:', color);
-            console.log('Umbral alcanzado:', threshold);
             showGameOver(color, threshold);
         } else {
             cellSample.classList.remove('blink-threshold');
         }
     });
 }
+
 function getGameOverThreshold(rows, cols) {
     const baseThreshold = 50;
     const baseGridSize = 15 * 15;
 
-    // No se establece condición para 6x6 y 10x10
     if ((rows === 6 && cols === 6) || (rows === 10 && cols === 10)) {
-        return null; // Retornamos null para indicar que no hay condición de fin de juego
+        return null;
     }
 
     const currentGridSize = rows * cols;
@@ -516,33 +450,27 @@ function getGameOverThreshold(rows, cols) {
 }
 
 function showGameOver(color, threshold) {
-    // Mostrar el overlay de GAME OVER
     const overlay = document.getElementById('game-over-overlay');
     const colorElement = document.getElementById('game-over-color');
     const thresholdElement = document.getElementById('game-over-threshold');
 
     colorElement.textContent = color;
     thresholdElement.textContent = threshold;
-    overlay.style.display = 'flex'; // Se muestra el overlay;
-    
-    // Pausar el juego o hacer que no sea interactivo
+    overlay.style.display = 'flex';
+
     isProcessing = true;
-    const cells = document.querySelectorAll('.cell');
-    cells.forEach(cell => cell.classList.add('processing'));
+    document.querySelectorAll('.cell').forEach(cell => cell.classList.add('processing'));
 }
 
 function updateCellsRemovedDisplay() {
     const cellsRemovedElement = document.getElementById('cells-removed');
     cellsRemovedElement.textContent = totalCellsRemoved;
 
-    // Aplicar el efecto de blinkedo
     cellsRemovedElement.classList.add('blink-cells-removed');
     setTimeout(() => {
         cellsRemovedElement.classList.remove('blink-cells-removed');
-    }, 1000); // Duración del blinkedo (1 segundo)
+    }, 1000);
 }
 
-// Inicializar con una grilla de 6x6 por defecto
 createGrid(rows, cols);
-updateColorSamples(); // Actualizar la muestra de colores al inicio del juego
-
+updateColorSamples();
