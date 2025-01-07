@@ -44,10 +44,17 @@ function toggleSeparators() {
     separatorVisible = !separatorVisible;
     document.querySelectorAll('.separador, .separador-sec').forEach(separator => {
         separator.style.backgroundColor = separatorVisible ? 'yellow' : 'black';
-        // Si quieres forzar una sincronía, asegúrate de que ambos cambien de color al mismo tiempo
-        // Esto significa que ambos separadores deben tener su color actualizado en el mismo ciclo de animación
     });
 }
+
+function toggleSeparatorsSecondaryOnly() {
+    separatorVisible = !separatorVisible;
+    document.querySelectorAll('.separador-sec').forEach(separator => {
+        separator.style.backgroundColor = separatorVisible ? 'yellow' : 'black';
+    });
+    // Aquí no se actualiza el separador del reloj primario durante el procesamiento
+}
+
 function manageClock() {
     document.querySelectorAll('#reloj .separador').forEach(separator => {
         if (isProcessing) {
@@ -456,8 +463,12 @@ function animate() {
     if (now - lastUpdateTime > updateInterval) {
         updateClockMaster();
         renderClocks();
-        if (!isProcessing) {
-            toggleSeparators(); // Ambos separadores se actualizan aquí
+        if (isProcessing) {
+            // Solo el separador del reloj secundario parpadea cuando isProcessing es true
+            toggleSeparatorsSecondaryOnly();
+        } else {
+            // Ambos separadores parpadean cuando isProcessing es false
+            toggleSeparators();
         }
         lastUpdateTime = now;
     }
