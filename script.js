@@ -63,10 +63,10 @@ function manageClock() {
     const separators = document.querySelectorAll('.separador');
     
     if (isProcessing) {
-        // Detener parpadeo
+        // Detener parpadeo y activar estado pausado
         separators.forEach(separator => {
-            separator.classList.remove('active');
-            separator.style.backgroundColor = 'black'; // Queda estático
+            separator.classList.remove('active'); // Detener animación
+            separator.classList.add('paused'); // Marcar como pausado
         });
 
         // Detener la actualización del reloj
@@ -74,18 +74,17 @@ function manageClock() {
             clearInterval(clockIntervalId);
             clockIntervalId = null;
         }
-        // El reloj queda mostrando la última hora actualizada.
-
     } else {
-        // Activar parpadeo
+        // Reactivar el parpadeo y quitar estado pausado
         separators.forEach(separator => {
-            separator.classList.add('active');
+            separator.classList.remove('paused'); // Quitar estado pausado
+            separator.classList.add('active'); // Reactivar animación
         });
 
-        // Iniciar la actualización del reloj solo si no existe ya un intervalo
+        // Iniciar la actualización del reloj si no hay intervalo
         if (!clockIntervalId) {
-            updateClock(); // Llamada inmediata para que aparezca la hora actual al instante
-            clockIntervalId = setInterval(updateClock, 1000); // Actualización cada 1s
+            updateClock(); // Mostrar la hora actual
+            clockIntervalId = setInterval(updateClock, 1000); // Actualizar cada 1 segundo
         }
     }
 }
