@@ -369,7 +369,7 @@ function resetGame() {
 
 window.resetGame = resetGame;
 
-function incrementScored(incrementBy, duration, steps) {
+function incrementScoreAnimated(incrementBy, duration, steps) {
     const targetScore = score + incrementBy;
     const stepSize = Math.round(incrementBy / steps);
     let stepsCompleted = 0;
