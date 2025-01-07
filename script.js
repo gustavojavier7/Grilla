@@ -32,10 +32,6 @@ function checkSelections() {
     document.getElementById('reset-game-btn').disabled = !difficulty;
 }
 
-// Hacer que la función sea global
-window.checkSelections = checkSelections;
-
-
 function initializeSeparators() {
     document.querySelectorAll('.separador').forEach(separator => {
         separator.style.backgroundColor = SEPARATOR_COLORS.ON;
@@ -65,12 +61,6 @@ function manageClock() {
     document.querySelectorAll('#reloj-sec .separador-sec').forEach(separator => {
         separator.classList.remove('paused');
     });
-
-function checkSelections() {
-    const difficulty = document.getElementById('difficulty').value;
-    document.getElementById('fill-grid-btn').disabled = !difficulty;
-    document.getElementById('reset-game-btn').disabled = !difficulty;
-}
 
 function createGrid(rows, cols) {
     gameContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
