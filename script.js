@@ -465,8 +465,8 @@ function animate() {
             document.getElementById('segundos').textContent = seconds;
         }
         if (countdown === 0) {
-            // Aquí puedes manejar lo que sucede cuando el tiempo se acaba, por ejemplo:
-            // gameOver();
+            // Mostrar el overlay de Game Over cuando el tiempo se acaba
+            showGameOver('Tiempo agotado', 0);
         }
 
         // El reloj secundario sigue funcionando como antes
