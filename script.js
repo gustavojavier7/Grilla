@@ -59,12 +59,6 @@ function manageClock() {
     });
 }
 
-
-    // El reloj secundario nunca se pausa
-    document.querySelectorAll('#reloj-sec .separador-sec').forEach(separator => {
-        separator.classList.remove('paused');
-    });
-
 function createGrid(rows, cols) {
     gameContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
     gameContainer.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
