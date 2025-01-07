@@ -44,9 +44,10 @@ function toggleSeparators() {
     separatorVisible = !separatorVisible;
     document.querySelectorAll('.separador, .separador-sec').forEach(separator => {
         separator.style.backgroundColor = separatorVisible ? 'yellow' : 'black';
+        // Si quieres forzar una sincronía, asegúrate de que ambos cambien de color al mismo tiempo
+        // Esto significa que ambos separadores deben tener su color actualizado en el mismo ciclo de animación
     });
 }
-
 function manageClock() {
     document.querySelectorAll('#reloj .separador').forEach(separator => {
         if (isProcessing) {
