@@ -56,8 +56,9 @@ function manageClock() {
             separator.classList.remove('paused');
         }
     });
-    // El reloj secundario no se pausa aquí, pero su parpadeo se controla por toggleSeparators() cuando no está procesando
+    // No pausar el separador del reloj secundario
 }
+
 function checkSelections() {
     const difficulty = document.getElementById('difficulty').value;
     document.getElementById('fill-grid-btn').disabled = !difficulty;
@@ -456,7 +457,7 @@ function animate() {
         updateClockMaster();
         renderClocks();
         if (!isProcessing) {
-            toggleSeparators();
+            toggleSeparators(); // Ambos separadores se actualizan aquí
         }
         lastUpdateTime = now;
     }
