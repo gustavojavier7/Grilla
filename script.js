@@ -354,7 +354,6 @@ function resetGame() {
     });
 
     updateScoreDisplay();
-    createGrid(rows, cols);
     fillGrid();
     updateColorSamples();
 
