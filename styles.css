@@ -102,6 +102,12 @@ body {
     animation: colorSwap 1s infinite;
 }
 
+.separador.paused {
+    background-color: black !important; /* Color estático */
+    animation: none; /* Detener cualquier animación */
+}
+
+
 @keyframes colorSwap {
     0%, 50% {
         background-color: yellow;
