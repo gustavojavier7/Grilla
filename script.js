@@ -63,7 +63,11 @@ function manageClock() {
             separator.classList.remove('paused');
         }
     });
+
     // No pausar el separador del reloj secundario
+    document.querySelectorAll('#reloj-sec .separador-sec').forEach(separator => {
+        separator.classList.remove('paused');
+    });
 }
 
 function checkSelections() {
