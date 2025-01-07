@@ -36,37 +36,23 @@ function renderClocks() {
     document.getElementById('segundos-sec').textContent = globalClock.seconds;
 }
 
-function manageSecondarySeparators() {
-    document.querySelectorAll('.separador-sec').forEach(separator => {
-        separator.classList.add('active');
-    });
-}
-
-function resumeMainBlinking() {
-    const msToNextSecond = getMsUntilNextSecond();
-    setTimeout(() => {
-        document.querySelectorAll('.separador').forEach(separator => {
-            separator.classList.remove('paused');
-            separator.classList.add('active');
-        });
-    }, msToNextSecond);
-}
-
-function getMsUntilNextSecond() {
-    const now = new Date();
-    return 1000 - now.getMilliseconds();
-}
-
-function manageClock() {
-    const separators = document.querySelectorAll('.separador');
+function manageSeparators() {
+    const primarySeparators = document.querySelectorAll('.separador');
     if (isProcessing) {
-        separators.forEach(separator => {
-            separator.classList.remove('active');
+        primarySeparators.forEach(separator => {
+            separator.classList.remove('separador-sec');
             separator.classList.add('paused');
         });
     } else {
-        resumeMainBlinking();
+        primarySeparators.forEach(separator => {
+            separator.classList.remove('paused');
+            separator.classList.add('separador-sec');
+        });
     }
+}
+
+function manageClock() {
+    manageSeparators();
 }
 
 function checkSelections() {
@@ -469,7 +455,6 @@ function animate() {
 
 document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(animate);
-    manageSecondarySeparators();
 });
 
 createGrid(rows, cols);
