@@ -5,20 +5,15 @@ let cellReferences = [];
 let firstSelected = null;
 let isProcessing = false;
 let score = 0;
-let cascadeMultiplier = 1;
 let roundsInCascade = 1;
 let totalRemovedThisCascade = 0;
 let rows = 6;
 let cols = 6;
 let cellCounts = {};
 let totalCellsRemoved = 0;
-let globalClock = { hours: '00', minutes: '00', seconds: '00' };
-let separatorVisible = true;
-let primarySeparatorVisible = true;
 let secondarySeparatorVisible = true;
 let lastUpdateTime = 0;
 let countdown = 60; // 1 minuto en segundos
-let countdownInterval = 1000; // Actualizar cada segundo
 let countdownStarted = false;
 const updateInterval = 1000; // 1s
 const SEPARATOR_COLORS = {
@@ -296,15 +291,11 @@ function removePulsatingCells(matches) {
             let finalPoints = totalRemovedThisCascade * roundsInCascade;
             score += finalPoints;
             updateScoreDisplay();
-
-            cascadeMultiplier = 1;
             roundsInCascade = 1;
             totalRemovedThisCascade = 0;
-
             isProcessing = false;
             manageClock();
             document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('processing'));
-
             applyScoreBlink();
         }
     }, 1000);
