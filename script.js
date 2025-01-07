@@ -78,17 +78,18 @@ function manageClock() {
             separator.classList.remove('active'); // Detener animación
             separator.classList.add('paused');    // Marcar como pausado
         });
-
-        // Detener la actualización del reloj
-        if (clockIntervalId) {
-            clearInterval(clockIntervalId);
-            clockIntervalId = null;
-        }
-
+        // Ya no es necesario detener ningún intervalo aquí
     } else {
-        
-         }
+        // Reactivar animación cuando no se está procesando
+        separators.forEach(separator => {
+            separator.classList.remove('paused');
+            separator.classList.add('active');
+        });
+        // No se llama a resumeClockSynced(), pues la actualización del reloj
+        // se maneja en el setInterval del DOMContentLoaded.
+    }
 }
+
 
 function checkSelections() {
     const difficulty = document.getElementById('difficulty').value;
