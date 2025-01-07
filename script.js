@@ -21,6 +21,10 @@ const SEPARATOR_COLORS = {
     OFF: 'black'
 };
 
+if (countdown === 0 && countdownStarted) {
+    showGameOver('Tiempo agotado');
+}
+
 COLORS.forEach(color => {
     cellCounts[color] = 0;
 });
@@ -423,20 +427,31 @@ function getGameOverThreshold(rows, cols) {
     return Math.floor((baseThreshold / baseGridSize) * currentGridSize);
 }
 
-function showGameOver(color, threshold) {
+function showGameOver(reason, threshold = null) {
     const overlay = document.getElementById('game-over-overlay');
-    const colorElement = document.getElementById('game-over-color');
-    const thresholdElement = document.getElementById('game-over-threshold');
+    const message = document.getElementById('game-over-message');
+    const gameOverReason = document.getElementById('game-over-reason');
+    const gameOverThreshold = document.getElementById('game-over-threshold');
 
-    if (color === 'Tiempo agotado') {
-        colorElement.textContent = color;
-        thresholdElement.textContent = ''; // Limpiar el umbral ya que no aplica para tiempo agotado
-    } else {
-        colorElement.textContent = color;
-        thresholdElement.textContent = threshold;
+    if (!gameOverReason || !gameOverThreshold) {
+        console.error('Elementos de Game Over no encontrados en el DOM.');
+        return;
     }
-    overlay.style.display = 'flex';
 
+    // Limpiar el contenido anterior para evitar sobreescrituras
+    gameOverReason.textContent = '';
+    gameOverThreshold.textContent = '';
+
+    if (reason === 'Tiempo agotado') {
+        gameOverReason.textContent = '¡Se acabó el tiempo!';
+        gameOverThreshold.style.display = 'none'; // Ocultar el elemento de umbral
+    } else {
+        gameOverReason.textContent = `El color/patrón "${reason}" alcanzó`;
+        gameOverThreshold.textContent = `${threshold} o más celdas.`;
+        gameOverThreshold.style.display = 'inline'; // Mostrar el umbral
+    }
+
+    overlay.style.display = 'flex';
     isProcessing = true;
     document.querySelectorAll('.cell').forEach(cell => cell.classList.add('processing'));
 }
