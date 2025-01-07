@@ -279,7 +279,7 @@ function removePulsatingCells(matches) {
             updateScoreDisplay();
 
             // Añadir el número de celdas removidas en esta jugada al historial
-            cellsRemovedHistory.push(totalCellsRemoved - (totalCellsRemoved - totalRemovedThisCascade));
+            cellsRemovedHistory.push(totalRemovedThisCascade);
             if (cellsRemovedHistory.length > 5) {
                 cellsRemovedHistory.shift(); // Mantener solo las 5 últimas jugadas
             }
@@ -287,6 +287,7 @@ function removePulsatingCells(matches) {
             // Calcular promedio de celdas removidas si hay más de una jugada
             if (cellsRemovedHistory.length > 1) {
                 const averageCellsRemoved = cellsRemovedHistory.reduce((sum, value) => sum + value, 0) / cellsRemovedHistory.length;
+                document.getElementById('current-average').textContent = averageCellsRemoved.toFixed(2);
                 console.log(`Promedio de celdas removidas: ${averageCellsRemoved.toFixed(2)}`);
             }
 
