@@ -46,8 +46,9 @@ function toggleSeparators() {
 
 function manageClock() {
     if (isProcessing) {
-        document.querySelectorAll('.separador').forEach(separator => {
+        document.querySelectorAll('#reloj .separador').forEach(separator => {
             separator.style.visibility = 'visible';
+            separator.style.backgroundColor = 'white'; // O cualquier color de fondo que desees
         });
     }
 }
