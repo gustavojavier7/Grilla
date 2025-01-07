@@ -29,6 +29,31 @@ function updateClock() {
     document.getElementById('segundos').textContent = seconds;
 }
 
+function updateSecondaryClock() {
+    const now = new Date();
+    let hours = now.getHours().toString().padStart(2, '0');
+    let minutes = now.getMinutes().toString().padStart(2, '0');
+    let seconds = now.getSeconds().toString().padStart(2, '0');
+
+    document.getElementById('secondary-horas').textContent = hours;
+    document.getElementById('secondary-minutos').textContent = minutes;
+    document.getElementById('secondary-segundos').textContent = seconds;
+}
+
+// Iniciar la actualización del reloj secundario
+setInterval(updateSecondaryClock, 1000);
+updateSecondaryClock(); // Llamada inicial para mostrar la hora inmediatamente
+
+// Función para manejar el parpadeo de los separadores del reloj secundario
+function manageSecondarySeparators() {
+    const separators = document.querySelectorAll('.secondary-separador');
+    separators.forEach(separator => {
+        separator.classList.add('active');
+    });
+}
+
+// Llamada inicial para manejar el parpadeo de los separadores del reloj secundario
+manageSecondarySeparators();
 function manageClock() {
     const separators = document.querySelectorAll('.separador');
     
