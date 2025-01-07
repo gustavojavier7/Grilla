@@ -19,8 +19,7 @@
                     <option value="">--Seleccionar--</option>
                     <option value="6">Fácil Infinito (6x6)</option>
                     <option value="10">Medio Infinito (10x10)</option>
-                    <option value="15">Difícil (15x15)</option>
-                </select>
+                </option>
                 <button id="fill-grid-btn" onclick="fillGrid()" disabled>Rellenar Celdas</button>
                 <button id="reset-game-btn" onclick="resetGame()" disabled>Reiniciar Juego</button>
                 <div id="version-text">Grilla - Versión 3.5</div>
@@ -64,7 +63,10 @@
     <div id="game-over-overlay">
         <div id="game-over-message">
             <h1>GAME OVER</h1>
-            <p>El color/patrón "<span id="game-over-color"></span>" alcanzó <span id="game-over-threshold"></span> o más celdas.</p>
+            <p>
+                <span id="game-over-reason"></span>
+                <span id="game-over-threshold"></span>
+            </p>
             <button id="restart-button" onclick="resetGame()">Reiniciar Juego</button>
         </div>
     </div>
