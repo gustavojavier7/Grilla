@@ -38,12 +38,10 @@ function renderClocks() {
 }
 
 function toggleSeparators() {
-    if (!isProcessing) {
-        separatorVisible = !separatorVisible;
-        document.querySelectorAll('.separador').forEach(separator => {
-            separator.style.visibility = separatorVisible ? 'visible' : 'hidden';
-        });
-    }
+    separatorVisible = !separatorVisible;
+    document.querySelectorAll('.separador').forEach(separator => {
+        separator.style.visibility = separatorVisible ? 'visible' : 'hidden';
+    });
 }
 
 function manageClock() {
@@ -454,7 +452,9 @@ function updateCellsRemovedDisplay() {
 function animate() {
     updateClockMaster();
     renderClocks();
-    toggleSeparators();
+    if (!isProcessing) {
+        toggleSeparators();
+    }
     requestAnimationFrame(animate);
 }
 
