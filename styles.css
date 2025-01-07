@@ -81,7 +81,8 @@ body {
     cursor: not-allowed;
 }
 
-#reloj, #secondary-clock, #score-display, #cells-removed-counter {
+/* Estilos compartidos para ambos relojes */
+#reloj, #reloj-secundario {
     font-size: var(--font-size-large);
     font-family: var(--font-stack);
     color: var(--highlight-color);
