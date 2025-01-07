@@ -482,17 +482,23 @@ function animate() {
     const now = performance.now();
     if (now - lastUpdateTime > updateInterval) {
         updateClockMaster();
-        renderClocks();
         
-        // Manejo separado de los separadores según el estado de procesamiento
-        if (isProcessing) {
-            // Solo el separador del reloj secundario parpadea
-            toggleSeparatorsSecondaryOnly();
-        } else {
-            // Ambos separadores parpadean de manera independiente
+        // Separar la renderización del reloj secundario
+        // El reloj secundario siempre se actualiza
+        document.getElementById('horas-sec').textContent = globalClock.hours;
+        document.getElementById('minutos-sec').textContent = globalClock.minutes;
+        document.getElementById('segundos-sec').textContent = globalClock.seconds;
+        
+        // El reloj primario solo se actualiza si no está procesando
+        if (!isProcessing) {
+            document.getElementById('horas').textContent = globalClock.hours;
+            document.getElementById('minutos').textContent = globalClock.minutes;
+            document.getElementById('segundos').textContent = globalClock.seconds;
             toggleSeparators();
-            toggleSeparatorsSecondaryOnly();
         }
+        
+        // El separador secundario siempre parpadea
+        toggleSeparatorsSecondaryOnly();
         
         lastUpdateTime = now;
     }
