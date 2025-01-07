@@ -467,7 +467,17 @@ function animate() {
         if (countdown === 0 && countdownStarted) {
             showGameOver('Tiempo agotado', 0);
         }
-     }
+
+        // El reloj secundario sigue funcionando como antes
+        document.getElementById('horas-sec').textContent = new Date().getHours().toString().padStart(2, '0');
+        document.getElementById('minutos-sec').textContent = new Date().getMinutes().toString().padStart(2, '0');
+        document.getElementById('segundos-sec').textContent = new Date().getSeconds().toString().padStart(2, '0');
+
+        // Solo parpadea el reloj secundario
+        toggleSeparators();
+
+        lastUpdateTime = now;
+    }
     requestAnimationFrame(animate);
 }
 
