@@ -18,11 +18,23 @@ let primarySeparatorVisible = true;
 let secondarySeparatorVisible = true;
 let lastUpdateTime = 0;
 const updateInterval = 1000; // 1s
-
+const SEPARATOR_COLORS = {
+    ON: 'yellow',
+    OFF: 'black'
+};
 
 COLORS.forEach(color => {
     cellCounts[color] = 0;
 });
+
+function initializeSeparators() {
+    document.querySelectorAll('.separador').forEach(separator => {
+        separator.style.backgroundColor = SEPARATOR_COLORS.ON;
+    });
+    document.querySelectorAll('.separador-sec').forEach(separator => {
+        separator.style.backgroundColor = SEPARATOR_COLORS.ON;
+    });
+}
 
 function updateClockMaster() {
     const now = new Date();
@@ -45,17 +57,18 @@ function renderClocks() {
 function toggleSeparators() {
     primarySeparatorVisible = !primarySeparatorVisible;
     document.querySelectorAll('.separador').forEach(separator => {
-        separator.style.backgroundColor = primarySeparatorVisible ? 'yellow' : 'black';
+        separator.style.backgroundColor = primarySeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
     });
 }
 
-// Función actualizada para manejar solo separadores secundarios
+// Función actualizada para manejar separadores secundarios
 function toggleSeparatorsSecondaryOnly() {
     secondarySeparatorVisible = !secondarySeparatorVisible;
     document.querySelectorAll('.separador-sec').forEach(separator => {
-        separator.style.backgroundColor = secondarySeparatorVisible ? 'yellow' : 'black';
+        separator.style.backgroundColor = secondarySeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
     });
 }
+
 
 function manageClock() {
     // Manejo del reloj primario
@@ -476,9 +489,8 @@ function animate() {
             // Solo el separador del reloj secundario parpadea
             toggleSeparatorsSecondaryOnly();
         } else {
-            // El separador del reloj primario parpadea
+            // Ambos separadores parpadean de manera independiente
             toggleSeparators();
-            // También hacemos parpadear el secundario de manera independiente
             toggleSeparatorsSecondaryOnly();
         }
         
