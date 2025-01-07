@@ -14,6 +14,9 @@ let cellCounts = {};
 let totalCellsRemoved = 0;
 let globalClock = { hours: '00', minutes: '00', seconds: '00' };
 let separatorVisible = true;
+let lastUpdateTime = 0;
+const updateInterval = 500; // 500 milisegundos
+
 
 COLORS.forEach(color => {
     cellCounts[color] = 0;
@@ -453,13 +456,19 @@ function updateCellsRemovedDisplay() {
 }
 
 function animate() {
-    updateClockMaster();
-    renderClocks();
-    if (!isProcessing) {
-        toggleSeparators();
+    const now = performance.now();
+    if (now - lastUpdateTime > updateInterval) {
+        updateClockMaster();
+        renderClocks();
+        if (!isProcessing) {
+            toggleSeparators();
+        }
+        lastUpdateTime = now;
     }
+    // Usar requestAnimationFrame para el siguiente ciclo, pero no para cada actualización
     requestAnimationFrame(animate);
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(animate);
