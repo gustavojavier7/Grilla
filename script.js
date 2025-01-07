@@ -42,25 +42,20 @@ function renderClocks() {
 
 function toggleSeparators() {
     separatorVisible = !separatorVisible;
-    document.querySelectorAll('.separador').forEach(separator => {
+    document.querySelectorAll('.separador, .separador-sec').forEach(separator => {
+        separator.style.backgroundColor = separatorVisible ? 'yellow' : 'black';
+    });
+}
+
+function manageClock() {
+    document.querySelectorAll('#reloj .separador').forEach(separator => {
         if (isProcessing) {
             separator.classList.add('paused');
         } else {
             separator.classList.remove('paused');
         }
     });
-}
-
-function manageClock() {
-    if (isProcessing) {
-        document.querySelectorAll('#reloj .separador').forEach(separator => {
-            separator.classList.add('paused');
-        });
-    } else {
-        document.querySelectorAll('#reloj .separador').forEach(separator => {
-            separator.classList.remove('paused');
-        });
-    }
+    // No hacer nada con los separadores secundarios aquí, dejándolos parpadear siempre.
 }
 
 function checkSelections() {
