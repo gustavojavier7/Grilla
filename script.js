@@ -25,23 +25,12 @@ function updateClockMaster() {
     globalClock.seconds = now.getSeconds().toString().padStart(2, '0');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    setInterval(updateClockMaster, 1000);
-    updateClockMaster();
-    renderPrimaryClock();
-    renderSecondaryClock();
-    manageSecondarySeparators();
-});
-
-function renderPrimaryClock() {
+function renderClocks() {
     if (!isProcessing) {
         document.getElementById('horas').textContent = globalClock.hours;
         document.getElementById('minutos').textContent = globalClock.minutes;
         document.getElementById('segundos').textContent = globalClock.seconds;
     }
-}
-
-function renderSecondaryClock() {
     document.getElementById('horas-sec').textContent = globalClock.hours;
     document.getElementById('minutos-sec').textContent = globalClock.minutes;
     document.getElementById('segundos-sec').textContent = globalClock.seconds;
@@ -471,6 +460,17 @@ function updateCellsRemovedDisplay() {
         cellsRemovedElement.classList.remove('blink-cells-removed');
     }, 1000);
 }
+
+function animate() {
+    updateClockMaster();
+    renderClocks();
+    requestAnimationFrame(animate);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    requestAnimationFrame(animate);
+    manageSecondarySeparators();
+});
 
 createGrid(rows, cols);
 updateColorSamples();
