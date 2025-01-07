@@ -58,7 +58,6 @@ function manageClock() {
     document.querySelectorAll('#reloj-sec .separador-sec').forEach(separator => {
         separator.classList.remove('paused');
     });
-}
 
 function checkSelections() {
     const difficulty = document.getElementById('difficulty').value;
