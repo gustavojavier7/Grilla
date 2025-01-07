@@ -41,6 +41,7 @@ function toggleSeparators() {
     separatorVisible = !separatorVisible;
     document.querySelectorAll('.separador').forEach(separator => {
         separator.style.visibility = separatorVisible ? 'visible' : 'hidden';
+        separator.style.backgroundColor = separatorVisible ? 'yellow' : 'black';
     });
 }
 
