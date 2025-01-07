@@ -289,6 +289,16 @@ function removePulsatingCells(matches) {
                 const averageCellsRemoved = cellsRemovedHistory.reduce((sum, value) => sum + value, 0) / cellsRemovedHistory.length;
                 document.getElementById('current-average').textContent = averageCellsRemoved.toFixed(2);
                 console.log(`Promedio de celdas removidas: ${averageCellsRemoved.toFixed(2)}`);
+
+                // Comparar celdas removidas en esta jugada con el promedio para añadir tiempo
+                if (totalRemovedThisCascade > averageCellsRemoved) {
+                    const extraTime = Math.ceil(totalRemovedThisCascade); // Redondear hacia arriba para segundos enteros
+                    countdown += extraTime;
+                    console.log(`Tiempo extendido por ${extraTime} segundos. Nuevo tiempo: ${countdown} segundos.`);
+                }
+            } else if (cellsRemovedHistory.length === 1) {
+                // Si solo hemos jugado una ronda, mostramos el valor de la primera jugada
+                document.getElementById('current-average').textContent = cellsRemovedHistory[0].toFixed(2);
             }
 
             roundsInCascade = 1;
