@@ -38,10 +38,12 @@ function renderClocks() {
 }
 
 function toggleSeparators() {
-    separatorVisible = !separatorVisible;
-    document.querySelectorAll('.separador').forEach(separator => {
-        separator.style.visibility = separatorVisible ? 'visible' : 'hidden';
-    });
+    if (!isProcessing) {
+        separatorVisible = !separatorVisible;
+        document.querySelectorAll('.separador').forEach(separator => {
+            separator.style.visibility = separatorVisible ? 'visible' : 'hidden';
+        });
+    }
 }
 
 function manageClock() {
@@ -49,6 +51,10 @@ function manageClock() {
         document.querySelectorAll('#reloj .separador').forEach(separator => {
             separator.style.visibility = 'visible';
             separator.style.backgroundColor = 'white'; // O cualquier color de fondo que desees
+        });
+    } else {
+        document.querySelectorAll('#reloj .separador').forEach(separator => {
+            separator.style.backgroundColor = ''; // Restablecer el color de fondo
         });
     }
 }
