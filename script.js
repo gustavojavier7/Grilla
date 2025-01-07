@@ -65,6 +65,23 @@ function manageSecondarySeparators() {
     });
 }
 
+function resumeMainBlinking() {
+    const msToNextSecond = getMsUntilNextSecond();
+
+    setTimeout(() => {
+        const primarySeparators = document.querySelectorAll('.separador');
+        primarySeparators.forEach(separator => {
+            separator.classList.remove('paused');
+            separator.classList.add('active');
+        });
+    }, msToNextSecond);
+}
+
+function getMsUntilNextSecond() {
+    const now = new Date();
+    return 1000 - now.getMilliseconds();
+}
+
 
 // Llamada inicial para manejar el parpadeo de los separadores del reloj secundario
 manageSecondarySeparators();
@@ -78,17 +95,14 @@ function manageClock() {
             separator.classList.remove('active'); // Detener animación
             separator.classList.add('paused');    // Marcar como pausado
         });
-        // Ya no es necesario detener ningún intervalo aquí
+
+        // (Si fuera necesario) lógica de detención de intervalos se eliminaría aquí.
     } else {
-        // Reactivar animación cuando no se está procesando
-        separators.forEach(separator => {
-            separator.classList.remove('paused');
-            separator.classList.add('active');
-        });
-        // No se llama a resumeClockSynced(), pues la actualización del reloj
-        // se maneja en el setInterval del DOMContentLoaded.
+        // En vez de reanudar inmediatamente, sincronizamos el parpadeo
+        resumeMainBlinking();
     }
 }
+
 
 
 function checkSelections() {
