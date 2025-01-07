@@ -19,6 +19,7 @@ let secondarySeparatorVisible = true;
 let lastUpdateTime = 0;
 let countdown = 60; // 1 minuto en segundos
 let countdownInterval = 1000; // Actualizar cada segundo
+let countdownStarted = false;
 const updateInterval = 1000; // 1s
 const SEPARATOR_COLORS = {
     ON: 'yellow',
@@ -97,10 +98,11 @@ function createGrid(rows, cols) {
 }
 
 function fillGrid() {
-    if (isProcessing) return;
+    if (isProcessing || !document.getElementById('difficulty').value) return; // Asegurarse de que se haya seleccionado una dificultad
     resetScore();
     totalCellsRemoved = 0;
     updateCellsRemovedDisplay();
+    countdownStarted = true;  // Iniciar el conteo regresivo
 
     const difficulty = document.getElementById('difficulty').value;
     if (difficulty) {
@@ -358,6 +360,7 @@ function resetScore() {
 function resetGame() {
     score = 0;
     countdown = 60;
+    countdownStarted = false; // Resetear el estado del conteo regresivo
     cascadeMultiplier = 1;
     roundsInCascade = 1;
     totalRemovedThisCascade = 0;
@@ -471,16 +474,14 @@ function updateCellsRemovedDisplay() {
 function animate() {
     const now = performance.now();
     if (now - lastUpdateTime > updateInterval) {
-        // Actualizar el conteo regresivo
-        if (countdown > 0 && !isProcessing) {
+        if (countdownStarted && countdown > 0 && !isProcessing) {
             countdown--;
             const minutes = Math.floor(countdown / 60).toString().padStart(2, '0');
             const seconds = (countdown % 60).toString().padStart(2, '0');
             document.getElementById('minutos').textContent = minutes;
             document.getElementById('segundos').textContent = seconds;
         }
-        if (countdown === 0) {
-            // Mostrar el overlay de Game Over cuando el tiempo se acaba
+        if (countdown === 0 && countdownStarted) {
             showGameOver('Tiempo agotado', 0);
         }
 
