@@ -408,7 +408,7 @@ function updateColorSamples() {
 
         if (threshold !== null && count >= threshold) {
             cellSample.classList.add('blink-threshold');
-            showGameOver(color, threshold);
+            showGameOver(color, threshold); // Pase el color y el umbral
         } else {
             cellSample.classList.remove('blink-threshold');
         }
