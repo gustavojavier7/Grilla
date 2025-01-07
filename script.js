@@ -21,10 +21,6 @@ const SEPARATOR_COLORS = {
     OFF: 'black'
 };
 
-if (countdown === 0 && countdownStarted) {
-    showGameOver('Tiempo agotado');
-}
-
 COLORS.forEach(color => {
     cellCounts[color] = 0;
 });
@@ -471,8 +467,7 @@ function animate() {
         if (countdown === 0 && countdownStarted) {
             showGameOver('Tiempo agotado', 0);
         }
-        // ... (resto del código de animate)
-    }
+     }
     requestAnimationFrame(animate);
 }
 
