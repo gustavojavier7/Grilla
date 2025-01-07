@@ -255,6 +255,14 @@ button:hover {
     animation: blink 1s infinite;
 }
 
+#game-over-threshold {
+    display: inline; /* Por defecto, mostrado */
+}
+
+#game-over-threshold.hidden {
+    display: none; /* Para ocultarlo cuando no sea necesario */
+}
+
 #game-over-overlay {
     position: fixed;
     top: 0;
