@@ -40,20 +40,22 @@ function renderClocks() {
 function toggleSeparators() {
     separatorVisible = !separatorVisible;
     document.querySelectorAll('.separador').forEach(separator => {
-        separator.style.visibility = separatorVisible ? 'visible' : 'hidden';
-        separator.style.backgroundColor = separatorVisible ? 'yellow' : 'black';
+        if (isProcessing) {
+            separator.classList.add('paused');
+        } else {
+            separator.classList.remove('paused');
+        }
     });
 }
 
 function manageClock() {
     if (isProcessing) {
         document.querySelectorAll('#reloj .separador').forEach(separator => {
-            separator.style.visibility = 'visible';
-            separator.style.backgroundColor = 'white'; // O cualquier color de fondo que desees
+            separator.classList.add('paused');
         });
     } else {
         document.querySelectorAll('#reloj .separador').forEach(separator => {
-            separator.style.backgroundColor = ''; // Restablecer el color de fondo
+            separator.classList.remove('paused');
         });
     }
 }
