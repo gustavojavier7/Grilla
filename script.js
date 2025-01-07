@@ -17,6 +17,7 @@ let countdown = 60; // 1 minuto en segundos
 let countdownStarted = false;
 let cascadeHistory = []; // Historial de cascadas
 let currentCascadeCount = 0; // Contador de cascadas en la ronda actual
+let cellsRemovedHistory = []; // Historial de celdas removidas en las últimas 5 jugadas
 const updateInterval = 1000; // 1s
 const SEPARATOR_COLORS = {
     ON: 'yellow',
@@ -226,91 +227,78 @@ function removePulsatingCells(matches) {
         });
         updateCellsRemovedDisplay();
 
-      let newMatches = new Set();
+        let newMatches = new Set();
 
-for (let col = 0; col < cols; col++) {
-    let emptySpaceCount = 0;
+        for (let col = 0; col < cols; col++) {
+            let emptySpaceCount = 0;
 
-    for (let row = rows - 1; row >= 0; row--) {
-        if (board[row][col] === null) {
-            emptySpaceCount++;
-        } else if (emptySpaceCount > 0) {
-            const newRow = row + emptySpaceCount;
-            board[newRow][col] = board[row][col];
-            cellReferences[newRow][col].className = `cell ${board[newRow][col]}`;
-            board[row][col] = null;
-            cellReferences[row][col].className = 'cell';
-        }
-    }
-
-    for (let row = 0; emptySpaceCount > 0; row++, emptySpaceCount--) {
-        const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-        board[row][col] = newColor;
-        cellReferences[row][col].className = `cell ${newColor}`;
-        cellCounts[newColor]++;
-    }
-}
-
-newMatches = checkNewMatches();
-if (newMatches.size > 0) {
-    newMatches.forEach(coord => {
-        const [row, col] = coord.split(',').map(Number);
-        const cell = cellReferences[row][col];
-        cell.classList.remove('matched');
-        cell.classList.add('matched');
-    });
-
-    const n = Math.log2(roundsInCascade) + 1;
-roundsInCascade = Math.pow(2, n);
-totalRemovedThisCascade += newMatches.size;
-
-const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
-incrementScoreAnimated(scoreIncrement, 2000, 20);
-
-setTimeout(() => {
-    removePulsatingCells(newMatches);
-}, 1000);
-} else {
-    isProcessing = false;
-    manageClock();
-    let finalPoints = totalRemovedThisCascade * roundsInCascade;
-    score += finalPoints;
-    updateScoreDisplay();
-    
-    // Actualizar el historial de cascadas y calcular extensión de tiempo
-    let currentCascadeCount = roundsInCascade;
-    cascadeHistory.push(currentCascadeCount);
-    if (cascadeHistory.length > 5) {
-        cascadeHistory.shift(); // Mantener solo las 5 últimas rondas
-    }
-
-    // Calcular promedio de cascadas si hay más de una ronda
-    if (cascadeHistory.length > 1) {
-        const averageCascades = cascadeHistory.reduce((sum, value) => sum + value, 0) / cascadeHistory.length;
-        if (currentCascadeCount > averageCascades) {
-            // Añadir tiempo extra basado en la diferencia con el promedio
-            const timeToAdd = 2 * (currentCascadeCount - averageCascades);
-            countdown += Math.ceil(timeToAdd); // Redondear hacia arriba para no perder segundos
-            console.log(`Tiempo extendido por ${Math.ceil(timeToAdd)} segundos. Nuevo tiempo: ${countdown} segundos.`);
-        }
-    }
-// Actualizar el promedio de cascadas en el DOM
-            if (cascadeHistory.length > 0) {
-                const averageCascades = cascadeHistory.reduce((sum, value) => sum + value, 0) / cascadeHistory.length;
-                document.getElementById('current-average').textContent = averageCascades.toFixed(2);
-            } else {
-                document.getElementById('current-average').textContent = '0.00';
+            for (let row = rows - 1; row >= 0; row--) {
+                if (board[row][col] === null) {
+                    emptySpaceCount++;
+                } else if (emptySpaceCount > 0) {
+                    const newRow = row + emptySpaceCount;
+                    board[newRow][col] = board[row][col];
+                    cellReferences[newRow][col].className = `cell ${board[newRow][col]}`;
+                    board[row][col] = null;
+                    cellReferences[row][col].className = 'cell';
+                }
             }
-    
-roundsInCascade = 1;
-totalRemovedThisCascade = 0;
-isProcessing = false;
-manageClock();
-document.querySelectorAll('.cell').forEach(cell => {
-    cell.classList.remove('processing');
-});
-applyScoreBlink();
-}
+
+            for (let row = 0; emptySpaceCount > 0; row++, emptySpaceCount--) {
+                const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+                board[row][col] = newColor;
+                cellReferences[row][col].className = `cell ${newColor}`;
+                cellCounts[newColor]++;
+            }
+        }
+
+        newMatches = checkNewMatches();
+        if (newMatches.size > 0) {
+            newMatches.forEach(coord => {
+                const [row, col] = coord.split(',').map(Number);
+                const cell = cellReferences[row][col];
+                cell.classList.remove('matched');
+                cell.classList.add('matched');
+            });
+
+            const n = Math.log2(roundsInCascade) + 1;
+            roundsInCascade = Math.pow(2, n);
+            totalRemovedThisCascade += newMatches.size;
+
+            const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
+            incrementScoreAnimated(scoreIncrement, 2000, 20);
+
+            setTimeout(() => {
+                removePulsatingCells(newMatches);
+            }, 1000);
+        } else {
+            isProcessing = false;
+            manageClock();
+            let finalPoints = totalRemovedThisCascade * roundsInCascade;
+            score += finalPoints;
+            updateScoreDisplay();
+
+            // Añadir el número de celdas removidas en esta jugada al historial
+            cellsRemovedHistory.push(totalCellsRemoved - (totalCellsRemoved - totalRemovedThisCascade));
+            if (cellsRemovedHistory.length > 5) {
+                cellsRemovedHistory.shift(); // Mantener solo las 5 últimas jugadas
+            }
+
+            // Calcular promedio de celdas removidas si hay más de una jugada
+            if (cellsRemovedHistory.length > 1) {
+                const averageCellsRemoved = cellsRemovedHistory.reduce((sum, value) => sum + value, 0) / cellsRemovedHistory.length;
+                console.log(`Promedio de celdas removidas: ${averageCellsRemoved.toFixed(2)}`);
+            }
+
+            roundsInCascade = 1;
+            totalRemovedThisCascade = 0;
+            isProcessing = false;
+            manageClock();
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.classList.remove('processing');
+            });
+            applyScoreBlink();
+        }
     }, 1000);
     updateColorSamples();
 }
