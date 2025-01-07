@@ -49,13 +49,13 @@ function toggleSeparators() {
 }
 
 function manageClock() {
-    // Solo manejamos el reloj secundario ahora
+    // Asegurarse de que los separadores secundarios estén activos
     document.querySelectorAll('#reloj-sec .separador-sec').forEach(separator => {
-        if (isProcessing) {
-            separator.classList.remove('paused'); // Mantener el parpadeo del secundario
-        }
+        separator.classList.remove('paused');
+        separator.style.backgroundColor = secondarySeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
     });
 }
+
 
     // El reloj secundario nunca se pausa
     document.querySelectorAll('#reloj-sec .separador-sec').forEach(separator => {
