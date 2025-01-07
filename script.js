@@ -274,6 +274,14 @@ function removePulsatingCells(matches) {
             let finalPoints = totalRemovedThisCascade * roundsInCascade;
             score += finalPoints;
             updateScoreDisplay();
+            
+            // Extender el tiempo de juego
+            if (roundsInCascade > 1) { // Solo si hubo más de una ronda de cascada
+                const extraTime = (roundsInCascade - 1) * 2; // Multiplicar por 2 el número de rondas menos la primera
+                countdown += extraTime;
+                console.log(`Tiempo extendido por ${extraTime} segundos. Nuevo tiempo: ${countdown} segundos.`);
+            }
+
             roundsInCascade = 1;
             totalRemovedThisCascade = 0;
             isProcessing = false;
