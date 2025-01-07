@@ -13,6 +13,7 @@ let cols = 6;
 let cellCounts = {};
 let totalCellsRemoved = 0;
 let globalClock = { hours: '00', minutes: '00', seconds: '00' };
+let separatorVisible = true;
 
 COLORS.forEach(color => {
     cellCounts[color] = 0;
@@ -36,23 +37,19 @@ function renderClocks() {
     document.getElementById('segundos-sec').textContent = globalClock.seconds;
 }
 
-function manageSeparators() {
-    const primarySeparators = document.querySelectorAll('.separador');
-    if (isProcessing) {
-        primarySeparators.forEach(separator => {
-            separator.classList.remove('separador-sec');
-            separator.classList.add('paused');
-        });
-    } else {
-        primarySeparators.forEach(separator => {
-            separator.classList.remove('paused');
-            separator.classList.add('separador-sec');
-        });
-    }
+function toggleSeparators() {
+    separatorVisible = !separatorVisible;
+    document.querySelectorAll('.separador').forEach(separator => {
+        separator.style.visibility = separatorVisible ? 'visible' : 'hidden';
+    });
 }
 
 function manageClock() {
-    manageSeparators();
+    if (isProcessing) {
+        document.querySelectorAll('.separador').forEach(separator => {
+            separator.style.visibility = 'visible';
+        });
+    }
 }
 
 function checkSelections() {
@@ -450,6 +447,7 @@ function updateCellsRemovedDisplay() {
 function animate() {
     updateClockMaster();
     renderClocks();
+    toggleSeparators();
     requestAnimationFrame(animate);
 }
 
