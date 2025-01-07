@@ -103,8 +103,8 @@ body {
 }
 
 .separador.paused {
-    background-color: black !important; /* Color estático */
-    animation: none; /* Detener cualquier animación */
+    background-color: black !important;
+    animation: none;
 }
 
 
