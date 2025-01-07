@@ -292,11 +292,22 @@ button:hover {
     background-color: var(--button-hover-bg-color);
 }
 
-#cells-removed {
-    font-size: var(--font-size-large);
-    font-family: var(--font-stack);
-    color: var(--highlight-color);
-    text-shadow:
+#score-display, #cells-removed-counter {
+    font-size: var(--font-size-large); /* Mismo tamaño que los relojes */
+    font-family: var(--font-stack); /* Fuente igual que los relojes */
+    color: var(--highlight-color); /* Mismo color que los relojes */
+    text-shadow: /* Sombra igual que los relojes */
+        -1px -1px 0 #000,
+         1px -1px 0 #000,
+        -1px 1px 0 #000,
+         1px 1px 0 #000;
+}
+
+#current-score, #cells-removed {
+    font-size: var(--font-size-large); /* Mismo tamaño que los números del reloj */
+    font-family: var(--font-stack); /* Fuente igual que los relojes */
+    color: var(--highlight-color); /* Mismo color que los números del reloj */
+    text-shadow: /* Sombra igual que los relojes */
         -1px -1px 0 #000,
          1px -1px 0 #000,
         -1px 1px 0 #000,
