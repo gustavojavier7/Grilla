@@ -49,11 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Función para manejar el parpadeo de los separadores del reloj secundario
 function manageSecondarySeparators() {
-    const separators = document.querySelectorAll('.secondary-separador');
+    const separators = document.querySelectorAll('.separador-sec');
     separators.forEach(separator => {
-        separator.classList.add('active');
+        separator.classList.add('active'); // Asegura que se activen los separadores
     });
 }
+
 
 // Llamada inicial para manejar el parpadeo de los separadores del reloj secundario
 manageSecondarySeparators();
