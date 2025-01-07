@@ -35,10 +35,11 @@ function updateSecondaryClock() {
     let minutes = now.getMinutes().toString().padStart(2, '0');
     let seconds = now.getSeconds().toString().padStart(2, '0');
 
-    document.getElementById('secondary-horas').textContent = hours;
-    document.getElementById('secondary-minutos').textContent = minutes;
-    document.getElementById('secondary-segundos').textContent = seconds;
+    document.getElementById('horas-sec').textContent = hours;
+    document.getElementById('minutos-sec').textContent = minutes;
+    document.getElementById('segundos-sec').textContent = seconds;
 }
+
 
 // Iniciar la actualización del reloj secundario
 setInterval(updateSecondaryClock, 1000);
