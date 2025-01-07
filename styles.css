@@ -114,6 +114,26 @@ body {
     }
 }
 
+#secondary-clock {
+    font-size: var(--font-size-large);
+    font-family: var(--font-stack);
+    color: var(--highlight-color);
+    text-shadow:
+        -1px -1px 0 #000,
+         1px -1px 0 #000,
+        -1px 1px 0 #000,
+         1px 1px 0 #000;
+    margin-top: 10px;
+    text-align: left;
+}
+
+.secondary-separador {
+    width: 5px; /* Ajusta el tamaño si es necesario */
+    height: 20px; /* Ajusta el tamaño si es necesario */
+    background-color: yellow; /* Color inicial */
+    animation: colorSwap 1s infinite;
+}
+
 
 #color-samples {
     display: flex;
