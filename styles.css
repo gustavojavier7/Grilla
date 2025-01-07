@@ -22,6 +22,28 @@ body {
     height: 100vh;
 }
 
+#cascade-average {
+    font-size: var(--font-size-large);
+    font-family: var(--font-stack);
+    color: var(--highlight-color);
+    text-shadow:
+        -1px -1px 0 #000,
+         1px -1px 0 #000,
+        -1px 1px 0 #000,
+         1px 1px 0 #000;
+}
+
+#current-average {
+    font-size: var(--font-size-large);
+    font-family: var(--font-stack);
+    color: var(--highlight-color);
+    text-shadow:
+        -1px -1px 0 #000,
+         1px -1px 0 #000,
+        -1px 1px 0 #000,
+         1px 1px 0 #000;
+}
+
 #main-container {
     display: flex;
     flex-direction: row;
