@@ -368,6 +368,7 @@ function resetGame() {
     roundsInCascade = 1;
     totalRemovedThisCascade = 0;
     totalCellsRemoved = 0;
+    cellsRemovedHistory = [];
     updateCellsRemovedDisplay();
 
     cellCounts = {};
@@ -377,7 +378,6 @@ function resetGame() {
 
     updateScoreDisplay();
     createGrid(rows, cols);
-    fillGrid();
     updateColorSamples();
 
     const overlay = document.getElementById('game-over-overlay');
