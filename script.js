@@ -378,6 +378,7 @@ function resetGame() {
 
     updateScoreDisplay();
     createGrid(rows, cols);
+    fillGrid();
     updateColorSamples();
 
     const overlay = document.getElementById('game-over-overlay');
