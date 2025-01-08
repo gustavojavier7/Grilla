@@ -363,7 +363,7 @@ function resetScore() {
 function resetGame() {
     score = 0;
     countdown = 60;
-    countdownStarted = false;
+    countdownStarted = true;
     cascadeMultiplier = 1;
     roundsInCascade = 1;
     totalRemovedThisCascade = 0;
