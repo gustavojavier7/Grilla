@@ -319,7 +319,7 @@ button:hover {
     background-color: var(--button-hover-bg-color);
 }
 
-#score-display, #cells-removed-counter {
+#score-display, #cells-removed-counter, #cells-removed-round {
     font-size: var(--font-size-large); /* Mismo tamaño que los relojes */
     font-family: var(--font-stack); /* Fuente igual que los relojes */
     color: var(--highlight-color); /* Mismo color que los relojes */
@@ -330,7 +330,7 @@ button:hover {
          1px 1px 0 #000;
 }
 
-#current-score, #cells-removed {
+#current-score, #cells-removed, #cells-removed-in-round {
     font-size: var(--font-size-large); /* Mismo tamaño que los números del reloj */
     font-family: var(--font-stack); /* Fuente igual que los relojes */
     color: var(--highlight-color); /* Mismo color que los números del reloj */
