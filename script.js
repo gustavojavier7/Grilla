@@ -387,7 +387,7 @@ function resetGame() {
     // Restablece el puntaje y los contadores
     score = 0;
     countdown = 60;
-    countdownStarted = true;
+    countdownStarted = false;
     cascadeMultiplier = 1;
     roundsInCascade = 1;
     totalRemovedThisCascade = 0;
