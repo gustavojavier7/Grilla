@@ -19,6 +19,8 @@ let countdownStarted = false;
 let cascadeHistory = []; // Historial de cascadas
 let currentCascadeCount = 0; // Contador de cascadas en la ronda actual
 let cellsRemovedHistory = []; // Historial de celdas removidas en las últimas 5 jugadas
+let timeoutIds = []; // Array para almacenar los IDs de los timeouts
+let intervalIds = []; // Array para almacenar los IDs de los intervals
 const updateInterval = 1000; // 1s
 const SEPARATOR_COLORS = {
     ON: 'yellow',
@@ -217,7 +219,7 @@ function removePulsatingCells(matches) {
         cell.classList.add('matched');
     });
 
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
         matches.forEach(coord => {
             const [row, col] = coord.split(',').map(Number);
             const color = board[row][col];
@@ -269,11 +271,12 @@ function removePulsatingCells(matches) {
             totalRemovedThisCascade += newMatches.size;
 
             const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
-            incrementScoreanimated(scoreIncrement, 2000, 20);
+            incrementScoreAnimated(scoreIncrement, 2000, 20);
 
-            setTimeout(() => {
+            const newTimeoutId = setTimeout(() => {
                 removePulsatingCells(newMatches);
             }, 1000);
+            timeoutIds.push(newTimeoutId);
         } else {
             isProcessing = false;
             manageClock();
@@ -315,6 +318,7 @@ function removePulsatingCells(matches) {
             applyScoreBlink();
         }
     }, 1000);
+    timeoutIds.push(timeoutId);
     updateColorSamples();
 }
 
@@ -364,7 +368,22 @@ function resetScore() {
     updateScoreDisplay();
 }
 
+function clearAllTimeouts() {
+    timeoutIds.forEach(timeoutId => clearTimeout(timeoutId));
+    timeoutIds = [];
+}
+
+function clearAllIntervals() {
+    intervalIds.forEach(intervalId => clearInterval(intervalId));
+    intervalIds = [];
+}
+
 function resetGame() {
+    // Detener todas las animaciones y procesos en curso
+    clearAllTimeouts();
+    clearAllIntervals();
+
+    // Restablece el puntaje y los contadores
     score = 0;
     countdown = 60;
     countdownStarted = true;
@@ -373,18 +392,26 @@ function resetGame() {
     totalRemovedThisCascade = 0;
     totalCellsRemoved = 0;
     cellsRemovedHistory = [];
+    contadorDeCeldasEnRonda = 0;
     updateCellsRemovedDisplay();
 
+    // Restablece los contadores de colores
     cellCounts = {};
     COLORS.forEach(color => {
         cellCounts[color] = 0;
     });
 
+    // Actualiza la visualización del puntaje
     updateScoreDisplay();
+    
+    // Recrea la cuadrícula y la llena con colores aleatorios
     createGrid(rows, cols);
     fillGrid();
+
+    // Actualiza la muestra de colores
     updateColorSamples();
 
+    // Oculta el overlay de "GAME OVER" si está visible
     const overlay = document.getElementById('game-over-overlay');
     if (overlay) {
         overlay.style.display = 'none';
