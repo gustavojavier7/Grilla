@@ -7,6 +7,7 @@ let isProcessing = false;
 let score = 0;
 let roundsInCascade = 1;
 let totalRemovedThisCascade = 0;
+let contadorDeCeldasEnRonda = 0;
 let rows = 6;
 let cols = 6;
 let cellCounts = {};
