@@ -194,9 +194,10 @@ function checkPatterns() {
             cell.classList.add('matched');
         });
 
-        setTimeout(() => {
+        const timeoutId = setTimeout(() => {
             removePulsatingCells(matches);
         }, 1000);
+        timeoutIds.push(timeoutId);
     } else {
         isProcessing = false;
         cells.forEach(cell => cell.classList.remove('processing'));
@@ -426,7 +427,7 @@ function resetGame() {
 
 window.resetGame = resetGame;
 
-function incrementScoreanimated(incrementBy, duration, steps) {
+function incrementScoreAnimated(incrementBy, duration, steps) {
     const targetScore = score + incrementBy;
     const stepSize = Math.round(incrementBy / steps);
     let stepsCompleted = 0;
@@ -441,15 +442,17 @@ function incrementScoreanimated(incrementBy, duration, steps) {
             clearInterval(intervalId);
         }
     }, duration / steps);
+    intervalIds.push(intervalId);
 }
 
 function applyScoreBlink() {
     if (!isProcessing) {
         const scoreElement = document.getElementById('current-score');
         scoreElement.classList.add('blink-score');
-        setTimeout(() => {
+        const timeoutId = setTimeout(() => {
             scoreElement.classList.remove('blink-score');
         }, 2000);
+        timeoutIds.push(timeoutId);
     }
 }
 
@@ -564,7 +567,6 @@ document.addEventListener('DOMContentLoaded', () => {
     resetGame();
     requestAnimationFrame(contadorRegresivo);
 });
-
 
 createGrid(rows, cols);
 updateColorSamples();
