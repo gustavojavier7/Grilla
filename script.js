@@ -479,12 +479,20 @@ function showGameOver(reason, threshold = null) {
 }
 
 function updateCellsRemovedDisplay() {
-    const cellsRemovedElement = document.getElementById('cells-removed');
-    cellsRemovedElement.textContent = totalCellsRemoved;
+    // Mostrar el total de celdas eliminadas
+    const totalCellsRemovedElement = document.getElementById('cells-removed');
+    totalCellsRemovedElement.textContent = totalCellsRemoved;
 
-    cellsRemovedElement.classList.add('blink-cells-removed');
+    // Mostrar las celdas eliminadas en la ronda actual
+    const cellsRemovedInRoundElement = document.getElementById('cells-removed-in-round');
+    cellsRemovedInRoundElement.textContent = contadorDeCeldasEnRonda;
+
+    // Añadir animación de parpadeo
+    totalCellsRemovedElement.classList.add('blink-cells-removed');
+    cellsRemovedInRoundElement.classList.add('blink-cells-removed');
     setTimeout(() => {
-        cellsRemovedElement.classList.remove('blink-cells-removed');
+        totalCellsRemovedElement.classList.remove('blink-cells-removed');
+        cellsRemovedInRoundElement.classList.remove('blink-cells-removed');
     }, 1000);
 }
 
