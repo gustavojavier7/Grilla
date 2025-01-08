@@ -269,7 +269,7 @@ function removePulsatingCells(matches) {
             totalRemovedThisCascade += newMatches.size;
 
             const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
-            incrementScoreAnimated(scoreIncrement, 2000, 20);
+            incrementScoreanimated(scoreIncrement, 2000, 20);
 
             setTimeout(() => {
                 removePulsatingCells(newMatches);
@@ -399,7 +399,7 @@ function resetGame() {
 
 window.resetGame = resetGame;
 
-function incrementScoreAnimated(incrementBy, duration, steps) {
+function incrementScoreanimated(incrementBy, duration, steps) {
     const targetScore = score + incrementBy;
     const stepSize = Math.round(incrementBy / steps);
     let stepsCompleted = 0;
@@ -496,7 +496,7 @@ function updateCellsRemovedDisplay() {
     }, 1000);
 }
 
-function animate() {
+function contadorRegresivo() {
     const now = performance.now();
     if (now - lastUpdateTime > updateInterval) {
         if (countdownStarted && countdown > 0 && !isProcessing) {
@@ -520,7 +520,7 @@ function animate() {
 
         lastUpdateTime = now;
     }
-    requestAnimationFrame(animate);
+    requestAnimationFrame(contadorRegresivo);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -535,7 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Inicializa el juego
     resetGame();
-    requestAnimationFrame(animate);
+    requestAnimationFrame(contadorRegresivo);
 });
 
 
