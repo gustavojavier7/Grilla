@@ -201,6 +201,8 @@ function checkPatterns() {
     }
 }
 
+let contadorDeCeldasEnRonda = 0; // Nueva variable para la ronda actual
+
 function removePulsatingCells(matches) {
     const rows = board.length;
     const cols = board[0].length;
@@ -225,6 +227,7 @@ function removePulsatingCells(matches) {
             cellReferences[row][col].className = 'cell';
             cellCounts[color]--;
             totalCellsRemoved++;
+            contadorDeCeldasEnRonda++; // Incrementa las celdas eliminadas en esta ronda
         });
         updateCellsRemovedDisplay();
 
@@ -254,6 +257,7 @@ function removePulsatingCells(matches) {
         }
 
         newMatches = checkNewMatches();
+
         if (newMatches.size > 0) {
             newMatches.forEach(coord => {
                 const [row, col] = coord.split(',').map(Number);
@@ -280,7 +284,7 @@ function removePulsatingCells(matches) {
             updateScoreDisplay();
 
             // Añadir el número de celdas removidas en esta jugada al historial
-            cellsRemovedHistory.push(totalRemovedThisCascade);
+            cellsRemovedHistory.push(contadorDeCeldasEnRonda);
             if (cellsRemovedHistory.length > 5) {
                 cellsRemovedHistory.shift(); // Mantener solo las 5 últimas jugadas
             }
@@ -292,8 +296,8 @@ function removePulsatingCells(matches) {
                 console.log(`Promedio de celdas removidas: ${averageCellsRemoved.toFixed(2)}`);
 
                 // Comparar celdas removidas en esta jugada con el promedio para añadir tiempo
-                if (totalRemovedThisCascade > averageCellsRemoved) {
-                    const extraTime = Math.ceil(totalRemovedThisCascade); // Redondear hacia arriba para segundos enteros
+                if (contadorDeCeldasEnRonda > averageCellsRemoved) {
+                    const extraTime = Math.ceil(contadorDeCeldasEnRonda); // Redondear hacia arriba para segundos enteros
                     countdown += extraTime;
                     console.log(`Tiempo extendido por ${extraTime} segundos. Nuevo tiempo: ${countdown} segundos.`);
                 }
@@ -304,6 +308,7 @@ function removePulsatingCells(matches) {
 
             roundsInCascade = 1;
             totalRemovedThisCascade = 0;
+            contadorDeCeldasEnRonda = 0; // Reinicia la variable para la próxima ronda
             isProcessing = false;
             manageClock();
             document.querySelectorAll('.cell').forEach(cell => {
