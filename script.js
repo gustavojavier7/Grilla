@@ -201,8 +201,6 @@ function checkPatterns() {
     }
 }
 
-let contadorDeCeldasEnRonda = 0; // Nueva variable para la ronda actual
-
 function removePulsatingCells(matches) {
     const rows = board.length;
     const cols = board[0].length;
