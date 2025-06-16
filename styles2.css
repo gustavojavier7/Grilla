@@ -15,7 +15,7 @@ body {
     align-items: flex-start;
 }
 
-#grid-container {
+#game-container {
     display: grid;
     gap: 2px;
     background-color: #333;
