@@ -214,8 +214,8 @@ function checkPatterns() {
         });
 
         const timeoutId = setTimeout(() => {
-            removePulsatingCells(matches);
-        }, 1000);
+            processMatchedCells(matches);
+        }, 2000);
         timeoutIds.push(timeoutId);
     } else {
         isProcessing = false;
@@ -223,129 +223,112 @@ function checkPatterns() {
     }
 }
 
-function removePulsatingCells(matches) {
+function processMatchedCells(matches) {
     const rows = board.length;
     const cols = board[0].length;
 
+    // Remove matched effect and clear matched cells
     matches.forEach(coord => {
         const [row, col] = coord.split(',').map(Number);
         const cell = cellReferences[row][col];
         cell.classList.remove('matched');
+        const color = board[row][col];
+        board[row][col] = null;
+        cell.className = 'cell';
+        cellCounts[color]--;
+        totalCellsRemoved++;
+        contadorDeCeldasEnRonda++;
     });
+    updateCellsRemovedDisplay();
 
-    matches.forEach(coord => {
-        const [row, col] = coord.split(',').map(Number);
-        const cell = cellReferences[row][col];
-        cell.classList.add('matched');
-    });
+    let newMatches = new Set();
 
-    const timeoutId = setTimeout(() => {
-        matches.forEach(coord => {
-            const [row, col] = coord.split(',').map(Number);
-            const color = board[row][col];
-            board[row][col] = null;
-            cellReferences[row][col].className = 'cell';
-            cellCounts[color]--;
-            totalCellsRemoved++;
-            contadorDeCeldasEnRonda++; // Incrementa las celdas eliminadas en esta ronda
-        });
-        updateCellsRemovedDisplay();
+    for (let col = 0; col < cols; col++) {
+        let emptySpaceCount = 0;
+        let delayIndex = 0;
 
-        let newMatches = new Set();
-
-        for (let col = 0; col < cols; col++) {
-            let emptySpaceCount = 0;
-            let delayIndex = 0;
-
-            for (let row = rows - 1; row >= 0; row--) {
-                if (board[row][col] === null) {
-                    emptySpaceCount++;
-                } else if (emptySpaceCount > 0) {
-                    const newRow = row + emptySpaceCount;
-                    board[newRow][col] = board[row][col];
-                    cellReferences[newRow][col].className = `cell ${board[newRow][col]}`;
-                    addFallAnimation(cellReferences[newRow][col], delayIndex * FALL_DURATION);
-                    board[row][col] = null;
-                    cellReferences[row][col].className = 'cell';
-                    delayIndex++;
-                }
-            }
-
-            for (let row = 0; emptySpaceCount > 0; row++, emptySpaceCount--) {
-                const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-                board[row][col] = newColor;
-                cellReferences[row][col].className = `cell ${newColor}`;
-                addFallAnimation(cellReferences[row][col], delayIndex * FALL_DURATION);
-                cellCounts[newColor]++;
+        for (let row = rows - 1; row >= 0; row--) {
+            if (board[row][col] === null) {
+                emptySpaceCount++;
+            } else if (emptySpaceCount > 0) {
+                const newRow = row + emptySpaceCount;
+                board[newRow][col] = board[row][col];
+                cellReferences[newRow][col].className = `cell ${board[newRow][col]}`;
+                addFallAnimation(cellReferences[newRow][col], delayIndex * FALL_DURATION);
+                board[row][col] = null;
+                cellReferences[row][col].className = 'cell';
                 delayIndex++;
             }
         }
 
-        flashGridBackground();
-
-        newMatches = checkNewMatches();
-
-        if (newMatches.size > 0) {
-            newMatches.forEach(coord => {
-                const [row, col] = coord.split(',').map(Number);
-                const cell = cellReferences[row][col];
-                cell.classList.remove('matched');
-                cell.classList.add('matched');
-            });
-
-            const n = Math.log2(roundsInCascade) + 1;
-            roundsInCascade = Math.pow(2, n);
-            totalRemovedThisCascade += newMatches.size;
-
-            const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
-            incrementScoreAnimated(scoreIncrement, 2000, 20);
-
-            const newTimeoutId = setTimeout(() => {
-                removePulsatingCells(newMatches);
-            }, 1000);
-            timeoutIds.push(newTimeoutId);
-        } else {
-            isProcessing = false;
-            manageClock();
-            let finalPoints = totalRemovedThisCascade * roundsInCascade;
-            score += finalPoints;
-            updateScoreDisplay();
-
-            // Añadir el número de celdas removidas en esta jugada al historial
-            cellsRemovedHistory.push(contadorDeCeldasEnRonda);
-            if (cellsRemovedHistory.length > 5) {
-                cellsRemovedHistory.shift(); // Mantener solo las 5 últimas jugadas
-            }
-
-            // Calcular promedio de celdas removidas si hay más de una jugada
-            if (cellsRemovedHistory.length > 1) {
-                const averageCellsRemoved = cellsRemovedHistory.reduce((sum, value) => sum + value, 0) / cellsRemovedHistory.length;
-                document.getElementById('current-average').textContent = averageCellsRemoved.toFixed(2);
-                console.log(`Promedio de celdas removidas: ${averageCellsRemoved.toFixed(2)}`);
-
-                // Comparar celdas removidas en esta jugada con el promedio para añadir tiempo
-                if (contadorDeCeldasEnRonda > averageCellsRemoved) {
-                    const extraTime = Math.ceil(contadorDeCeldasEnRonda); // Redondear hacia arriba para segundos enteros
-                    countdown += extraTime;
-                    console.log(`Tiempo extendido por ${extraTime} segundos. Nuevo tiempo: ${countdown} segundos.`);
-                }
-            } else if (cellsRemovedHistory.length === 1) {
-                // Si solo hemos jugado una ronda, mostramos el valor de la primera jugada
-                document.getElementById('current-average').textContent = cellsRemovedHistory[0].toFixed(2);
-            }
-
-            roundsInCascade = 1;
-            totalRemovedThisCascade = 0;
-            contadorDeCeldasEnRonda = 0; // Reinicia la variable para la próxima ronda
-            isProcessing = false;
-            manageClock();
-            document.querySelectorAll('.cell').forEach(cell => {
-                cell.classList.remove('processing');
-            });
-            applyScoreBlink();
+        for (let row = 0; emptySpaceCount > 0; row++, emptySpaceCount--) {
+            const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+            board[row][col] = newColor;
+            cellReferences[row][col].className = `cell ${newColor}`;
+            addFallAnimation(cellReferences[row][col], delayIndex * FALL_DURATION);
+            cellCounts[newColor]++;
+            delayIndex++;
         }
-    }, 1000);
-    timeoutIds.push(timeoutId);
+    }
+
+    flashGridBackground();
+
+    newMatches = checkNewMatches();
+
+    if (newMatches.size > 0) {
+        newMatches.forEach(coord => {
+            const [row, col] = coord.split(',').map(Number);
+            const cell = cellReferences[row][col];
+            cell.classList.add('matched');
+        });
+
+        const n = Math.log2(roundsInCascade) + 1;
+        roundsInCascade = Math.pow(2, n);
+        totalRemovedThisCascade += newMatches.size;
+
+        const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
+        incrementScoreAnimated(scoreIncrement, 2000, 20);
+
+        const newTimeoutId = setTimeout(() => {
+            processMatchedCells(newMatches);
+        }, 2000);
+        timeoutIds.push(newTimeoutId);
+    } else {
+        isProcessing = false;
+        manageClock();
+        let finalPoints = totalRemovedThisCascade * roundsInCascade;
+        score += finalPoints;
+        updateScoreDisplay();
+
+        cellsRemovedHistory.push(contadorDeCeldasEnRonda);
+        if (cellsRemovedHistory.length > 5) {
+            cellsRemovedHistory.shift();
+        }
+
+        if (cellsRemovedHistory.length > 1) {
+            const averageCellsRemoved = cellsRemovedHistory.reduce((sum, value) => sum + value, 0) / cellsRemovedHistory.length;
+            document.getElementById('current-average').textContent = averageCellsRemoved.toFixed(2);
+            console.log(`Promedio de celdas removidas: ${averageCellsRemoved.toFixed(2)}`);
+
+            if (contadorDeCeldasEnRonda > averageCellsRemoved) {
+                const extraTime = Math.ceil(contadorDeCeldasEnRonda);
+                countdown += extraTime;
+                console.log(`Tiempo extendido por ${extraTime} segundos. Nuevo tiempo: ${countdown} segundos.`);
+            }
+        } else if (cellsRemovedHistory.length === 1) {
+            document.getElementById('current-average').textContent = cellsRemovedHistory[0].toFixed(2);
+        }
+
+        roundsInCascade = 1;
+        totalRemovedThisCascade = 0;
+        contadorDeCeldasEnRonda = 0;
+        isProcessing = false;
+        manageClock();
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.classList.remove('processing');
+        });
+        applyScoreBlink();
+    }
     updateColorSamples();
 }
 
