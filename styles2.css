@@ -309,16 +309,19 @@ label {
 }
 
 @keyframes fall {
-    from {
+    0% {
         top: -50px;
     }
-    to {
+    5% {
+        top: -50px;
+    }
+    100% {
         top: 0;
     }
 }
 
 .fall {
-    animation: fall 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    animation: fall 0.4s cubic-bezier(0.2, 0, 0.5, 1) forwards;
 }
 
 @keyframes gridFlash {
