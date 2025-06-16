@@ -73,13 +73,6 @@ function addFallAnimation(cell, delay = 0) {
     cell.addEventListener('animationend', handler);
 }
 
-function flashGridBackground() {
-    gameContainer.classList.add('flash-bg');
-    setTimeout(() => {
-        gameContainer.classList.remove('flash-bg');
-    }, 1000);
-}
-
 function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -218,8 +211,7 @@ function checkPatterns() {
 }
 
 async function handleCascade(matches) {
-    flashGridBackground();
-    await wait(1000);
+    // Previously the grid flashed here; effect removed
     matches.forEach(coord => {
         const [row, col] = coord.split(',').map(Number);
         const cell = cellReferences[row][col];
