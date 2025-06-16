@@ -61,6 +61,22 @@ function manageClock() {
     });
 }
 
+function addFallAnimation(cell) {
+    cell.classList.add('fall');
+    const handler = () => {
+        cell.classList.remove('fall');
+        cell.removeEventListener('animationend', handler);
+    };
+    cell.addEventListener('animationend', handler);
+}
+
+function flashGridBackground() {
+    gameContainer.classList.add('flash-bg');
+    setTimeout(() => {
+        gameContainer.classList.remove('flash-bg');
+    }, 1000);
+}
+
 function createGrid(rows, cols) {
     gameContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
     gameContainer.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
@@ -244,6 +260,7 @@ function removePulsatingCells(matches) {
                     const newRow = row + emptySpaceCount;
                     board[newRow][col] = board[row][col];
                     cellReferences[newRow][col].className = `cell ${board[newRow][col]}`;
+                    addFallAnimation(cellReferences[newRow][col]);
                     board[row][col] = null;
                     cellReferences[row][col].className = 'cell';
                 }
@@ -253,9 +270,12 @@ function removePulsatingCells(matches) {
                 const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
                 board[row][col] = newColor;
                 cellReferences[row][col].className = `cell ${newColor}`;
+                addFallAnimation(cellReferences[row][col]);
                 cellCounts[newColor]++;
             }
         }
+
+        flashGridBackground();
 
         newMatches = checkNewMatches();
 

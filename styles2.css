@@ -30,7 +30,7 @@ body {
     background-color: #ddd;
     border: 1px solid #999;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.2s;
     position: relative;
 }
 
@@ -40,6 +40,8 @@ body {
 
 .cell.selected {
     border: 3px solid white;
+    transform: scale(1.2);
+    z-index: 1;
 }
 
 .cell.verde {
@@ -304,6 +306,32 @@ label {
         color: #FF9800;
         text-shadow: 0 0 5px #FF9800;
     }
+}
+
+@keyframes fall {
+    from {
+        top: -50px;
+    }
+    to {
+        top: 0;
+    }
+}
+
+.fall {
+    animation: fall 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes gridFlash {
+    0%, 100% {
+        background-color: #333;
+    }
+    50% {
+        background-color: #ffffff;
+    }
+}
+
+.flash-bg {
+    animation: gridFlash 0.2s linear 5;
 }
 
 #game-over-overlay {
