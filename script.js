@@ -1,4 +1,5 @@
 const COLORS = ['gris-ondas', 'verde', 'cyan', 'puntos-blancos', 'rayado', 'magenta'];
+const FALL_DURATION = 0.4; // duration in seconds for a single fall animation
 let gameContainer = document.getElementById('game-container');
 let board = [];
 let cellReferences = [];
@@ -61,10 +62,12 @@ function manageClock() {
     });
 }
 
-function addFallAnimation(cell) {
+function addFallAnimation(cell, delay = 0) {
+    cell.style.animationDelay = `${delay}s`;
     cell.classList.add('fall');
     const handler = () => {
         cell.classList.remove('fall');
+        cell.style.animationDelay = '';
         cell.removeEventListener('animationend', handler);
     };
     cell.addEventListener('animationend', handler);
@@ -252,6 +255,7 @@ function removePulsatingCells(matches) {
 
         for (let col = 0; col < cols; col++) {
             let emptySpaceCount = 0;
+            let delayIndex = 0;
 
             for (let row = rows - 1; row >= 0; row--) {
                 if (board[row][col] === null) {
@@ -260,9 +264,10 @@ function removePulsatingCells(matches) {
                     const newRow = row + emptySpaceCount;
                     board[newRow][col] = board[row][col];
                     cellReferences[newRow][col].className = `cell ${board[newRow][col]}`;
-                    addFallAnimation(cellReferences[newRow][col]);
+                    addFallAnimation(cellReferences[newRow][col], delayIndex * FALL_DURATION);
                     board[row][col] = null;
                     cellReferences[row][col].className = 'cell';
+                    delayIndex++;
                 }
             }
 
@@ -270,8 +275,9 @@ function removePulsatingCells(matches) {
                 const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
                 board[row][col] = newColor;
                 cellReferences[row][col].className = `cell ${newColor}`;
-                addFallAnimation(cellReferences[row][col]);
+                addFallAnimation(cellReferences[row][col], delayIndex * FALL_DURATION);
                 cellCounts[newColor]++;
+                delayIndex++;
             }
         }
 
