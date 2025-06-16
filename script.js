@@ -80,6 +80,10 @@ function flashGridBackground() {
     }, 1000);
 }
 
+function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function createGrid(rows, cols) {
     gameContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
     gameContainer.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
@@ -206,24 +210,26 @@ function checkPatterns() {
     if (matches.size > 0) {
         roundsInCascade = 1;
         totalRemovedThisCascade += matches.size;
-
-        matches.forEach(coord => {
-            const [row, col] = coord.split(',').map(Number);
-            const cell = cellReferences[row][col];
-            cell.classList.add('matched');
-        });
-
-        const timeoutId = setTimeout(() => {
-            processMatchedCells(matches);
-        }, 2000);
-        timeoutIds.push(timeoutId);
+        handleCascade(matches);
     } else {
         isProcessing = false;
         cells.forEach(cell => cell.classList.remove('processing'));
     }
 }
 
-function processMatchedCells(matches) {
+async function handleCascade(matches) {
+    flashGridBackground();
+    await wait(1000);
+    matches.forEach(coord => {
+        const [row, col] = coord.split(',').map(Number);
+        const cell = cellReferences[row][col];
+        cell.classList.add('matched');
+    });
+    await wait(2000);
+    await processMatchedCells(matches);
+}
+
+async function processMatchedCells(matches) {
     const rows = board.length;
     const cols = board[0].length;
 
@@ -242,6 +248,7 @@ function processMatchedCells(matches) {
     updateCellsRemovedDisplay();
 
     let newMatches = new Set();
+    let maxDelay = 0;
 
     for (let col = 0; col < cols; col++) {
         let emptySpaceCount = 0;
@@ -255,6 +262,7 @@ function processMatchedCells(matches) {
                 board[newRow][col] = board[row][col];
                 cellReferences[newRow][col].className = `cell ${board[newRow][col]}`;
                 addFallAnimation(cellReferences[newRow][col], delayIndex * FALL_DURATION);
+                if (delayIndex * FALL_DURATION > maxDelay) maxDelay = delayIndex * FALL_DURATION;
                 board[row][col] = null;
                 cellReferences[row][col].className = 'cell';
                 delayIndex++;
@@ -266,22 +274,17 @@ function processMatchedCells(matches) {
             board[row][col] = newColor;
             cellReferences[row][col].className = `cell ${newColor}`;
             addFallAnimation(cellReferences[row][col], delayIndex * FALL_DURATION);
+            if (delayIndex * FALL_DURATION > maxDelay) maxDelay = delayIndex * FALL_DURATION;
             cellCounts[newColor]++;
             delayIndex++;
         }
     }
 
-    flashGridBackground();
+    await wait((maxDelay + FALL_DURATION) * 1000);
 
     newMatches = checkNewMatches();
 
     if (newMatches.size > 0) {
-        newMatches.forEach(coord => {
-            const [row, col] = coord.split(',').map(Number);
-            const cell = cellReferences[row][col];
-            cell.classList.add('matched');
-        });
-
         const n = Math.log2(roundsInCascade) + 1;
         roundsInCascade = Math.pow(2, n);
         totalRemovedThisCascade += newMatches.size;
@@ -289,10 +292,7 @@ function processMatchedCells(matches) {
         const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
         incrementScoreAnimated(scoreIncrement, 2000, 20);
 
-        const newTimeoutId = setTimeout(() => {
-            processMatchedCells(newMatches);
-        }, 2000);
-        timeoutIds.push(newTimeoutId);
+        await handleCascade(newMatches);
     } else {
         isProcessing = false;
         manageClock();
