@@ -324,18 +324,6 @@ label {
     animation: fall 0.4s cubic-bezier(0.2, 0, 0.5, 1) forwards;
 }
 
-@keyframes gridFlash {
-    0%, 100% {
-        background-color: #333;
-    }
-    50% {
-        background-color: #ffffff;
-    }
-}
-
-.flash-bg {
-    animation: gridFlash 0.2s linear 5;
-}
 
 #game-over-overlay {
     position: fixed;
