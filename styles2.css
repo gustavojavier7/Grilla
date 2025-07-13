@@ -39,9 +39,7 @@ body {
 }
 
 .cell.selected {
-    border: 3px solid white;
-    transform: scale(1.2);
-    z-index: 1;
+    +     opacity: 0.6; /* Atenúa el color de la celda */
 }
 
 .cell.verde {
