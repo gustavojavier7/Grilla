@@ -187,11 +187,11 @@ label {
     border: 2px solid #333;
 }
 
-.separador, .separador-sec {
-    background-color: #ffeb3b; /* Fondo fijo */
-    color: black; /* Color inicial del texto */
+.separador, .separador-sec, .separador-principal {
+    background-color: #ffeb3b;
+    color: black;
     padding: 0 2px;
-    transition: color 0.3s ease; /* Transición suave para el parpadeo */
+    transition: color 0.3s ease;
 }
 
 /* Puedes eliminar o ignorar las animaciones @keyframes blinkSeparator y .separador.blink, ya que el parpadeo ahora se maneja vía JS. */
