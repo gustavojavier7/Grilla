@@ -345,7 +345,7 @@ async function processMatchedCells(matches) {
 
         if (cellsRemovedHistory.length > 1) {
             const averageCellsRemoved = cellsRemovedHistory.reduce((sum, value) => sum + value, 0) / cellsRemovedHistory.length;
-            document.getElementById('current-average').textContent = averageCellsRemoved.toFixed(3);
+            document.getElementById('current-average').textContent = averageCellsRemoved.toFixed(3).padStart(7, '0');
             console.log(`Promedio de celdas removidas: ${averageCellsRemoved.toFixed(2)}`);
 
             if (contadorDeCeldasEnRonda > averageCellsRemoved) {
@@ -354,7 +354,7 @@ async function processMatchedCells(matches) {
                 console.log(`Tiempo extendido por ${extraTime} segundos. Nuevo tiempo: ${countdown} segundos.`);
             }
         } else if (cellsRemovedHistory.length === 1) {
-            document.getElementById('current-average').textContent = cellsRemovedHistory[0].toFixed(2);
+            document.getElementById('current-average').textContent = cellsRemovedHistory[0].toFixed(3).padStart(7, '0');
         }
 
         roundsInCascade = 1;
