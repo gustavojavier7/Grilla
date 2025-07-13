@@ -582,6 +582,15 @@ function contadorRegresivo() {
             const seconds = (countdown % 60).toString().padStart(2, '0');
             document.getElementById('minutos').textContent = minutes;
             document.getElementById('segundos').textContent = seconds;
+            // Añadir/quitar clase blink al separador principal
+            const separadorPrincipal = document.getElementById('separador-principal');
+            if (separadorPrincipal) {
+                if (countdown % 2 === 0) { // Parpadea cada segundo
+                    separadorPrincipal.classList.add('blink');
+                } else {
+                    separadorPrincipal.classList.remove('blink');
+                }
+            }
         }
         if (countdown === 0 && countdownStarted) {
             showGameOver('Tiempo agotado', 0);
