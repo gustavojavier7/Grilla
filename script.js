@@ -14,6 +14,7 @@ let rows = 6;
 let cols = 6;
 let cellCounts = {};
 let totalCellsRemoved = 0;
+let mainSeparatorVisible = true;
 let secondarySeparatorVisible = true;
 let lastUpdateTime = 0;
 let countdown = 60; // 1 minuto en segundos
@@ -589,7 +590,8 @@ function contadorRegresivo() {
 
             // El separador principal parpadea porque el tiempo corre
             if (separadorPrincipal) {
-                separadorPrincipal.style.backgroundColor = secondarySeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
+                mainSeparatorVisible = !mainSeparatorVisible;
+                separadorPrincipal.style.backgroundColor = mainSeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
             }
         } else {
             // El juego está pausado o terminado: el separador queda fijo
