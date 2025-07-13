@@ -1,5 +1,6 @@
 const COLORS = ['gris-ondas', 'verde', 'cyan', 'puntos-blancos', 'rayado', 'magenta'];
-const FALL_DURATION = 0.5; // duration in seconds for a single fall animation
+const FALL_DURATION = 0.3; // duration in seconds for a single fall animation
+const FALL_STAGGER_DELAY = 0.1; // delay between consecutive cell falls in a column
 let gameContainer = document.getElementById('game-container');
 let board = [];
 let cellReferences = [];
@@ -292,10 +293,10 @@ async function processMatchedCells(matches) {
                 const distanceToMoveUp = emptySpaceCount * (40 + 2); // 40px height + 2px gap
 
                 // Use the unified addFallAnimation
-                addFallAnimation(targetCellElement, delayIndex * FALL_DURATION, -distanceToMoveUp, false);
+                addFallAnimation(targetCellElement, delayIndex * FALL_STAGGER_DELAY, -distanceToMoveUp, false);
 
                 // Update maxDelay for the overall wait
-                if (delayIndex * FALL_DURATION > maxDelay) maxDelay = delayIndex * FALL_DURATION;
+                if (delayIndex * FALL_STAGGER_DELAY > maxDelay) maxDelay = delayIndex * FALL_STAGGER_DELAY;
                 delayIndex++;
             }
         }
@@ -310,8 +311,8 @@ async function processMatchedCells(matches) {
             // Es el número de filas desde la parte superior del bloque vacío hasta su targetRow
             const distanceToFall = (emptySpaceCount - i) * (40 + 2); // 40px height + 2px gap
 
-            addFallAnimation(cellReferences[targetRow][col], delayIndex * FALL_DURATION, -distanceToFall, true);
-            if (delayIndex * FALL_DURATION > maxDelay) maxDelay = delayIndex * FALL_DURATION;
+            addFallAnimation(cellReferences[targetRow][col], delayIndex * FALL_STAGGER_DELAY, -distanceToFall, true);
+            if (delayIndex * FALL_STAGGER_DELAY > maxDelay) maxDelay = delayIndex * FALL_STAGGER_DELAY;
             cellCounts[newColor]++;
             delayIndex++;
         }
