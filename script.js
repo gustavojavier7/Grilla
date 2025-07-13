@@ -600,7 +600,6 @@ function contadorRegresivo() {
                 separadorPrincipal.style.color = SEPARATOR_COLORS.ON;
                 console.log('Separador Principal (pausado/terminado): ', separadorPrincipal.style.color);
             }
-            }
         }
 
         if (countdown === 0 && countdownStarted) {
