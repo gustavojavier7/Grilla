@@ -39,7 +39,7 @@ body {
 }
 
 .cell.selected {
-    +     opacity: 0.6; /* Atenúa el color de la celda */
+    opacity: 0.6; /* Atenúa el color de la celda */
 }
 
 .cell.verde {
@@ -319,7 +319,7 @@ label {
 }
 
 .fall {
-    animation: fall 0.4s cubic-bezier(0.2, 0, 0.5, 1) forwards;
+    animation: fall 1.5s cubic-bezier(0.2, 0, 0.5, 1) forwards;
 }
 
 
@@ -389,4 +389,3 @@ label {
         font-size: 18px;
     }
 }
-
