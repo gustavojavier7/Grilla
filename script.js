@@ -62,15 +62,25 @@ function manageClock() {
     });
 }
 
-function addFallAnimation(cell, delay = 0) {
-    cell.style.animationDelay = `${delay}s`;
-    cell.classList.add('fall');
-    const handler = () => {
-        cell.classList.remove('fall');
-        cell.style.animationDelay = '';
-        cell.removeEventListener('animationend', handler);
+function addFallAnimation(cell, delay = 0, initialOffset = 0) {
+    // Set initial state (hidden above or at original position)
+    cell.style.transition = 'none'; // Disable transition for initial positioning
+    cell.style.transform = `translateY(${initialOffset}px)`;
+    
+    // Force reflow to apply the initial transform immediately
+    void cell.offsetWidth; 
+
+    // Re-enable transition and animate to final position (translateY(0))
+    cell.style.transition = `transform ${FALL_DURATION}s cubic-bezier(0.2, 0, 0.5, 1) ${delay}s`;
+    cell.style.transform = 'translateY(0)';
+
+    // Clean up inline styles after animation
+    const transitionEndHandler = () => {
+        cell.style.transition = ''; // Remove inline transition
+        cell.style.transform = ''; // Remove inline transform
+        cell.removeEventListener('transitionend', transitionEndHandler);
     };
-    cell.addEventListener('animationend', handler);
+    cell.addEventListener('transitionend', transitionEndHandler);
 }
 
 function wait(ms) {
@@ -265,49 +275,31 @@ async function processMatchedCells(matches) {
                 const targetCellElement = cellReferences[newRow][newCol];
                 const oldCellElement = cellReferences[oldRow][oldCol]; // Reference to the element at the old position
 
-                // 1. Clear the old cell's visual (already done above, but good to be explicit)
+                // Clear the old cell's visual
                 oldCellElement.className = 'cell';
 
-                // 2. Set the new cell's color at its destination grid position
+                // Set the new cell's color at its destination grid position
                 targetCellElement.className = `cell ${fallingColor}`;
 
-                // 3. Calculate the distance to move up for the animation
-                //    Each cell is 40px height + 2px gap = 42px
-                const distanceToMoveUp = emptySpaceCount * (40 + 2);
+                // Calculate the distance to move up for the animation
+                const distanceToMoveUp = emptySpaceCount * (40 + 2); // 40px height + 2px gap
 
-                // 4. Apply initial transform to the target cell to move it to its *starting* visual position
-                //    Disable transition temporarily to avoid animating the initial jump up
-                targetCellElement.style.transition = 'none';
-                targetCellElement.style.transform = `translateY(-${distanceToMoveUp}px)`;
+                // Use the unified addFallAnimation
+                addFallAnimation(targetCellElement, delayIndex * FALL_DURATION, -distanceToMoveUp);
 
-                // 5. Force reflow to apply the transform immediately
-                void targetCellElement.offsetWidth; // Triggers a reflow
-
-                // 6. Re-enable transition and animate to final position (translateY(0))
-                targetCellElement.style.transition = `transform ${FALL_DURATION}s cubic-bezier(0.2, 0, 0.5, 1)`;
-                targetCellElement.style.transform = 'translateY(0)';
-
-                // Add event listener to clean up inline styles after animation
-                const transitionEndHandler = () => {
-                    targetCellElement.style.transition = ''; // Remove inline transition
-                    targetCellElement.style.transform = ''; // Remove inline transform
-                    targetCellElement.removeEventListener('transitionend', transitionEndHandler);
-                };
-                targetCellElement.addEventListener('transitionend', transitionEndHandler);
-
-                // Update maxDelay for the overall wait (still based on FALL_DURATION)
+                // Update maxDelay for the overall wait
                 if (delayIndex * FALL_DURATION > maxDelay) maxDelay = delayIndex * FALL_DURATION;
                 delayIndex++;
             }
         }
 
-        // Handle newly generated cells at the top (these still use the original 'fall' animation)
+        // Handle newly generated cells at the top
         for (let row = 0; emptySpaceCount > 0; row++, emptySpaceCount--) {
             const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
             board[row][col] = newColor;
             cellReferences[row][col].className = `cell ${newColor}`;
-            // Use the existing addFallAnimation for new cells coming from off-screen
-            addFallAnimation(cellReferences[row][col], delayIndex * FALL_DURATION);
+            // Use the unified addFallAnimation for new cells coming from off-screen
+            addFallAnimation(cellReferences[row][col], delayIndex * FALL_DURATION, -(rows * (40 + 2))); // Start from above the grid
             if (delayIndex * FALL_DURATION > maxDelay) maxDelay = delayIndex * FALL_DURATION;
             cellCounts[newColor]++;
             delayIndex++;
