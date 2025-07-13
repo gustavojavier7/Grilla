@@ -89,12 +89,13 @@ body {
     );
 }
 
-.triangulo-blanco {
-    background-color: #001f3f;
+.cuadricula-pequena {
+    background-color: #8B0000; /* Dark Red */
     background-image: 
-        conic-gradient(from 150deg at center, transparent 0deg 120deg, white 120deg 240deg, transparent 240deg 360deg);
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
+        linear-gradient(45deg, rgba(255,255,255,0.2) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.2) 75%, rgba(255,255,255,0.2) 100%),
+        linear-gradient(45deg, rgba(255,255,255,0.2) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.2) 75%, rgba(255,255,255,0.2) 100%);
+    background-size: 10px 10px;
+    background-position: 0 0, 5px 5px;
 }
 
 .cell.matched {
