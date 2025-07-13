@@ -252,16 +252,17 @@ label {
 }
 
 .cell-sample {
-    width: 30px;
-    height: 30px;
+    width: 40px; /* Ancho igual a las celdas del juego */
+    height: 40px; /* Altura igual a las celdas del juego */
     border: 1px solid #999;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 14px; /* Tamaño de fuente ajustado */
     font-weight: bold;
     color: white;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7);
+    box-sizing: border-box; /* Asegura que el padding y borde no alteren el tamaño final */
 }
 
 .cell-sample.blink-threshold {
