@@ -601,6 +601,7 @@ function contadorRegresivo() {
                 console.log('Separador Principal (pausado/terminado): ', separadorPrincipal.style.color);
             }
         }
+        }
 
         if (countdown === 0 && countdownStarted) {
             showGameOver('Tiempo agotado', 0);
