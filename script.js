@@ -581,41 +581,36 @@ function contadorRegresivo() {
         const separadorPrincipal = document.getElementById('separador-principal');
 
         if (countdownStarted && countdown > 0 && !isProcessing) {
-            // El juego está en marcha: el cronómetro avanza
             countdown--;
             const minutes = Math.floor(countdown / 60).toString().padStart(2, '0');
             const seconds = (countdown % 60).toString().padStart(2, '0');
             document.getElementById('minutos').textContent = minutes;
             document.getElementById('segundos').textContent = seconds;
 
-            // El separador principal parpadea porque el tiempo corre
             if (separadorPrincipal) {
                 mainSeparatorVisible = !mainSeparatorVisible;
                 separadorPrincipal.style.color = mainSeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
                 console.log('Separador Principal (activo): ', separadorPrincipal.style.color);
             }
         } else {
-            // El juego está pausado o terminado: el separador queda fijo y visible
             if (separadorPrincipal) {
                 separadorPrincipal.style.color = SEPARATOR_COLORS.ON;
                 console.log('Separador Principal (pausado/terminado): ', separadorPrincipal.style.color);
             }
-        }
         }
 
         if (countdown === 0 && countdownStarted) {
             showGameOver('Tiempo agotado', 0);
         }
 
-        // El reloj secundario siempre se actualiza y parpadea
         document.getElementById('horas-sec').textContent = new Date().getHours().toString().padStart(2, '0');
         document.getElementById('minutos-sec').textContent = new Date().getMinutes().toString().padStart(2, '0');
         document.getElementById('segundos-sec').textContent = new Date().getSeconds().toString().padStart(2, '0');
         
-        toggleSeparators(); // Esto controla el parpadeo del reloj secundario
-
+        toggleSeparators();
         lastUpdateTime = now;
     }
+
     requestAnimationFrame(contadorRegresivo);
 }
 
