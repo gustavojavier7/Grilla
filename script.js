@@ -582,14 +582,11 @@ function contadorRegresivo() {
             const seconds = (countdown % 60).toString().padStart(2, '0');
             document.getElementById('minutos').textContent = minutes;
             document.getElementById('segundos').textContent = seconds;
-            // Añadir/quitar clase blink al separador principal
+
+            // Sincronizar el parpadeo del separador principal con el secundario
             const separadorPrincipal = document.getElementById('separador-principal');
             if (separadorPrincipal) {
-                if (countdown % 2 === 0) { // Parpadea cada segundo
-                    separadorPrincipal.classList.add('blink');
-                } else {
-                    separadorPrincipal.classList.remove('blink');
-                }
+                separadorPrincipal.style.backgroundColor = secondarySeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
             }
         }
         if (countdown === 0 && countdownStarted) {
