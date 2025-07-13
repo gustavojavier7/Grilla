@@ -71,7 +71,7 @@ function addFallAnimation(cell, delay = 0, initialOffset = 0) {
     void cell.offsetWidth; 
 
     // Re-enable transition and animate to final position (translateY(0))
-    cell.style.transition = `transform ${FALL_DURATION}s cubic-bezier(0.2, 0, 0.5, 1) ${delay}s`;
+    cell.style.transition = `transform ${FALL_DURATION}s cubic-bezier(0.42, 0, 1.0, 1.0) ${delay}s`;
     cell.style.transform = 'translateY(0)';
 
     // Clean up inline styles after animation
@@ -294,12 +294,12 @@ async function processMatchedCells(matches) {
         }
 
         // Handle newly generated cells at the top
-        for (let row = 0; emptySpaceCount > 0; row++, emptySpaceCount--) {
+        for (let i = 0; i < emptySpaceCount; i++) {
+            const targetRow = (emptySpaceCount - 1) - i;
             const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-            board[row][col] = newColor;
-            cellReferences[row][col].className = `cell ${newColor}`;
-            // Use the unified addFallAnimation for new cells coming from off-screen
-            addFallAnimation(cellReferences[row][col], delayIndex * FALL_DURATION, -(rows * (40 + 2))); // Start from above the grid
+            board[targetRow][col] = newColor;
+            cellReferences[targetRow][col].className = `cell ${newColor}`;
+            addFallAnimation(cellReferences[targetRow][col], delayIndex * FALL_DURATION, -(rows * (40 + 2))); // Start from above the grid
             if (delayIndex * FALL_DURATION > maxDelay) maxDelay = delayIndex * FALL_DURATION;
             cellCounts[newColor]++;
             delayIndex++;
