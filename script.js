@@ -1,6 +1,6 @@
 const COLORS = ['gris-ondas', 'verde', 'cyan', 'puntos-blancos', 'rayado', 'magenta'];
-const FALL_DURATION = 0.3; // duration in seconds for a single fall animation
-const FALL_STAGGER_DELAY = 0.1; // delay between consecutive cell falls in a column
+const FALL_DURATION = 0.2; // duration in seconds for a single fall animation
+const FALL_STAGGER_DELAY = 0.01; // delay between consecutive cell falls in a column
 let gameContainer = document.getElementById('game-container');
 let board = [];
 let cellReferences = [];
