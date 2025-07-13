@@ -189,12 +189,14 @@ label {
 
 .separador, .separador-sec {
     background-color: #ffeb3b; /* Fondo fijo */
-    color: black; /* Color de los puntos */
+    color: black; /* Color inicial del texto */
     padding: 0 2px;
-    transition: color 0.3s ease; /* Transición para el color del texto */
+    transition: color 0.3s ease; /* Transición suave para el parpadeo */
 }
 
-/* Efecto de parpadeo para el separador principal del cronómetro */
+/* Puedes eliminar o ignorar las animaciones @keyframes blinkSeparator y .separador.blink, ya que el parpadeo ahora se maneja vía JS. */
+/* Las siguientes reglas CSS ya no son necesarias para el parpadeo controlado por JS */
+/*
 .separador.blink {
     animation: blinkSeparator 1s ease-in-out infinite;
 }
@@ -210,7 +212,6 @@ label {
     }
 }
 
-/* Efecto de parpadeo para separadores secundarios */
 .separador-sec.blink {
     animation: blinkSeparatorSec 1s ease-in-out infinite;
 }
@@ -223,6 +224,7 @@ label {
         color: transparent;
     }
 }
+*/
 
 #score-display, #average-cells-removed, #cells-removed-counter, #cells-removed-round {
     font-size: 16px;
