@@ -580,24 +580,19 @@ function contadorRegresivo() {
         const separadorPrincipal = document.getElementById('separador-principal');
 
         if (countdownStarted && countdown > 0 && !isProcessing) {
-            // El juego está en marcha
+            // El juego está en marcha: el cronómetro avanza
             countdown--;
             const minutes = Math.floor(countdown / 60).toString().padStart(2, '0');
             const seconds = (countdown % 60).toString().padStart(2, '0');
             document.getElementById('minutos').textContent = minutes;
             document.getElementById('segundos').textContent = seconds;
 
-            // El separador principal parpadea
+            // El separador principal parpadea porque el tiempo corre
             if (separadorPrincipal) {
-                const currentColor = separadorPrincipal.style.backgroundColor;
-                if (currentColor === 'yellow') {
-                    separadorPrincipal.style.backgroundColor = 'black';
-                } else {
-                    separadorPrincipal.style.backgroundColor = 'yellow';
-                }
+                separadorPrincipal.style.backgroundColor = secondarySeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
             }
         } else {
-            // El juego está pausado o terminado, el separador queda fijo
+            // El juego está pausado o terminado: el separador queda fijo
             if (separadorPrincipal) {
                 separadorPrincipal.style.backgroundColor = SEPARATOR_COLORS.ON;
             }
@@ -612,7 +607,7 @@ function contadorRegresivo() {
         document.getElementById('minutos-sec').textContent = new Date().getMinutes().toString().padStart(2, '0');
         document.getElementById('segundos-sec').textContent = new Date().getSeconds().toString().padStart(2, '0');
         
-        toggleSeparators(); // Esto controla el parpadeo de ambos relojes
+        toggleSeparators(); // Esto controla el parpadeo del reloj secundario
 
         lastUpdateTime = now;
     }
