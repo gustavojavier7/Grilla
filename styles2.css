@@ -43,19 +43,19 @@ body {
     opacity: 0.6; /* Atenúa el color de la celda */
 }
 
-.cell.verde {
+.verde {
     background-color: #4CAF50;
 }
 
-.cell.cyan {
+.cyan {
     background-color: #00BCD4;
 }
 
-.cell.magenta {
+.magenta {
     background-color: #E91E63;
 }
 
-.cell.rayado {
+.rayado {
     background: linear-gradient(45deg, #2196F3 25%, transparent 25%), 
                 linear-gradient(-45deg, #2196F3 25%, transparent 25%), 
                 linear-gradient(45deg, transparent 75%, #2196F3 75%), 
@@ -65,13 +65,13 @@ body {
     background-color: #BBDEFB;
 }
 
-.cell.puntos-blancos {
+.puntos-blancos {
     background-color: #F44336;
     background-image: radial-gradient(circle, white 1px, transparent 1px);
     background-size: 6px 6px;
 }
 
-.cell.gris-ondas {
+.gris-ondas {
     background-color: #9E9E9E;
     background-image: repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.3) 2px, rgba(255,255,255,0.3) 4px);
 }
