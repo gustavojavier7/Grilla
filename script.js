@@ -1,5 +1,5 @@
 const COLORS = ['gris-ondas', 'verde', 'cyan', 'puntos-blancos', 'rayado', 'magenta'];
-const FALL_DURATION = 1.5; // duration in seconds for a single fall animation
+const FALL_DURATION = 0.5; // duration in seconds for a single fall animation
 let gameContainer = document.getElementById('game-container');
 let board = [];
 let cellReferences = [];
