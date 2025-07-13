@@ -26,8 +26,8 @@ let timeoutIds = []; // Array para almacenar los IDs de los timeouts
 let intervalIds = []; // Array para almacenar los IDs de los intervals
 const updateInterval = 1000; // 1s
 const SEPARATOR_COLORS = {
-    ON: '#ffeb3b',
-    OFF: '#ffeb3b'
+    ON: 'black',    // Visible: texto negro
+    OFF: 'transparent'  // Invisible: texto transparente
 };
 
 COLORS.forEach(color => {
@@ -43,24 +43,24 @@ function checkSelections() {
 
 function initializeSeparators() {
     document.querySelectorAll('.separador').forEach(separator => {
-        separator.style.backgroundColor = SEPARATOR_COLORS.ON;
+        separator.style.color = SEPARATOR_COLORS.ON;
     });
     document.querySelectorAll('.separador-sec').forEach(separator => {
-        separator.style.backgroundColor = SEPARATOR_COLORS.ON;
+        separator.style.color = SEPARATOR_COLORS.ON;
     });
 }
 
 function toggleSeparators() {
     secondarySeparatorVisible = !secondarySeparatorVisible;
     document.querySelectorAll('.separador-sec').forEach(separator => {
-        separator.style.backgroundColor = secondarySeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
+        separator.style.color = secondarySeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
     });
 }
 
 function manageClock() {
     document.querySelectorAll('#reloj-sec .separador-sec').forEach(separator => {
         separator.classList.remove('paused');
-        separator.style.backgroundColor = secondarySeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
+        separator.style.color = secondarySeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
     });
 }
 
@@ -591,14 +591,15 @@ function contadorRegresivo() {
             // El separador principal parpadea porque el tiempo corre
             if (separadorPrincipal) {
                 mainSeparatorVisible = !mainSeparatorVisible;
-                separadorPrincipal.style.backgroundColor = mainSeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
-                console.log('Separador Principal (activo): ', separadorPrincipal.style.backgroundColor);
+                separadorPrincipal.style.color = mainSeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
+                console.log('Separador Principal (activo): ', separadorPrincipal.style.color);
             }
         } else {
-            // El juego está pausado o terminado: el separador queda fijo
+            // El juego está pausado o terminado: el separador queda fijo y visible
             if (separadorPrincipal) {
-                separadorPrincipal.style.backgroundColor = SEPARATOR_COLORS.ON;
-                console.log('Separador Principal (pausado/terminado): ', separadorPrincipal.style.backgroundColor);
+                separadorPrincipal.style.color = SEPARATOR_COLORS.ON;
+                console.log('Separador Principal (pausado/terminado): ', separadorPrincipal.style.color);
+            }
             }
         }
 
