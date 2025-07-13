@@ -235,7 +235,7 @@ async function handleCascade(matches) {
         const cell = cellReferences[row][col];
         cell.classList.add('matched');
     });
-    await wait(2000);
+    await wait(700);
     await processMatchedCells(matches);
 }
 
