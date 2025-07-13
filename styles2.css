@@ -188,9 +188,10 @@ label {
 }
 
 .separador, .separador-sec {
-    background-color: yellow;
+    background-color: #ffeb3b; /* Fondo fijo */
+    color: black; /* Color de los puntos */
     padding: 0 2px;
-    transition: background-color 0.3s ease;
+    transition: color 0.3s ease; /* Transición para el color del texto */
 }
 
 /* Efecto de parpadeo para el separador principal del cronómetro */
@@ -200,11 +201,11 @@ label {
 
 @keyframes blinkSeparator {
     0%, 50% {
-        background-color: yellow;
+        color: black;
         opacity: 1;
     }
     51%, 100% {
-        background-color: transparent;
+        color: transparent;
         opacity: 0.3;
     }
 }
@@ -216,10 +217,10 @@ label {
 
 @keyframes blinkSeparatorSec {
     0%, 50% {
-        background-color: yellow;
+        color: black;
     }
     51%, 100% {
-        background-color: black;
+        color: transparent;
     }
 }
 
