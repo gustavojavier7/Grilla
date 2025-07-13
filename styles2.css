@@ -32,6 +32,7 @@ body {
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
     position: relative;
+    position: relative;
 }
 
 .cell:hover {
