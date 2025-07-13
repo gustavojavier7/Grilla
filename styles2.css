@@ -89,14 +89,12 @@ body {
     );
 }
 
-.cruz-blanca {
-    background-color: #000000; /* Fondo negro */
-    background-image:
-        linear-gradient(45deg, white 2px, transparent 2px),
-        linear-gradient(-45deg, white 2px, transparent 2px);
+.triangulo-blanco {
+    background-color: #001f3f;
+    background-image: 
+        conic-gradient(from 150deg at center, transparent 0deg 120deg, white 120deg 240deg, transparent 240deg 360deg);
     background-size: 100% 100%;
     background-repeat: no-repeat;
-    background-position: center;
 }
 
 .cell.matched {
