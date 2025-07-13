@@ -62,22 +62,29 @@ function manageClock() {
     });
 }
 
-function addFallAnimation(cell, delay = 0, initialOffset = 0) {
+function addFallAnimation(cell, delay = 0, initialOffset = 0, isNewCell = false) {
     // Set initial state (hidden above or at original position)
     cell.style.transition = 'none'; // Disable transition for initial positioning
     cell.style.transform = `translateY(${initialOffset}px)`;
+    if (isNewCell) {
+        cell.style.opacity = '0';
+    }
     
     // Force reflow to apply the initial transform immediately
     void cell.offsetWidth; 
 
     // Re-enable transition and animate to final position (translateY(0))
-    cell.style.transition = `transform ${FALL_DURATION}s cubic-bezier(0.42, 0, 1.0, 1.0) ${delay}s`;
+    cell.style.transition = `transform ${FALL_DURATION}s cubic-bezier(0.42, 0, 1.0, 1.0) ${delay}s, opacity ${FALL_DURATION}s linear ${delay}s`;
     cell.style.transform = 'translateY(0)';
+    if (isNewCell) {
+        cell.style.opacity = '1';
+    }
 
     // Clean up inline styles after animation
     const transitionEndHandler = () => {
         cell.style.transition = ''; // Remove inline transition
         cell.style.transform = ''; // Remove inline transform
+        cell.style.opacity = ''; // Remove inline opacity
         cell.removeEventListener('transitionend', transitionEndHandler);
     };
     cell.addEventListener('transitionend', transitionEndHandler);
@@ -285,7 +292,7 @@ async function processMatchedCells(matches) {
                 const distanceToMoveUp = emptySpaceCount * (40 + 2); // 40px height + 2px gap
 
                 // Use the unified addFallAnimation
-                addFallAnimation(targetCellElement, delayIndex * FALL_DURATION, -distanceToMoveUp);
+                addFallAnimation(targetCellElement, delayIndex * FALL_DURATION, -distanceToMoveUp, false);
 
                 // Update maxDelay for the overall wait
                 if (delayIndex * FALL_DURATION > maxDelay) maxDelay = delayIndex * FALL_DURATION;
@@ -303,7 +310,7 @@ async function processMatchedCells(matches) {
             // Es el número de filas desde la parte superior del bloque vacío hasta su targetRow
             const distanceToFall = (emptySpaceCount - i) * (40 + 2); // 40px height + 2px gap
 
-            addFallAnimation(cellReferences[targetRow][col], delayIndex * FALL_DURATION, -distanceToFall);
+            addFallAnimation(cellReferences[targetRow][col], delayIndex * FALL_DURATION, -distanceToFall, true);
             if (delayIndex * FALL_DURATION > maxDelay) maxDelay = delayIndex * FALL_DURATION;
             cellCounts[newColor]++;
             delayIndex++;
