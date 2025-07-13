@@ -345,7 +345,7 @@ async function processMatchedCells(matches) {
 
         if (cellsRemovedHistory.length > 1) {
             const averageCellsRemoved = cellsRemovedHistory.reduce((sum, value) => sum + value, 0) / cellsRemovedHistory.length;
-            document.getElementById('current-average').textContent = averageCellsRemoved.toFixed(2);
+            document.getElementById('current-average').textContent = averageCellsRemoved.toFixed(3);
             console.log(`Promedio de celdas removidas: ${averageCellsRemoved.toFixed(2)}`);
 
             if (contadorDeCeldasEnRonda > averageCellsRemoved) {
@@ -588,7 +588,12 @@ function contadorRegresivo() {
 
             // El separador principal parpadea
             if (separadorPrincipal) {
-                separadorPrincipal.style.backgroundColor = secondarySeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
+                const currentColor = separadorPrincipal.style.backgroundColor;
+                if (currentColor === 'yellow') {
+                    separadorPrincipal.style.backgroundColor = 'black';
+                } else {
+                    separadorPrincipal.style.backgroundColor = 'yellow';
+                }
             }
         } else {
             // El juego está pausado o terminado, el separador queda fijo
