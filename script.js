@@ -299,7 +299,11 @@ async function processMatchedCells(matches) {
             const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
             board[targetRow][col] = newColor;
             cellReferences[targetRow][col].className = `cell ${newColor}`;
-            addFallAnimation(cellReferences[targetRow][col], delayIndex * FALL_DURATION, -(rows * (40 + 2))); // Start from above the grid
+            // Calcula la distancia que esta celda específica debe "caer"
+            // Es el número de filas desde la parte superior del bloque vacío hasta su targetRow
+            const distanceToFall = (emptySpaceCount - i) * (40 + 2); // 40px height + 2px gap
+
+            addFallAnimation(cellReferences[targetRow][col], delayIndex * FALL_DURATION, -distanceToFall);
             if (delayIndex * FALL_DURATION > maxDelay) maxDelay = delayIndex * FALL_DURATION;
             cellCounts[newColor]++;
             delayIndex++;
