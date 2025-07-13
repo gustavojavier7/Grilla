@@ -451,6 +451,7 @@ function resetGame() {
 
     // Actualiza la visualización del puntaje
     updateScoreDisplay();
+    document.getElementById('current-average').textContent = '000.000';
     
     // Recrea la cuadrícula y la llena con colores aleatorios
     createGrid(rows, cols);
