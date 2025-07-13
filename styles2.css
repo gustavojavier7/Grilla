@@ -307,21 +307,7 @@ label {
     }
 }
 
-@keyframes fall {
-    0% {
-        top: -50px;
-    }
-    5% {
-        top: -50px;
-    }
-    100% {
-        top: 0;
-    }
-}
 
-.fall {
-    animation: fall 1.5s cubic-bezier(0.2, 0, 0.5, 1) forwards;
-}
 
 
 #game-over-overlay {
