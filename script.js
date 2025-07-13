@@ -576,30 +576,37 @@ function updateCellsRemovedDisplay() {
 function contadorRegresivo() {
     const now = performance.now();
     if (now - lastUpdateTime > updateInterval) {
+        const separadorPrincipal = document.getElementById('separador-principal');
+
         if (countdownStarted && countdown > 0 && !isProcessing) {
+            // El juego está en marcha
             countdown--;
             const minutes = Math.floor(countdown / 60).toString().padStart(2, '0');
             const seconds = (countdown % 60).toString().padStart(2, '0');
             document.getElementById('minutos').textContent = minutes;
             document.getElementById('segundos').textContent = seconds;
 
-            // Sincronizar el parpadeo del separador principal con el secundario
-            const separadorPrincipal = document.getElementById('separador-principal');
+            // El separador principal parpadea
             if (separadorPrincipal) {
                 separadorPrincipal.style.backgroundColor = secondarySeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
             }
+        } else {
+            // El juego está pausado o terminado, el separador queda fijo
+            if (separadorPrincipal) {
+                separadorPrincipal.style.backgroundColor = SEPARATOR_COLORS.ON;
+            }
         }
+
         if (countdown === 0 && countdownStarted) {
             showGameOver('Tiempo agotado', 0);
         }
 
-        // El reloj secundario sigue funcionando como antes
+        // El reloj secundario siempre se actualiza y parpadea
         document.getElementById('horas-sec').textContent = new Date().getHours().toString().padStart(2, '0');
         document.getElementById('minutos-sec').textContent = new Date().getMinutes().toString().padStart(2, '0');
         document.getElementById('segundos-sec').textContent = new Date().getSeconds().toString().padStart(2, '0');
-
-        // Solo parpadea el reloj secundario
-        toggleSeparators();
+        
+        toggleSeparators(); // Esto controla el parpadeo de ambos relojes
 
         lastUpdateTime = now;
     }
