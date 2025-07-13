@@ -45,35 +45,54 @@ body {
 
 .verde {
     background-color: #4CAF50;
+    background-image: radial-gradient(circle at center, rgba(255,255,255,0.6) 10px, transparent 10px);
 }
 
 .cyan {
     background-color: #00BCD4;
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.4) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+    background-size: 100% 2px, 2px 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 .magenta {
     background-color: #E91E63;
+    background-image: radial-gradient(circle, white 2px, transparent 2px),
+                      radial-gradient(circle, white 4px, transparent 4px);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .rayado {
-    background: linear-gradient(45deg, #2196F3 25%, transparent 25%), 
-                linear-gradient(-45deg, #2196F3 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, #2196F3 75%), 
-                linear-gradient(-45deg, transparent 75%, #2196F3 75%);
-    background-size: 8px 8px;
-    background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
-    background-color: #BBDEFB;
+    background-color: #2196F3;
+    background-image: repeating-linear-gradient(
+        135deg,
+        white 0px,
+        white 2px,
+        transparent 2px,
+        transparent 8px
+    );
 }
 
 .puntos-blancos {
     background-color: #F44336;
-    background-image: radial-gradient(circle, white 1px, transparent 1px);
-    background-size: 6px 6px;
+    background-image: radial-gradient(circle, white 2px, transparent 2px);
+    background-size: 10px 10px;
 }
 
 .gris-ondas {
     background-color: #9E9E9E;
-    background-image: repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.3) 2px, rgba(255,255,255,0.3) 4px);
+    background-image: repeating-linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.4) 0px,
+        rgba(255, 255, 255, 0.4) 4px,
+        transparent 4px,
+        transparent 10px
+    );
 }
 
 .cell.matched {
