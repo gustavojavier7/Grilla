@@ -78,12 +78,6 @@ body {
     );
 }
 
-.puntos-blancos {
-    background-color: #F44336;
-    background-image: radial-gradient(circle, white 2px, transparent 2px);
-    background-size: 10px 10px;
-}
-
 .gris-ondas {
     background-color: #9E9E9E;
     background-image: repeating-linear-gradient(
@@ -93,6 +87,16 @@ body {
         transparent 4px,
         transparent 10px
     );
+}
+
+.cruz-blanca {
+    background-color: #000000; /* Fondo negro */
+    background-image:
+        linear-gradient(to right, white 2px, transparent 2px),
+        linear-gradient(to bottom, white 2px, transparent 2px);
+    background-size: 100% 2px, 2px 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 .cell.matched {
