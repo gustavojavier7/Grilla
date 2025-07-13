@@ -92,11 +92,11 @@ body {
 .cruz-blanca {
     background-color: #000000; /* Fondo negro */
     background-image:
-        linear-gradient(to right, white 2px, transparent 2px),
-        linear-gradient(to bottom, white 2px, transparent 2px);
-    background-size: 100% 2px, 2px 100%;
-    background-position: center center;
+        linear-gradient(45deg, white 2px, transparent 2px),
+        linear-gradient(-45deg, white 2px, transparent 2px);
+    background-size: 100% 100%;
     background-repeat: no-repeat;
+    background-position: center;
 }
 
 .cell.matched {
