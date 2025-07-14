@@ -36,11 +36,22 @@ body {
 }
 
 .cell:hover {
-    background-color: #bbb;
+    box-shadow: inset 0 0 0 2px yellow;
 }
 
 .cell.selected {
-    opacity: 0.6; /* Atenúa el color de la celda */
+    box-shadow: inset 0 0 0 2px yellow;
+    opacity: 0.7;
+}
+
+@keyframes blink-highlight {
+    50% {
+        opacity: 0.3;
+    }
+}
+
+.highlight-max-count {
+    animation: blink-highlight 0.5s step-end infinite;
 }
 
 .verde {
@@ -277,17 +288,80 @@ label {
 }
 
 .cell-sample {
-    width: 40px; /* Ancho igual a las celdas del juego */
-    height: 40px; /* Altura igual a las celdas del juego */
-    border: 1px solid #999;
+    width: 40px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    font-size: 14px; /* Tamaño de fuente ajustado */
+    gap: 4px;
+    background-color: transparent !important;
+    border: none;
+    font-size: 14px;
     font-weight: bold;
-    color: white;
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7);
-    box-sizing: border-box; /* Asegura que el padding y borde no alteren el tamaño final */
+    color: black;
+    text-shadow: none;
+}
+
+.cell-sample::before {
+    content: '';
+    width: 40px;
+    height: 40px;
+    border: 1px solid #999;
+    box-sizing: border-box;
+}
+
+.cell-sample.verde::before {
+    background-color: #4CAF50;
+    background-image: radial-gradient(circle at center, rgba(255,255,255,0.6) 10px, transparent 10px);
+}
+
+.cell-sample.cyan::before {
+    background-color: #00BCD4;
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.4) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+    background-size: 100% 2px, 2px 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.cell-sample.magenta::before {
+    background-color: #E91E63;
+    background-image: radial-gradient(circle, white 2px, transparent 2px),
+                      radial-gradient(circle, white 4px, transparent 4px);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.cell-sample.rayado::before {
+    background-color: #2196F3;
+    background-image: repeating-linear-gradient(
+        135deg,
+        white 0px,
+        white 2px,
+        transparent 2px,
+        transparent 8px
+    );
+}
+
+.cell-sample.gris-ondas::before {
+    background-color: #9E9E9E;
+    background-image: repeating-linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.4) 0px,
+        rgba(255, 255, 255, 0.4) 4px,
+        transparent 4px,
+        transparent 10px
+    );
+}
+
+.cell-sample.cuadricula-pequena::before {
+    background-color: #8B0000; /* Dark Red */
+    background-image: 
+        linear-gradient(45deg, rgba(255,255,255,0.2) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.2) 75%, rgba(255,255,255,0.2) 100%),
+        linear-gradient(45deg, rgba(255,255,255,0.2) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.2) 75%, rgba(255,255,255,0.2) 100%);
+    background-size: 10px 10px;
+    background-position: 0 0, 5px 5px;
 }
 
 .cell-sample.blink-threshold {
