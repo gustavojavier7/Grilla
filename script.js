@@ -240,6 +240,53 @@ async function handleCascade(matches) {
     await processMatchedCells(matches);
 }
 
+function getNewWeightedColor(row, col) {
+    // Get a list of colors sorted by their current count (least common first)
+    const sortedColors = COLORS.slice().sort((a, b) => {
+        const countA = cellCounts[a] || 0;
+        const countB = cellCounts[b] || 0;
+        return countA - countB;
+    });
+
+    // Iterate through the sorted list to find the first "safe" color
+    for (const color of sortedColors) {
+        // Safety Check: Does placing this color create a 3-in-a-row match?
+        const isSafe = !(
+            // --- Vertical & Horizontal Checks ---
+            // Vertical match below
+            (row < board.length - 2 && board[row + 1][col] === color && board[row + 2][col] === color) ||
+            // Horizontal match to the left
+            (col > 1 && board[row][col - 1] === color && board[row][col - 2] === color) ||
+            // Horizontal match centered
+            (col > 0 && col < board[0].length - 1 && board[row][col - 1] === color && board[row][col + 1] === color) ||
+            // Horizontal match to the right
+            (col < board[0].length - 2 && board[row][col + 1] === color && board[row][col + 2] === color) ||
+            
+            // --- Diagonal Checks ---
+            // Diagonal Up-Left
+            (row > 1 && col > 1 && board[row - 1][col - 1] === color && board[row - 2][col - 2] === color) ||
+            // Diagonal Up-Right
+            (row > 1 && col < board[0].length - 2 && board[row - 1][col + 1] === color && board[row - 2][col + 2] === color) ||
+            // Diagonal Down-Left
+            (row < board.length - 2 && col > 1 && board[row + 1][col - 1] === color && board[row + 2][col - 2] === color) ||
+            // Diagonal Down-Right
+            (row < board.length - 2 && col < board[0].length - 2 && board[row + 1][col + 1] === color && board[row + 2][col + 2] === color) ||
+            // Diagonal Centered (Up-Left to Down-Right)
+            (row > 0 && row < board.length - 1 && col > 0 && col < board[0].length - 1 && board[row - 1][col - 1] === color && board[row + 1][col + 1] === color) ||
+            // Diagonal Centered (Up-Right to Down-Left)
+            (row > 0 && row < board.length - 1 && col > 0 && col < board[0].length - 1 && board[row - 1][col + 1] === color && board[row + 1][col - 1] === color)
+        );
+
+        if (isSafe) {
+            return color; // Return the first safe color found
+        }
+    }
+
+    // Fallback: If all colors are somehow unsafe (extremely rare), 
+    // return the absolute least common one to prevent the game from stalling.
+    return sortedColors[0];
+}
+
 async function processMatchedCells(matches) {
     const rows = board.length;
     const cols = board[0].length;
@@ -269,34 +316,22 @@ async function processMatchedCells(matches) {
             if (board[row][col] === null) {
                 emptySpaceCount++;
             } else if (emptySpaceCount > 0) {
-                // This is an existing cell that needs to fall
                 const oldRow = row;
-                const oldCol = col;
                 const newRow = row + emptySpaceCount;
-                const newCol = col;
+                const fallingColor = board[oldRow][col];
 
-                const fallingColor = board[oldRow][oldCol];
+                board[newRow][col] = fallingColor;
+                board[oldRow][col] = null;
 
-                // Update logical board state
-                board[newRow][newCol] = fallingColor;
-                board[oldRow][oldCol] = null;
+                const targetCellElement = cellReferences[newRow][col];
+                const oldCellElement = cellReferences[oldRow][col];
 
-                const targetCellElement = cellReferences[newRow][newCol];
-                const oldCellElement = cellReferences[oldRow][oldCol]; // Reference to the element at the old position
-
-                // Clear the old cell's visual
                 oldCellElement.className = 'cell';
-
-                // Set the new cell's color at its destination grid position
                 targetCellElement.className = `cell ${fallingColor}`;
 
-                // Calculate the distance to move up for the animation
-                const distanceToMoveUp = emptySpaceCount * (40 + 2); // 40px height + 2px gap
-
-                // Use the unified addFallAnimation
+                const distanceToMoveUp = emptySpaceCount * (40 + 2);
                 addFallAnimation(targetCellElement, delayIndex * FALL_STAGGER_DELAY, -distanceToMoveUp, false);
 
-                // Update maxDelay for the overall wait
                 if (delayIndex * FALL_STAGGER_DELAY > maxDelay) maxDelay = delayIndex * FALL_STAGGER_DELAY;
                 delayIndex++;
             }
@@ -305,21 +340,23 @@ async function processMatchedCells(matches) {
         // Handle newly generated cells at the top
         for (let i = 0; i < emptySpaceCount; i++) {
             const targetRow = (emptySpaceCount - 1) - i;
-            const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+            
+            // *** NEW LOGIC: Get a weighted random color that doesn't create an immediate match ***
+            const newColor = getNewWeightedColor(targetRow, col);
+            
             board[targetRow][col] = newColor;
             cellReferences[targetRow][col].className = `cell ${newColor}`;
-            // Calcula la distancia que esta celda específica debe "caer"
-            // Es el número de filas desde la parte superior del bloque vacío hasta su targetRow
-            const distanceToFall = (emptySpaceCount - i) * (40 + 2); // 40px height + 2px gap
-
+            
+            const distanceToFall = (emptySpaceCount - i) * (40 + 2);
             addFallAnimation(cellReferences[targetRow][col], delayIndex * FALL_STAGGER_DELAY, -distanceToFall, true);
+            
             if (delayIndex * FALL_STAGGER_DELAY > maxDelay) maxDelay = delayIndex * FALL_STAGGER_DELAY;
             cellCounts[newColor]++;
             delayIndex++;
         }
     }
 
-    await wait((maxDelay + FALL_DURATION) * 1000); // Wait for all animations to complete
+    await wait((maxDelay + FALL_DURATION) * 1000);
 
     newMatches = checkNewMatches();
 
@@ -507,18 +544,31 @@ function applyScoreBlink() {
 
 function updateColorSamples() {
     const threshold = getGameOverThreshold(rows, cols);
+
+    // Find the top two counts
+    const sortedCounts = Object.entries(cellCounts).sort(([, a], [, b]) => b - a);
+    const topTwoColors = sortedCounts.slice(0, 2).map(([color]) => color);
+
     COLORS.forEach(color => {
         const count = cellCounts[color];
         const totalCells = rows * cols;
         const percent = ((count / totalCells) * 100).toFixed(2);
 
         const cellSample = document.querySelector(`.cell-sample.${color}`);
-        cellSample.querySelector('span').textContent = count;
+        const span = cellSample.querySelector('span');
+        span.textContent = count;
         cellSample.setAttribute('data-percentage', `${percent}%`);
+
+        // Highlight if the color is one of the top two
+        if (topTwoColors.includes(color)) {
+            span.classList.add('highlight-max-count');
+        } else {
+            span.classList.remove('highlight-max-count');
+        }
 
         if (threshold !== null && count >= threshold) {
             cellSample.classList.add('blink-threshold');
-            showGameOver(color, threshold); // Pase el color y el umbral
+            showGameOver(color, threshold);
         } else {
             cellSample.classList.remove('blink-threshold');
         }
