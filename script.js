@@ -532,7 +532,7 @@ function applyScoreBlink() {
 }
 
 function updateColorSamples() {
-    const threshold = getGameOverThreshold(rows, cols);
+    // La lógica de umbral se ha deshabilitado
 
     // Find the top two counts
     const sortedCounts = Object.entries(cellCounts).sort(([, a], [, b]) => b - a);
@@ -555,25 +555,14 @@ function updateColorSamples() {
             span.classList.remove('highlight-max-count');
         }
 
-        if (threshold !== null && count >= threshold) {
-            cellSample.classList.add('blink-threshold');
-            showGameOver(color, threshold);
-        } else {
-            cellSample.classList.remove('blink-threshold');
-        }
+        // La verificación de umbral se ha eliminado; simplemente limpiamos la clase
+        cellSample.classList.remove('blink-threshold');
     });
 }
 
 function getGameOverThreshold(rows, cols) {
-    const baseThreshold = 50;
-    const baseGridSize = 15 * 15;
-
-    if ((rows === 6 && cols === 6) || (rows === 10 && cols === 10)) {
-        return null;
-    }
-
-    const currentGridSize = rows * cols;
-    return Math.floor((baseThreshold / baseGridSize) * currentGridSize);
+    // La funcionalidad de umbral se ha desactivado por completo
+    return null;
 }
 
 function showGameOver(reason, threshold = null) {
