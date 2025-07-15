@@ -1,4 +1,4 @@
-const COLORS = ['gris-ondas', 'verde', 'cyan', 'cuadricula-pequena', 'rayado', 'magenta'];
+const COLORS = ['cruz-roja', 'hoja', 'agujero-negro', 'prohibido', 'ondas-rosadas', 'calavera'];
 const FALL_DURATION = 0.2; // duration in seconds for a single fall animation
 const FALL_STAGGER_DELAY = 0; // delay between consecutive cell falls in a column
 let gameContainer = document.getElementById('game-container');
@@ -139,6 +139,7 @@ function fillGrid() {
         cellCounts[randomColor]++;
     });
     checkPatterns();
+    checkForCalavera();
 }
 
 function handleCellClick(cell) {
@@ -171,6 +172,7 @@ function swapColors(cell1, cell2) {
 
     cell1.element.className = `cell ${board[cell1.row][cell1.col]}`;
     cell2.element.className = `cell ${board[cell2.row][cell2.col]}`;
+    checkForCalavera();
 }
 
 function checkLine(startRow, startCol, deltaRow, deltaCol) {
@@ -395,6 +397,7 @@ async function processMatchedCells(matches) {
         applyScoreBlink();
     }
     updateColorSamples();
+    checkForCalavera();
 }
 
 function checkNewMatches() {
@@ -565,6 +568,13 @@ function getGameOverThreshold(rows, cols) {
     return null;
 }
 
+function checkForCalavera() {
+    const bottomRow = board[board.length - 1];
+    if (bottomRow.some(color => color === 'calavera')) {
+        showGameOver('Game Over. La Muerte te ha alcanzado.');
+    }
+}
+
 function showGameOver(reason) {
     const overlay = document.getElementById('game-over-overlay');
     const message = document.getElementById('game-over-message');
@@ -573,6 +583,9 @@ function showGameOver(reason) {
 
     if (reason === 'Tiempo agotado') {
         gameOverReason.textContent = '¡Se acabó el tiempo!';
+        gameOverThreshold.style.display = 'none';
+    } else if (reason) {
+        gameOverReason.textContent = reason;
         gameOverThreshold.style.display = 'none';
     }
 
