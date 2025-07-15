@@ -307,6 +307,7 @@ label {
     align-items: center;
     gap: 4px;
     background-color: transparent !important;
+    background-image: none !important;
     border: none;
     font-size: 14px;
     font-weight: bold;
