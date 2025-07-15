@@ -240,50 +240,39 @@ async function handleCascade(matches) {
     await processMatchedCells(matches);
 }
 
-function getNewWeightedColor(row, col) {
-    // Get a list of colors sorted by their current count (least common first)
+function getNewWeightedColorOptimized(row, col) {
+    // Ordenar colores por conteo (menor a mayor para priorizar los menos comunes)
     const sortedColors = COLORS.slice().sort((a, b) => {
         const countA = cellCounts[a] || 0;
         const countB = cellCounts[b] || 0;
         return countA - countB;
     });
 
-    // Iterate through the sorted list to find the first "safe" color
+    // Iterar sobre los colores para encontrar el primero "seguro"
     for (const color of sortedColors) {
-        // Safety Check: Does placing this color create a 3-in-a-row match?
         const isSafe = !(
-            // --- Vertical & Horizontal Checks ---
-            // Vertical match below
-            (row < board.length - 2 && board[row + 1][col] === color && board[row + 2][col] === color) ||
-            // Horizontal match to the left
-            (col > 1 && board[row][col - 1] === color && board[row][col - 2] === color) ||
-            // Horizontal match centered
-            (col > 0 && col < board[0].length - 1 && board[row][col - 1] === color && board[row][col + 1] === color) ||
-            // Horizontal match to the right
-            (col < board[0].length - 2 && board[row][col + 1] === color && board[row][col + 2] === color) ||
-            
-            // --- Diagonal Checks ---
-            // Diagonal Up-Left
-            (row > 1 && col > 1 && board[row - 1][col - 1] === color && board[row - 2][col - 2] === color) ||
-            // Diagonal Up-Right
-            (row > 1 && col < board[0].length - 2 && board[row - 1][col + 1] === color && board[row - 2][col + 2] === color) ||
-            // Diagonal Down-Left
-            (row < board.length - 2 && col > 1 && board[row + 1][col - 1] === color && board[row + 2][col - 2] === color) ||
-            // Diagonal Down-Right
-            (row < board.length - 2 && col < board[0].length - 2 && board[row + 1][col + 1] === color && board[row + 2][col + 2] === color) ||
-            // Diagonal Centered (Up-Left to Down-Right)
-            (row > 0 && row < board.length - 1 && col > 0 && col < board[0].length - 1 && board[row - 1][col - 1] === color && board[row + 1][col + 1] === color) ||
-            // Diagonal Centered (Up-Right to Down-Left)
-            (row > 0 && row < board.length - 1 && col > 0 && col < board[0].length - 1 && board[row - 1][col + 1] === color && board[row + 1][col - 1] === color)
+            // Verificaciones verticales
+            (row < board.length - 2 && board[row + 1][col] === color && board[row + 2][col] === color) || // Abajo
+            (row > 1 && board[row - 1][col] === color && board[row - 2][col] === color) || // Arriba
+
+            // Verificaciones horizontales
+            (col > 1 && board[row][col - 1] === color && board[row][col - 2] === color) || // Izquierda
+            (col < board[0].length - 2 && board[row][col + 1] === color && board[row][col + 2] === color) || // Derecha
+            (col > 0 && col < board[0].length - 1 && board[row][col - 1] === color && board[row][col + 1] === color) || // Centro horizontal
+
+            // Verificaciones diagonales (solo si están dentro de límites)
+            (row < board.length - 2 && col < board[0].length - 2 && board[row + 1][col + 1] === color && board[row + 2][col + 2] === color) || // Diagonal descendente derecha
+            (row > 1 && col > 1 && board[row - 1][col - 1] === color && board[row - 2][col - 2] === color) || // Diagonal ascendente izquierda
+            (row < board.length - 2 && col > 1 && board[row + 1][col - 1] === color && board[row + 2][col - 2] === color) || // Diagonal descendente izquierda
+            (row > 1 && col < board[0].length - 2 && board[row - 1][col + 1] === color && board[row - 2][col + 2] === color) // Diagonal ascendente derecha
         );
 
         if (isSafe) {
-            return color; // Return the first safe color found
+            return color; // Retornar el primer color seguro encontrado
         }
     }
 
-    // Fallback: If all colors are somehow unsafe (extremely rare), 
-    // return the absolute least common one to prevent the game from stalling.
+    // Fallback: Si todos los colores son inseguros (caso raro), devolver el menos común
     return sortedColors[0];
 }
 
@@ -342,7 +331,7 @@ async function processMatchedCells(matches) {
             const targetRow = (emptySpaceCount - 1) - i;
             
             // *** NEW LOGIC: Get a weighted random color that doesn't create an immediate match ***
-            const newColor = getNewWeightedColor(targetRow, col);
+            const newColor = getNewWeightedColorOptimized(targetRow, col);
             
             board[targetRow][col] = newColor;
             cellReferences[targetRow][col].className = `cell ${newColor}`;
