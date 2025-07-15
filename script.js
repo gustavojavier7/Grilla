@@ -565,7 +565,7 @@ function getGameOverThreshold(rows, cols) {
     return null;
 }
 
-function showGameOver(reason, threshold = null) {
+function showGameOver(reason) {
     const overlay = document.getElementById('game-over-overlay');
     const message = document.getElementById('game-over-message');
     const gameOverReason = document.getElementById('game-over-reason');
@@ -574,10 +574,6 @@ function showGameOver(reason, threshold = null) {
     if (reason === 'Tiempo agotado') {
         gameOverReason.textContent = '¡Se acabó el tiempo!';
         gameOverThreshold.style.display = 'none';
-    } else {
-        gameOverReason.textContent = `El color/patrón "${reason}" alcanzó`;
-        gameOverThreshold.textContent = `${threshold} o más celdas.`;
-        gameOverThreshold.style.display = 'inline';
     }
 
     overlay.style.display = 'flex';
@@ -628,7 +624,7 @@ function contadorRegresivo() {
         }
 
         if (countdown === 0 && countdownStarted) {
-            showGameOver('Tiempo agotado', 0);
+            showGameOver('Tiempo agotado');
         }
 
         document.getElementById('horas-sec').textContent = new Date().getHours().toString().padStart(2, '0');
