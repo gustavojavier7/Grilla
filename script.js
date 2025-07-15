@@ -10,8 +10,8 @@ let score = 0;
 let roundsInCascade = 1;
 let totalRemovedThisCascade = 0;
 let contadorDeCeldasEnRonda = 0;
-let rows = 6;
-let cols = 6;
+let rows = 10;
+let cols = 10;
 let cellCounts = {};
 let totalCellsRemoved = 0;
 let mainSeparatorVisible = true;
@@ -639,8 +639,10 @@ function contadorRegresivo() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Vincular el evento 'change' al selector de dificultad
     const difficultySelect = document.getElementById('difficulty');
+    const difficulties = [10, 15, 20];
+    difficultySelect.innerHTML = '<option value="">--Seleccionar--</option>' +
+        difficulties.map(d => `<option value="${d}">${d}x${d}</option>`).join('');
     difficultySelect.addEventListener('change', () => {
         const difficulty = difficultySelect.value;
         console.log("Dificultad seleccionada:", difficulty);
@@ -648,7 +650,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('reset-game-btn').disabled = !difficulty;
     });
 
-    // Inicializa el juego
     resetGame();
     requestAnimationFrame(contadorRegresivo);
 });
