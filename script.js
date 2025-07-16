@@ -24,6 +24,7 @@ let currentCascadeCount = 0; // Contador de cascadas en la ronda actual
 let cellsRemovedHistory = []; // Historial de celdas removidas en las últimas 5 jugadas
 let timeoutIds = []; // Array para almacenar los IDs de los timeouts
 let intervalIds = []; // Array para almacenar los IDs de los intervals
+let allowCalaveraGameOver = false; // Controla si la calavera en la última fila provoca GAME OVER
 const updateInterval = 1000; // 1s
 const SEPARATOR_COLORS = {
     ON: 'black',    // Visible: texto negro
@@ -96,6 +97,25 @@ function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function swapCalaverasFromBottomRow() {
+    const bottomRowIndex = board.length - 1;
+    if (bottomRowIndex < 1) return;
+
+    for (let col = 0; col < board[0].length; col++) {
+        if (board[bottomRowIndex][col] === 'calavera') {
+            const upperRow = bottomRowIndex - 1;
+            [board[bottomRowIndex][col], board[upperRow][col]] = [board[upperRow][col], board[bottomRowIndex][col]];
+
+            const bottomCell = cellReferences[bottomRowIndex][col];
+            const upperCell = cellReferences[upperRow][col];
+            if (bottomCell && upperCell) {
+                bottomCell.className = `cell ${board[bottomRowIndex][col]}`;
+                upperCell.className = `cell ${board[upperRow][col]}`;
+            }
+        }
+    }
+}
+
 function createGrid(rows, cols) {
     gameContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
     gameContainer.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
@@ -122,6 +142,7 @@ function fillGrid() {
     totalCellsRemoved = 0;
     updateCellsRemovedDisplay();
     countdownStarted = true;  // Iniciar el conteo regresivo
+    allowCalaveraGameOver = false; // No permitir GAME OVER por calavera durante el llenado inicial
 
     const difficulty = document.getElementById('difficulty').value;
     if (difficulty) {
@@ -134,13 +155,13 @@ function fillGrid() {
         const row = parseInt(cell.dataset.row);
         const col = parseInt(cell.dataset.col);
         const availableColors = COLORS;
-    const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
+        const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
         board[row][col] = randomColor;
         cell.className = `cell ${randomColor}`;
         cellCounts[randomColor]++;
     });
+    swapCalaverasFromBottomRow();
     checkPatterns();
-    checkForCalavera();
 }
 
 function handleCellClick(cell) {
@@ -173,6 +194,7 @@ function swapColors(cell1, cell2) {
 
     cell1.element.className = `cell ${board[cell1.row][cell1.col]}`;
     cell2.element.className = `cell ${board[cell2.row][cell2.col]}`;
+    allowCalaveraGameOver = true; // A partir de aquí, la calavera en la última fila puede provocar GAME OVER
     checkForCalavera();
 }
 
@@ -570,6 +592,7 @@ function getGameOverThreshold(rows, cols) {
 }
 
 function checkForCalavera() {
+    if (!allowCalaveraGameOver) return;
     const bottomRow = board[board.length - 1];
     if (bottomRow.some(color => color === 'calavera')) {
         showGameOver('Game Over. La Muerte te ha alcanzado.');
