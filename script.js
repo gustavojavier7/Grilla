@@ -136,7 +136,7 @@ function createGrid(rows, cols) {
     }
 }
 
-function fillGrid() {
+async function fillGrid() {
     if (isProcessing || !document.getElementById('difficulty').value) return; // Asegurarse de que se haya seleccionado una dificultad
     resetScore();
     totalCellsRemoved = 0;
@@ -160,8 +160,8 @@ function fillGrid() {
         cell.className = `cell ${randomColor}`;
         cellCounts[randomColor]++;
     });
+    await checkPatterns();
     swapCalaverasFromBottomRow();
-    checkPatterns();
 }
 
 function handleCellClick(cell) {
@@ -195,7 +195,6 @@ function swapColors(cell1, cell2) {
     cell1.element.className = `cell ${board[cell1.row][cell1.col]}`;
     cell2.element.className = `cell ${board[cell2.row][cell2.col]}`;
     allowCalaveraGameOver = true; // A partir de aquí, la calavera en la última fila puede provocar GAME OVER
-    checkForCalavera();
 }
 
 function checkLine(startRow, startCol, deltaRow, deltaCol) {
@@ -208,7 +207,7 @@ function checkLine(startRow, startCol, deltaRow, deltaCol) {
     return true;
 }
 
-function checkPatterns() {
+async function checkPatterns() {
     if (isProcessing) return;
     isProcessing = true;
     manageClock();
@@ -247,7 +246,7 @@ function checkPatterns() {
     if (matches.size > 0) {
         roundsInCascade = 1;
         totalRemovedThisCascade += matches.size;
-        handleCascade(matches);
+        await handleCascade(matches);
     } else {
         isProcessing = false;
         cells.forEach(cell => cell.classList.remove('processing'));
