@@ -272,11 +272,18 @@ label {
 }
 */
 
-#score-display, #average-cells-removed, #cells-removed-counter, #cells-removed-round {
+#rrc-display, #average-cells-removed, #cells-removed-counter, #cells-removed-round {
     font-size: 16px;
     font-weight: bold;
     text-align: center;
     color: #333;
+}
+
+#skull-risk {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: red;
 }
 
 #version-text {
@@ -406,17 +413,16 @@ label {
     }
 }
 
-.blink-score {
-    animation: blinkScore 2s ease-in-out;
+.blink-risk {
+    animation: blinkRisk 1s ease-in-out;
 }
 
-@keyframes blinkScore {
+@keyframes blinkRisk {
     0%, 100% {
-        color: #333;
+        color: red;
     }
     50% {
-        color: #4CAF50;
-        text-shadow: 0 0 10px #4CAF50;
+        color: darkred;
     }
 }
 
