@@ -6,9 +6,6 @@ let board = [];
 let cellReferences = [];
 let firstSelected = null;
 let isProcessing = false;
-let score = 0;
-let roundsInCascade = 1;
-let totalRemovedThisCascade = 0;
 let contadorDeCeldasEnRonda = 0;
 let rows = 10;
 let cols = 10;
@@ -25,6 +22,7 @@ let cellsRemovedHistory = []; // Historial de celdas removidas en las últimas 5
 let timeoutIds = []; // Array para almacenar los IDs de los timeouts
 let intervalIds = []; // Array para almacenar los IDs de los intervals
 let allowCalaveraGameOver = false; // Controla si la calavera en la última fila provoca GAME OVER
+let skullRiskHistory = [];
 const updateInterval = 1000; // 1s
 const SEPARATOR_COLORS = {
     ON: 'black',    // Visible: texto negro
@@ -138,7 +136,7 @@ function createGrid(rows, cols) {
 
 async function fillGrid() {
     if (isProcessing || !document.getElementById('difficulty').value) return; // Asegurarse de que se haya seleccionado una dificultad
-    resetScore();
+    document.getElementById('skull-risk').textContent = '0%';
     totalCellsRemoved = 0;
     updateCellsRemovedDisplay();
     countdownStarted = true;  // Iniciar el conteo regresivo
@@ -162,6 +160,7 @@ async function fillGrid() {
     });
     await checkPatterns();
     swapCalaverasFromBottomRow();
+    updateSkullRiskDisplay();
 }
 
 function handleCellClick(cell) {
@@ -244,8 +243,6 @@ async function checkPatterns() {
     }
 
     if (matches.size > 0) {
-        roundsInCascade = 1;
-        totalRemovedThisCascade += matches.size;
         await handleCascade(matches);
     } else {
         isProcessing = false;
@@ -374,20 +371,10 @@ async function processMatchedCells(matches) {
     newMatches = checkNewMatches();
 
     if (newMatches.size > 0) {
-        const n = Math.log2(roundsInCascade) + 1;
-        roundsInCascade = Math.pow(2, n);
-        totalRemovedThisCascade += newMatches.size;
-
-        const scoreIncrement = totalRemovedThisCascade * roundsInCascade;
-        incrementScoreAnimated(scoreIncrement, 2000, 20);
-
         await handleCascade(newMatches);
     } else {
         isProcessing = false;
         manageClock();
-        let finalPoints = totalRemovedThisCascade * roundsInCascade;
-        score += finalPoints;
-        updateScoreDisplay();
 
         cellsRemovedHistory.push(contadorDeCeldasEnRonda);
         if (cellsRemovedHistory.length > 5) {
@@ -408,15 +395,19 @@ async function processMatchedCells(matches) {
             document.getElementById('current-average').textContent = cellsRemovedHistory[0].toFixed(3).padStart(7, '0');
         }
 
-        roundsInCascade = 1;
-        totalRemovedThisCascade = 0;
         contadorDeCeldasEnRonda = 0;
         isProcessing = false;
         manageClock();
         document.querySelectorAll('.cell').forEach(cell => {
             cell.classList.remove('processing');
         });
-        applyScoreBlink();
+
+        const risk = calculateSkullRisk();
+        skullRiskHistory.push(risk);
+        if (skullRiskHistory.length > 5) {
+            skullRiskHistory.shift();
+        }
+        updateSkullRiskDisplay();
     }
     updateColorSamples();
     checkForCalavera();
@@ -457,16 +448,6 @@ function checkNewMatches() {
     return newMatches;
 }
 
-function updateScoreDisplay() {
-    let scoreString = score.toString().padStart(16, '0');
-    let formattedScore = scoreString.match(/.{1,4}/g).join('-');
-    document.getElementById('current-score').textContent = formattedScore;
-}
-
-function resetScore() {
-    score = 0;
-    updateScoreDisplay();
-}
 
 function clearAllTimeouts() {
     timeoutIds.forEach(timeoutId => clearTimeout(timeoutId));
@@ -483,13 +464,9 @@ function resetGame() {
     clearAllTimeouts();
     clearAllIntervals();
 
-    // Restablece el puntaje y los contadores
-    score = 0;
+    // Restablece los contadores
     countdown = 60;
     countdownStarted = false;
-    cascadeMultiplier = 1;
-    roundsInCascade = 1;
-    totalRemovedThisCascade = 0;
     totalCellsRemoved = 0;
     cellsRemovedHistory = [];
     contadorDeCeldasEnRonda = 0;
@@ -501,9 +478,8 @@ function resetGame() {
         cellCounts[color] = 0;
     });
 
-    // Actualiza la visualización del puntaje
-    updateScoreDisplay();
     document.getElementById('current-average').textContent = '000.000';
+    document.getElementById('skull-risk').textContent = '0%';
     
     // Recrea la cuadrícula y la llena con colores aleatorios
     createGrid(rows, cols);
@@ -526,35 +502,6 @@ function resetGame() {
 }
 
 window.resetGame = resetGame;
-
-function incrementScoreAnimated(incrementBy, duration, steps) {
-    const targetScore = score + incrementBy;
-    const stepSize = Math.round(incrementBy / steps);
-    let stepsCompleted = 0;
-    const intervalId = setInterval(() => {
-        if (stepsCompleted < steps - 1) {
-            score += stepSize;
-            updateScoreDisplay();
-            stepsCompleted++;
-        } else {
-            score = targetScore;
-            updateScoreDisplay();
-            clearInterval(intervalId);
-        }
-    }, duration / steps);
-    intervalIds.push(intervalId);
-}
-
-function applyScoreBlink() {
-    if (!isProcessing) {
-        const scoreElement = document.getElementById('current-score');
-        scoreElement.classList.add('blink-score');
-        const timeoutId = setTimeout(() => {
-            scoreElement.classList.remove('blink-score');
-        }, 2000);
-        timeoutIds.push(timeoutId);
-    }
-}
 
 function updateColorSamples() {
     // La lógica de umbral se ha deshabilitado
@@ -615,6 +562,40 @@ function showGameOver(reason) {
     overlay.style.display = 'flex';
     isProcessing = true; // Asegúrate de que esto está en true para evitar nuevas interacciones
     document.querySelectorAll('.cell').forEach(cell => cell.classList.add('processing'));
+}
+
+function calculateSkullRisk() {
+    const rows = board.length;
+    const cols = board[0].length;
+    let totalScore = 0;
+    const maxProximityScorePerSkull = 10;
+
+    for (let row = 0; row < rows; row++) {
+        let skullCountInRow = 0;
+        for (let col = 0; col < cols; col++) {
+            if (board[row][col] === 'calavera') {
+                skullCountInRow++;
+            }
+        }
+        const distanceToBottom = rows - 1 - row;
+        const proximityWeight = maxProximityScorePerSkull * (1 - distanceToBottom / rows);
+        totalScore += skullCountInRow * proximityWeight;
+    }
+
+    const maxPossibleScore = cols * maxProximityScorePerSkull;
+    const risk = maxPossibleScore > 0 ? Math.min(100, Math.round((totalScore / maxPossibleScore) * 100)) : 0;
+
+    return risk;
+}
+
+function updateSkullRiskDisplay() {
+    const risk = calculateSkullRisk();
+    const riskElement = document.getElementById('skull-risk');
+    riskElement.textContent = `${risk}%`;
+    if (risk > 75) {
+        riskElement.classList.add('blink-risk');
+        setTimeout(() => riskElement.classList.remove('blink-risk'), 1000);
+    }
 }
 
 function updateCellsRemovedDisplay() {
