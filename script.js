@@ -133,10 +133,8 @@ function fillGrid() {
     document.querySelectorAll('.cell').forEach(cell => {
         const row = parseInt(cell.dataset.row);
         const col = parseInt(cell.dataset.col);
-        const availableColors = row === rows - 1
-            ? COLORS.filter(color => color !== 'calavera')
-            : COLORS;
-        const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
+        const availableColors = COLORS;
+    const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
         board[row][col] = randomColor;
         cell.className = `cell ${randomColor}`;
         cellCounts[randomColor]++;
