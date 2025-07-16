@@ -568,24 +568,28 @@ function showGameOver(reason) {
 function calculateSkullRisk() {
     const rows = board.length;
     const cols = board[0].length;
+    const baseRiskPerCell = 0.9739 / cols;
     let totalScore = 0;
-    const maxProximityScorePerSkull = 10;
 
-    for (let row = 0; row < rows; row++) {
-        let skullCountInRow = 0;
-        for (let col = 0; col < cols; col++) {
+    for (let col = 0; col < cols; col++) {
+        let distance = rows;
+        let rowCalavera = -1;
+        for (let row = rows - 1; row >= 0; row--) {
             if (board[row][col] === 'calavera') {
-                skullCountInRow++;
+                rowCalavera = row;
+                distance = rows - 1 - row;
+                break;
             }
         }
-        const distanceToBottom = rows - 1 - row;
-        const proximityWeight = maxProximityScorePerSkull * (1 - distanceToBottom / rows);
-        totalScore += skullCountInRow * proximityWeight;
+        const weight = rowCalavera === -1 ? 0 : (rows - rowCalavera) / (rows - 1);
+        const cellRisk = baseRiskPerCell * weight;
+        totalScore += cellRisk;
+        console.log(`Columna ${col}: fila_calavera = ${rowCalavera}, distancia = ${distance}, peso = ${weight.toFixed(2)}, riesgo por celda = ${cellRisk.toFixed(4)}`);
     }
 
-    const maxPossibleScore = cols * maxProximityScorePerSkull;
+    const maxPossibleScore = cols * baseRiskPerCell;
     const risk = maxPossibleScore > 0 ? Math.min(100, Math.round((totalScore / maxPossibleScore) * 100)) : 0;
-
+    console.log(`Total Score: ${totalScore.toFixed(4)}, Max Possible Score: ${maxPossibleScore.toFixed(4)}, Risk: ${risk}%`);
     return risk;
 }
 
