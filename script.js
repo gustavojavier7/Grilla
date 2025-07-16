@@ -368,6 +368,8 @@ async function processMatchedCells(matches) {
 
     await wait((maxDelay + FALL_DURATION) * 1000);
 
+    updateSkullRiskDisplay();
+
     newMatches = checkNewMatches();
 
     if (newMatches.size > 0) {
@@ -407,7 +409,6 @@ async function processMatchedCells(matches) {
         if (skullRiskHistory.length > 5) {
             skullRiskHistory.shift();
         }
-        updateSkullRiskDisplay();
     }
     updateColorSamples();
     checkForCalavera();
