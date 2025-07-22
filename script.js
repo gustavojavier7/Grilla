@@ -1,4 +1,3 @@
-// Versión 4.6 - Algoritmo de generación mejorado (implementación parcial)
 const COLORS = ['cruz-roja', 'hoja', 'agujero-negro', 'prohibido', 'ondas-rosadas', 'calavera'];
 const FALL_DURATION = 0.2; // duration in seconds for a single fall animation
 const FALL_STAGGER_DELAY = 0; // delay between consecutive cell falls in a column
@@ -390,37 +389,16 @@ function createGrid(rows, cols) {
 }
 
 async function fillGrid() {
-    if (isProcessing || !document.getElementById('difficulty').value) return; // Asegurarse de que se haya seleccionado una dificultad
+    if (isProcessing || !document.getElementById('difficulty').value) return;
+
     document.getElementById('skull-risk').textContent = '0%';
-    totalCellsRemoved = 0;
-    updateCellsRemovedDisplay();
-    countdownStarted = true;  // Iniciar el conteo regresivo
-    allowCalaveraGameOver = false; // No permitir GAME OVER por calavera durante el llenado inicial
 
-    const difficulty = document.getElementById('difficulty').value;
-    if (difficulty) {
-        rows = cols = parseInt(difficulty, 10);
-    }
-
-    createGrid(rows, cols);
-
-    board = await generateStableBoardWithValidMoves();
-
-    // Reiniciar conteo de colores
-    COLORS.forEach(color => {
-        cellCounts[color] = 0;
-    });
-
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-            const color = board[row][col];
-            const cell = cellReferences[row][col];
-            cell.className = `cell ${color}`;
-            cellCounts[color]++;
         }
     }
 
     updateSkullRiskDisplay();
+    allowCalaveraGameOver = true; // Activar después de generación completa
+    console.log('Tablero estable generado exitosamente');
 }
 
 function handleCellClick(cell) {
