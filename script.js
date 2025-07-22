@@ -1,4 +1,3 @@
-// Versión 4.7 - Algoritmo de generación mejorado (implementación parcial)
 const COLORS = ['cruz-roja', 'hoja', 'agujero-negro', 'prohibido', 'ondas-rosadas', 'calavera'];
 const FALL_DURATION = 0.2; // duration in seconds for a single fall animation
 const FALL_STAGGER_DELAY = 0; // delay between consecutive cell falls in a column
@@ -393,31 +392,7 @@ async function fillGrid() {
     if (isProcessing || !document.getElementById('difficulty').value) return;
 
     document.getElementById('skull-risk').textContent = '0%';
-    totalCellsRemoved = 0;
-    updateCellsRemovedDisplay();
-    countdownStarted = true;
-    allowCalaveraGameOver = false; // Desactivar durante generación
 
-    const difficulty = document.getElementById('difficulty').value;
-    if (difficulty) {
-        rows = cols = parseInt(difficulty, 10);
-    }
-
-    createGrid(rows, cols);
-
-    // Usar el nuevo algoritmo de generación
-    console.log('Generando tablero estable...');
-    const stableBoard = await generateStableBoardWithValidMoves();
-
-    // Aplicar el tablero generado
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-            board[row][col] = stableBoard[row][col];
-            const cell = cellReferences[row][col];
-            if (cell) {
-                cell.className = `cell ${stableBoard[row][col]}`;
-                cellCounts[stableBoard[row][col]]++;
-            }
         }
     }
 
