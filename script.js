@@ -1,3 +1,4 @@
+// Versión 4.6 - Algoritmo de generación mejorado (implementación parcial)
 const COLORS = ['cruz-roja', 'hoja', 'agujero-negro', 'prohibido', 'ondas-rosadas', 'calavera'];
 const FALL_DURATION = 0.2; // duration in seconds for a single fall animation
 const FALL_STAGGER_DELAY = 0; // delay between consecutive cell falls in a column
@@ -32,6 +33,278 @@ const SEPARATOR_COLORS = {
 COLORS.forEach(color => {
     cellCounts[color] = 0;
 });
+
+// ===== NUEVAS FUNCIONES DE GENERACIÓN MEJORADA =====
+function getRandomWeightedColor() {
+    return COLORS[Math.floor(Math.random() * COLORS.length)];
+}
+
+function generateRandomBoard(rows, cols) {
+    const newBoard = [];
+    for (let row = 0; row < rows; row++) {
+        newBoard[row] = [];
+        for (let col = 0; col < cols; col++) {
+            newBoard[row][col] = getRandomWeightedColor();
+        }
+    }
+    return newBoard;
+}
+
+function copyBoard(board) {
+    return board.map(row => [...row]);
+}
+
+function detectPatternsInBoard(board) {
+    const matches = new Set();
+    const rows = board.length;
+    const cols = board[0].length;
+
+    // Detectar matches horizontales
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols - 2; col++) {
+            const color = board[row][col];
+            if (color && color !== 'calavera' &&
+                board[row][col + 1] === color &&
+                board[row][col + 2] === color) {
+                matches.add(`${row},${col}`);
+                matches.add(`${row},${col + 1}`);
+                matches.add(`${row},${col + 2}`);
+            }
+        }
+    }
+
+    // Detectar matches verticales
+    for (let row = 0; row < rows - 2; row++) {
+        for (let col = 0; col < cols; col++) {
+            const color = board[row][col];
+            if (color && color !== 'calavera' &&
+                board[row + 1][col] === color &&
+                board[row + 2][col] === color) {
+                matches.add(`${row},${col}`);
+                matches.add(`${row + 1},${col}`);
+                matches.add(`${row + 2},${col}`);
+            }
+        }
+    }
+
+    return matches;
+}
+
+function removeMatchesFromBoard(board, matches) {
+    const newBoard = copyBoard(board);
+    matches.forEach(match => {
+        const [row, col] = match.split(',').map(Number);
+        newBoard[row][col] = null;
+    });
+    return newBoard;
+}
+
+function simulateFallAndGeneration(board) {
+    const rows = board.length;
+    const cols = board[0].length;
+    const newBoard = copyBoard(board);
+
+    // Simular caída por columna
+    for (let col = 0; col < cols; col++) {
+        const existingPieces = [];
+
+        // Recoger piezas existentes de abajo hacia arriba
+        for (let row = rows - 1; row >= 0; row--) {
+            if (newBoard[row][col] !== null) {
+                existingPieces.push(newBoard[row][col]);
+                newBoard[row][col] = null;
+            }
+        }
+
+        // Colocar piezas existentes en la parte inferior
+        for (let i = 0; i < existingPieces.length; i++) {
+            const targetRow = rows - 1 - i;
+            newBoard[targetRow][col] = existingPieces[i];
+        }
+
+        // Generar nuevas piezas para espacios vacíos
+        for (let row = 0; row < rows - existingPieces.length; row++) {
+            newBoard[row][col] = generateSafeColor(row, col, newBoard);
+        }
+    }
+
+    return newBoard;
+}
+
+function generateSafeColor(row, col, board) {
+    const availableColors = [...COLORS];
+
+    // Remover colores que crearían matches inmediatos
+    for (const color of COLORS) {
+        if (wouldCreateImmediateMatch(row, col, color, board)) {
+            const index = availableColors.indexOf(color);
+            if (index > -1) {
+                availableColors.splice(index, 1);
+            }
+        }
+    }
+
+    // Si todos los colores crean matches, usar uno aleatorio
+    if (availableColors.length === 0) {
+        return COLORS[Math.floor(Math.random() * COLORS.length)];
+    }
+
+    // Selección ponderada
+    return availableColors[Math.floor(Math.random() * availableColors.length)];
+}
+
+function wouldCreateImmediateMatch(row, col, color, board) {
+    if (color === 'calavera') return false;
+
+    const rows = board.length;
+    const cols = board[0].length;
+
+    // Verificar match horizontal
+    let horizontalCount = 1;
+
+    // Contar hacia la izquierda
+    for (let c = col - 1; c >= 0 && board[row][c] === color; c--) {
+        horizontalCount++;
+    }
+
+    // Contar hacia la derecha
+    for (let c = col + 1; c < cols && board[row][c] === color; c++) {
+        horizontalCount++;
+    }
+
+    if (horizontalCount >= 3) return true;
+
+    // Verificar match vertical
+    let verticalCount = 1;
+
+    // Contar hacia arriba
+    for (let r = row - 1; r >= 0 && board[r][col] === color; r--) {
+        verticalCount++;
+    }
+
+    // Contar hacia abajo
+    for (let r = row + 1; r < rows && board[r][col] === color; r++) {
+        verticalCount++;
+    }
+
+    return verticalCount >= 3;
+}
+
+function hasValidMoves(board) {
+    const rows = board.length;
+    const cols = board[0].length;
+
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            // Verificar intercambio horizontal
+            if (col < cols - 1) {
+                if (isValidSwap(row, col, row, col + 1, board)) {
+                    return true;
+                }
+            }
+
+            // Verificar intercambio vertical
+            if (row < rows - 1) {
+                if (isValidSwap(row, col, row + 1, col, board)) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+function isValidSwap(row1, col1, row2, col2, board) {
+    const testBoard = copyBoard(board);
+
+    // Simular intercambio
+    [testBoard[row1][col1], testBoard[row2][col2]] =
+    [testBoard[row2][col2], testBoard[row1][col1]];
+
+    // Verificar si se crean matches
+    const matches = detectPatternsInBoard(testBoard);
+    return matches.size > 0;
+}
+
+function validateFinalBoard(board) {
+    // Verificar que no hay calaveras en fila inferior
+    const bottomRow = board[board.length - 1];
+    if (bottomRow.some(color => color === 'calavera')) {
+        return false;
+    }
+
+    // Verificar que hay movimientos válidos
+    if (!hasValidMoves(board)) {
+        return false;
+    }
+
+    // Verificar que no quedan matches inmediatos
+    const remainingMatches = detectPatternsInBoard(board);
+    if (remainingMatches.size > 0) {
+        return false;
+    }
+
+    return true;
+}
+
+function generateSafeFallbackBoard() {
+    const newBoard = [];
+    const safeColors = COLORS.filter(color => color !== 'calavera');
+
+    for (let row = 0; row < rows; row++) {
+        newBoard[row] = [];
+        for (let col = 0; col < cols; col++) {
+            // Usar solo colores seguros en patrón alternado
+            const colorIndex = (row + col) % safeColors.length;
+            newBoard[row][col] = safeColors[colorIndex];
+        }
+    }
+
+    return newBoard;
+}
+
+async function generateStableBoardWithValidMoves() {
+    const MAX_GENERATION_ATTEMPTS = 50;
+    const MAX_CASCADE_DEPTH = 20;
+
+    console.log('Iniciando generación de tablero estable...');
+
+    for (let attempt = 1; attempt <= MAX_GENERATION_ATTEMPTS; attempt++) {
+        console.log(`Intento de generación ${attempt}/${MAX_GENERATION_ATTEMPTS}`);
+
+        // Fase 1: Generación inicial aleatoria
+        let simulatedBoard = generateRandomBoard(rows, cols);
+
+        // Fase 2: Simulación completa de cascadas
+        let cascadeCount = 0;
+        while (cascadeCount < MAX_CASCADE_DEPTH) {
+            const matches = detectPatternsInBoard(simulatedBoard);
+
+            if (matches.size === 0) {
+                break; // No más cascadas
+            }
+
+            // Simular eliminación y regeneración
+            simulatedBoard = removeMatchesFromBoard(simulatedBoard, matches);
+            simulatedBoard = simulateFallAndGeneration(simulatedBoard);
+
+            cascadeCount++;
+        }
+
+        // Fase 3: Verificaciones finales
+        if (validateFinalBoard(simulatedBoard)) {
+            console.log(`Tablero válido generado en intento ${attempt}`);
+            return simulatedBoard;
+        }
+
+        console.log(`Intento ${attempt} falló verificaciones`);
+    }
+
+    // Fallback: generar tablero seguro
+    console.warn('Usando tablero fallback sin calaveras en fila inferior');
+    return generateSafeFallbackBoard();
+}
 
 function checkSelections() {
     const difficulty = document.getElementById('difficulty').value;
@@ -95,24 +368,6 @@ function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function swapCalaverasFromBottomRow() {
-    const bottomRowIndex = board.length - 1;
-    if (bottomRowIndex < 1) return;
-
-    for (let col = 0; col < board[0].length; col++) {
-        if (board[bottomRowIndex][col] === 'calavera') {
-            const upperRow = bottomRowIndex - 1;
-            [board[bottomRowIndex][col], board[upperRow][col]] = [board[upperRow][col], board[bottomRowIndex][col]];
-
-            const bottomCell = cellReferences[bottomRowIndex][col];
-            const upperCell = cellReferences[upperRow][col];
-            if (bottomCell && upperCell) {
-                bottomCell.className = `cell ${board[bottomRowIndex][col]}`;
-                upperCell.className = `cell ${board[upperRow][col]}`;
-            }
-        }
-    }
-}
 
 function createGrid(rows, cols) {
     gameContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
@@ -149,17 +404,22 @@ async function fillGrid() {
 
     createGrid(rows, cols);
 
-    document.querySelectorAll('.cell').forEach(cell => {
-        const row = parseInt(cell.dataset.row);
-        const col = parseInt(cell.dataset.col);
-        const availableColors = COLORS;
-        const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
-        board[row][col] = randomColor;
-        cell.className = `cell ${randomColor}`;
-        cellCounts[randomColor]++;
+    board = await generateStableBoardWithValidMoves();
+
+    // Reiniciar conteo de colores
+    COLORS.forEach(color => {
+        cellCounts[color] = 0;
     });
-    await checkPatterns();
-    swapCalaverasFromBottomRow();
+
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const color = board[row][col];
+            const cell = cellReferences[row][col];
+            cell.className = `cell ${color}`;
+            cellCounts[color]++;
+        }
+    }
+
     updateSkullRiskDisplay();
 }
 
