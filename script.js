@@ -486,6 +486,31 @@ function updateColorSamples() {
     });
 }
 
+async function fillGrid() {
+    if (isProcessing || !document.getElementById('difficulty').value) return;
+    
+    isProcessing = true;
+    document.getElementById('skull-risk').textContent = '0%';
+    
+    // Usar el nuevo algoritmo de generación mejorada
+    board = await generateStableBoardWithValidMoves();
+    
+    // Actualizar la visualización
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const color = board[row][col];
+            cellReferences[row][col].className = `cell ${color}`;
+            cellCounts[color] = (cellCounts[color] || 0) + 1;
+        }
+    }
+    
+    updateSkullRiskDisplay();
+    updateColorSamples();
+    allowCalaveraGameOver = true;
+    isProcessing = false;
+    console.log('Tablero estable generado exitosamente');
+}
+
 function getGameOverThreshold(rows, cols) {
     // La funcionalidad de umbral se ha desactivado por completo
     return null;
