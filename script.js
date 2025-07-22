@@ -920,15 +920,18 @@ document.addEventListener('DOMContentLoaded', () => {
     difficultySelect.innerHTML = '<option value="">--Seleccionar--</option>' +
         difficulties.map(d => `<option value="${d}">${d}x${d}</option>`).join('');
     difficultySelect.addEventListener('change', () => {
-        const difficulty = difficultySelect.value;
+        const difficulty = parseInt(difficultySelect.value, 10);
         console.log("Dificultad seleccionada:", difficulty);
         document.getElementById('fill-grid-btn').disabled = !difficulty;
         document.getElementById('reset-game-btn').disabled = !difficulty;
+
+        if (difficulty) {
+            rows = difficulty;
+            cols = difficulty;
+            resetGame();
+        }
     });
 
     resetGame();
     requestAnimationFrame(contadorRegresivo);
 });
-
-createGrid(rows, cols);
-updateColorSamples();
