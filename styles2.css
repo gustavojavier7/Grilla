@@ -3,10 +3,12 @@ html, body {
     padding: 0;
     height: 100vh;
     width: 100vw;
+    box-sizing: border-box; /* Crucial para manejar padding */
 }
 
 body {
     font-family: Arial, sans-serif;
+    padding: 40px; /* NUEVO: Mayor margen en todos los lados */
     background-color: #f0f0f0;
     display: flex;
     justify-content: center;
@@ -14,37 +16,39 @@ body {
     min-height: auto;
     height: 100vh;
     width: 100vw;
-    padding: 20px;
-    overflow: hidden;
-    box-sizing: border-box;
+    overflow: hidden; /* Evita el scroll del navegador */
 }
 
 #main-container {
     display: flex;
     gap: 20px;
     align-items: flex-start;
-    justify-content: center;
-    width: 100%;
-    max-width: 1200px;
-    height: 100%;
-    box-sizing: border-box;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 #game-container {
+    /* CÁLCULO DINÁMICO: */
+    /* Ancho: 100vw - 80px (padding total) - 20px (gap) - 250px (controles) = calc(100vw - 350px) */
+    /* Alto: 100vh - 80px (padding total) = calc(100vh - 80px) */
+    --max-width-grid: calc(100vw - 350px);
+    --max-height-grid: calc(100vh - 80px);
+
+    width: min(var(--max-width-grid), var(--max-height-grid));
+    height: min(var(--max-width-grid), var(--max-height-grid));
+
     display: grid;
     gap: 2px;
     background-color: #333;
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    max-width: 100%;
-    max-height: 100%;
-    box-sizing: border-box;
+    flex-shrink: 0; /* Asegura que la cuadrícula no se encoja */
 }
 
 .cell {
-    width: 40px;
-    height: 40px;
+    width: auto; /* El tamaño lo da el grid */
+    height: auto;
     background-color: #ddd;
     border: 1px solid #999;
     cursor: pointer;
@@ -298,7 +302,7 @@ label {
 }
 
 .cell-sample {
-    width: 40px;
+    width: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -314,8 +318,8 @@ label {
 
 .cell-sample::before {
     content: '';
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     border: 1px solid #999;
     box-sizing: border-box;
 }
@@ -457,12 +461,7 @@ label {
         flex-direction: column;
         align-items: center;
     }
-    
-    .cell {
-        width: 30px;
-        height: 30px;
-    }
-    
+
     #countdown {
         font-size: 36px;
     }
