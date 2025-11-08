@@ -32,7 +32,7 @@ body {
     /* Ancho: 100vw - 80px (padding total) - 20px (gap) - 250px (controles) = calc(100vw - 350px) */
     /* Alto: 100vh - 80px (padding total) = calc(100vh - 80px) */
     --max-width-grid: calc(100vw - 350px);
-    --max-height-grid: calc(100vh - 80px);
+    --max-height-grid: calc(100vh - 90px);
 
     width: min(var(--max-width-grid), var(--max-height-grid));
     height: min(var(--max-width-grid), var(--max-height-grid));
@@ -98,11 +98,6 @@ body {
 
 .gota-azul {
     background-color: #5AC8FA;
-    background-image: none;
-}
-
-.gota-morada {
-    background-color: #5856D6;
     background-image: none;
 }
 
@@ -346,11 +341,6 @@ label {
 
 .cell-sample.gota-azul::before {
     background-color: #5AC8FA;
-    background-image: none;
-}
-
-.cell-sample.gota-morada::before {
-    background-color: #5856D6;
     background-image: none;
 }
 

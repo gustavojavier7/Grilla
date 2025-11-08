@@ -1,5 +1,5 @@
 // Versión 4.8 - Algoritmo de generación mejorado (implementación parcial)
-const COLORS = ['jelly-rojo', 'gota-naranja', 'limon-amarillo', 'gota-verde', 'gota-azul', 'gota-morada', 'calavera'];
+const COLORS = ['jelly-rojo', 'gota-naranja', 'limon-amarillo', 'gota-verde', 'gota-azul', 'calavera'];
 const FALL_DURATION = 0.2; // duration in seconds for a single fall animation
 const FALL_STAGGER_DELAY = 0; // delay between consecutive cell falls in a column
 let gameContainer = document.getElementById('game-container');
