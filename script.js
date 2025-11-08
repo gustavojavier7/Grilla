@@ -64,7 +64,7 @@ function detectPatternsInBoard(board) {
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols - 2; col++) {
             const color = board[row][col];
-            if (color && color !== 'calavera' &&
+            if (color &&
                 board[row][col + 1] === color &&
                 board[row][col + 2] === color) {
                 matches.add(`${row},${col}`);
@@ -78,7 +78,7 @@ function detectPatternsInBoard(board) {
     for (let row = 0; row < rows - 2; row++) {
         for (let col = 0; col < cols; col++) {
             const color = board[row][col];
-            if (color && color !== 'calavera' &&
+            if (color &&
                 board[row + 1][col] === color &&
                 board[row + 2][col] === color) {
                 matches.add(`${row},${col}`);
@@ -155,7 +155,6 @@ function generateSafeColor(row, col, board) {
 }
 
 function wouldCreateImmediateMatch(row, col, color, board) {
-    if (color === 'calavera') return false;
 
     const rows = board.length;
     const cols = board[0].length;
