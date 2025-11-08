@@ -783,6 +783,8 @@ async function fillGrid() {
     updateSkullRiskDisplay();
     updateColorSamples();
     allowCalaveraGameOver = true;
+    countdownStarted = true;
+    lastUpdateTime = performance.now();
     isProcessing = false;
     console.log('Tablero estable generado exitosamente');
 }
