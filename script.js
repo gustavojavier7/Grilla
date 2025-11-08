@@ -55,6 +55,18 @@ function copyBoard(board) {
     return board.map(row => [...row]);
 }
 
+// NUEVA FUNCIÓN PARA OBTENER EL TAMAÑO REAL DE LA CELDA
+function getCellDimensions() {
+    if (cellReferences && cellReferences[0] && cellReferences[0][0]) {
+        const rect = cellReferences[0][0].getBoundingClientRect();
+        return {
+            size: rect.width,
+            gap: 2 // El gap es un valor fijo en el CSS
+        };
+    }
+    return { size: 40, gap: 2 };
+}
+
 function detectPatternsInBoard(board) {
     const matches = new Set();
     const rows = board.length;
@@ -599,6 +611,9 @@ async function processMatchedCells(matches) {
     });
     updateCellsRemovedDisplay();
 
+    const { size: cellSize, gap: cellGap } = getCellDimensions();
+    const cellTotalSpace = cellSize + cellGap;
+
     let newMatches = new Set();
     let maxDelay = 0;
 
@@ -623,7 +638,7 @@ async function processMatchedCells(matches) {
                 oldCellElement.className = 'cell';
                 targetCellElement.className = `cell ${fallingColor}`;
 
-                const distanceToMoveUp = emptySpaceCount * (40 + 2);
+                const distanceToMoveUp = emptySpaceCount * cellTotalSpace;
                 addFallAnimation(targetCellElement, delayIndex * FALL_STAGGER_DELAY, -distanceToMoveUp, false);
 
                 if (delayIndex * FALL_STAGGER_DELAY > maxDelay) maxDelay = delayIndex * FALL_STAGGER_DELAY;
@@ -641,7 +656,7 @@ async function processMatchedCells(matches) {
             board[targetRow][col] = newColor;
             cellReferences[targetRow][col].className = `cell ${newColor}`;
             
-            const distanceToFall = (emptySpaceCount - i) * (40 + 2);
+            const distanceToFall = (emptySpaceCount - i) * cellTotalSpace;
             addFallAnimation(cellReferences[targetRow][col], delayIndex * FALL_STAGGER_DELAY, -distanceToFall, true);
             
             if (delayIndex * FALL_STAGGER_DELAY > maxDelay) maxDelay = delayIndex * FALL_STAGGER_DELAY;
@@ -801,7 +816,16 @@ function updateColorSamples() {
         const percent = ((count / totalCells) * 100).toFixed(2);
 
         const cellSample = document.querySelector(`.cell-sample.${color}`);
+        if (!cellSample) {
+            console.warn(`No se encontró la muestra de color para: ${color}`);
+            return;
+        }
+
         const span = cellSample.querySelector('span');
+        if (!span) {
+            console.warn(`No se encontró el elemento <span> dentro de la muestra de color: ${color}`);
+            return;
+        }
         span.textContent = count;
         cellSample.setAttribute('data-percentage', `${percent}%`);
 
