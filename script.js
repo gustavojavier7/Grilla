@@ -57,13 +57,15 @@ function copyBoard(board) {
 
 // NUEVA FUNCIÓN PARA OBTENER EL TAMAÑO REAL DE LA CELDA
 function getCellDimensions() {
+    // Intenta obtener las dimensiones de la primera celda creada (0, 0)
     if (cellReferences && cellReferences[0] && cellReferences[0][0]) {
         const rect = cellReferences[0][0].getBoundingClientRect();
         return {
             size: rect.width,
-            gap: 2 // El gap es un valor fijo en el CSS
+            gap: 2 // El gap (brecha) es un valor fijo en el CSS
         };
     }
+    // Fallback si la celda no se ha renderizado
     return { size: 40, gap: 2 };
 }
 
