@@ -116,6 +116,34 @@ function detectPatternsInBoard(board) {
         }
     }
 
+    // Detectar matches diagonales (Ascendente Derecha)
+    for (let row = 2; row < rows; row++) {
+        for (let col = 0; col < cols - 2; col++) {
+            const color = board[row][col];
+            if (color &&
+                board[row - 1][col + 1] === color &&
+                board[row - 2][col + 2] === color) {
+                matches.add(`${row},${col}`);
+                matches.add(`${row - 1},${col + 1}`);
+                matches.add(`${row - 2},${col + 2}`);
+            }
+        }
+    }
+
+    // Detectar matches diagonales (Ascendente Izquierda)
+    for (let row = 2; row < rows; row++) {
+        for (let col = 2; col < cols; col++) {
+            const color = board[row][col];
+            if (color &&
+                board[row - 1][col - 1] === color &&
+                board[row - 2][col - 2] === color) {
+                matches.add(`${row},${col}`);
+                matches.add(`${row - 1},${col - 1}`);
+                matches.add(`${row - 2},${col - 2}`);
+            }
+        }
+    }
+
     return matches;
 }
 
