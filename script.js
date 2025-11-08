@@ -88,6 +88,34 @@ function detectPatternsInBoard(board) {
         }
     }
 
+    // Detectar matches diagonales (Descendente Derecha)
+    for (let row = 0; row < rows - 2; row++) {
+        for (let col = 0; col < cols - 2; col++) {
+            const color = board[row][col];
+            if (color &&
+                board[row + 1][col + 1] === color &&
+                board[row + 2][col + 2] === color) {
+                matches.add(`${row},${col}`);
+                matches.add(`${row + 1},${col + 1}`);
+                matches.add(`${row + 2},${col + 2}`);
+            }
+        }
+    }
+
+    // Detectar matches diagonales (Descendente Izquierda)
+    for (let row = 0; row < rows - 2; row++) {
+        for (let col = 2; col < cols; col++) {
+            const color = board[row][col];
+            if (color &&
+                board[row + 1][col - 1] === color &&
+                board[row + 2][col - 2] === color) {
+                matches.add(`${row},${col}`);
+                matches.add(`${row + 1},${col - 1}`);
+                matches.add(`${row + 2},${col - 2}`);
+            }
+        }
+    }
+
     return matches;
 }
 
