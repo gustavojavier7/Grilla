@@ -77,7 +77,7 @@ body {
 }
 
 .gota-naranja {
-    background-color: #FF9500;
+    background-color: #C8A2C8;
     background-image: none;
 }
 
@@ -321,7 +321,7 @@ label {
 }
 
 .cell-sample.gota-naranja::before {
-    background-color: #FF9500;
+    background-color: #C8A2C8;
     background-image: none;
 }
 
