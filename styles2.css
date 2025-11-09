@@ -32,7 +32,7 @@ body {
     /* Ancho: 100vw - 80px (padding total) - 20px (gap) - 250px (controles) = calc(100vw - 350px) */
     /* Alto: 100vh - 80px (padding total) = calc(100vh - 80px) */
     --max-width-grid: calc(100vw - 350px);
-    --max-height-grid: calc(100vh - 90px);
+    --max-height-grid: calc(100vh - 82px);
 
     width: min(var(--max-width-grid), var(--max-height-grid));
     height: min(var(--max-width-grid), var(--max-height-grid));
