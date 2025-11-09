@@ -466,6 +466,12 @@ function handleCellClick(cell) {
 
     const row = parseInt(cell.dataset.row);
     const col = parseInt(cell.dataset.col);
+    const cellColor = board[row][col];
+
+    if (cellColor === 'calavera') {
+        showGameOver('Game Over. La Muerte te ha alcanzado.');
+        return;
+    }
 
     if (firstSelected === null) {
         firstSelected = { row, col, element: cell };
