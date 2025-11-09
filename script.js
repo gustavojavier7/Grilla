@@ -911,28 +911,35 @@ function showGameOver(reason) {
 function calculateSkullRisk() {
     const rows = board.length;
     const cols = board[0].length;
-    const baseRiskPerCell = 0.9739 / cols;
-    let totalScore = 0;
 
-    for (let col = 0; col < cols; col++) {
-        let distance = rows;
-        let rowCalavera = -1;
-        for (let row = rows - 1; row >= 0; row--) {
-            if (board[row][col] === 'calavera') {
-                rowCalavera = row;
-                distance = rows - 1 - row;
-                break;
-            }
-        }
-        const weight = rowCalavera === -1 ? 0 : (rows - rowCalavera) / (rows - 1);
-        const cellRisk = baseRiskPerCell * weight;
-        totalScore += cellRisk;
-        console.log(`Columna ${col}: fila_calavera = ${rowCalavera}, distancia = ${distance}, peso = ${weight.toFixed(2)}, riesgo por celda = ${cellRisk.toFixed(4)}`);
+    if (rows === 0 || cols === 0) {
+        return 0;
     }
 
-    const maxPossibleScore = cols * baseRiskPerCell;
-    const risk = maxPossibleScore > 0 ? Math.min(100, Math.round((totalScore / maxPossibleScore) * 100)) : 0;
-    console.log(`Total Score: ${totalScore.toFixed(4)}, Max Possible Score: ${maxPossibleScore.toFixed(4)}, Risk: ${risk}%`);
+    let totalDepthWeight = 0;
+    let skullCount = 0;
+
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            if (board[row][col] === 'calavera') {
+                skullCount++;
+                const depthWeight = rows === 1 ? 1 : row / (rows - 1);
+                totalDepthWeight += depthWeight;
+                console.log(`Calavera en (${row}, ${col}) con peso de profundidad ${depthWeight.toFixed(2)}`);
+            }
+        }
+    }
+
+    if (skullCount === 0) {
+        console.log('No hay calaveras. Riesgo = 0%');
+        return 0;
+    }
+
+    const averageDepth = totalDepthWeight / skullCount;
+    const occupancyFactor = skullCount / (rows * cols);
+    const riskScore = averageDepth * occupancyFactor * 100;
+    const risk = Math.min(100, Math.round(riskScore));
+    console.log(`Total calaveras: ${skullCount}, Profundidad promedio: ${averageDepth.toFixed(4)}, Factor de ocupación: ${occupancyFactor.toFixed(4)}, Riesgo: ${risk}%`);
     return risk;
 }
 
