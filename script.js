@@ -936,10 +936,9 @@ function calculateSkullRisk() {
     }
 
     const averageDepth = totalDepthWeight / skullCount;
-    const occupancyFactor = skullCount / (rows * cols);
-    const riskScore = averageDepth * occupancyFactor * 100;
+    const riskScore = averageDepth * 100;
     const risk = Math.min(100, Math.round(riskScore));
-    console.log(`Total calaveras: ${skullCount}, Profundidad promedio: ${averageDepth.toFixed(4)}, Factor de ocupación: ${occupancyFactor.toFixed(4)}, Riesgo: ${risk}%`);
+    console.log(`Total calaveras: ${skullCount}, Profundidad promedio: ${averageDepth.toFixed(4)}, Riesgo: ${risk}%`);
     return risk;
 }
 
