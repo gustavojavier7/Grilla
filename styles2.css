@@ -8,42 +8,37 @@ html, body {
 
 body {
     font-family: Arial, sans-serif;
-    padding: 40px; /* NUEVO: Mayor margen en todos los lados */
     background-color: #f0f0f0;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: auto;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden; /* Evita el scroll del navegador */
+    flex-direction: column;
+    margin: 0;
+    min-height: 100vh;
 }
 
 #main-container {
     display: flex;
     gap: 20px;
-    align-items: flex-start;
-    max-width: 100%;
-    max-height: 100%;
+    align-items: stretch;
+    flex: 1;
+    width: 100%;
+    padding: 40px;
+    box-sizing: border-box;
+    min-height: 0;
+    min-width: 0;
 }
 
 #game-container {
-    /* CÁLCULO DINÁMICO: */
-    /* Ancho: 100vw - 80px (padding total) - 20px (gap) - 250px (controles) = calc(100vw - 350px) */
-    /* Alto: 100vh - 80px (padding total) = calc(100vh - 80px) */
-    --max-width-grid: calc(100vw - 350px);
-    --max-height-grid: calc(100vh - 82px);
-
-    width: min(var(--max-width-grid), var(--max-height-grid));
-    height: min(var(--max-width-grid), var(--max-height-grid));
-
     display: grid;
     gap: 2px;
     background-color: #333;
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    flex-shrink: 0; /* Asegura que la cuadrícula no se encoja */
+    flex: 1;
+    height: 100%;
+    max-height: 100%;
+    min-width: 0;
+    aspect-ratio: 1 / 1;
 }
 
 .cell {
@@ -139,7 +134,8 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    min-width: 250px;
+    width: 250px;
+    flex: 0 0 250px;
 }
 
 #buttons-container {
