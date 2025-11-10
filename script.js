@@ -110,9 +110,8 @@ function findMatches(grid, options = {}) {
     const matches = new Set();
     const skipValues = new Set(options.skipValues || []);
 
-    if (options.peligroso) {
-        skipValues.add(options.peligroso);
-    }
+    // NO añadir automáticamente el valor peligroso a skipValues
+    // Permitir que se detecten patrones de calaveras si se solicita explícitamente
 
     const shouldSkip = value => value == null || skipValues.has(value);
     const directions = [
@@ -149,7 +148,8 @@ function findMatches(grid, options = {}) {
 }
 
 function detectarPatrones(grilla, config) {
-    return findMatches(grilla, { peligroso: config?.VALOR_PELIGROSO });
+    const skipValues = config?.VALOR_PELIGROSO ? [config.VALOR_PELIGROSO] : [];
+    return findMatches(grilla, { skipValues });
 }
 
 function eliminarMatches(grilla, matches) {
@@ -443,7 +443,8 @@ async function checkPatterns() {
     isProcessing = true;
     manageClock();
     const cells = document.querySelectorAll('.cell');
-    const matches = findMatches(board, { peligroso: activeConfig?.VALOR_PELIGROSO });
+    const skipValues = activeConfig?.VALOR_PELIGROSO ? [activeConfig.VALOR_PELIGROSO] : [];
+    const matches = findMatches(board, { skipValues });
 
     if (matches.size > 0) {
         await handleCascade(matches);
@@ -621,7 +622,8 @@ async function processMatchedCells(matches) {
 }
 
 function checkNewMatches() {
-    return findMatches(board, { peligroso: activeConfig?.VALOR_PELIGROSO });
+    const skipValues = activeConfig?.VALOR_PELIGROSO ? [activeConfig.VALOR_PELIGROSO] : [];
+    return findMatches(board, { skipValues });
 }
 
 
