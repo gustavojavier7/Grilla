@@ -148,8 +148,138 @@ function findMatches(grid, options = {}) {
 }
 
 function detectarPatrones(grilla, config) {
-    const skipValues = config?.VALOR_PELIGROSO ? [config.VALOR_PELIGROSO] : [];
-    return findMatches(grilla, { skipValues });
+    return findMatches(grilla, { skipValues: [] });
+}
+
+function validarConfigBasica(config) {
+    if (!config || typeof config !== 'object') {
+        throw new Error('Configuración inválida: se esperaba un objeto.');
+    }
+
+    const { FILAS, COLUMNAS, VALORES_PERMITIDOS, VALORES_SEGUROS_FILA_0 } = config;
+
+    if (!Number.isInteger(FILAS) || FILAS <= 0) {
+        throw new Error('Configuración inválida: FILAS debe ser un entero positivo.');
+    }
+
+    if (!Number.isInteger(COLUMNAS) || COLUMNAS <= 0) {
+        throw new Error('Configuración inválida: COLUMNAS debe ser un entero positivo.');
+    }
+
+    if (!Array.isArray(VALORES_PERMITIDOS) || VALORES_PERMITIDOS.length === 0) {
+        throw new Error('Configuración inválida: VALORES_PERMITIDOS debe contener al menos un valor.');
+    }
+
+    if (!Array.isArray(VALORES_SEGUROS_FILA_0) || VALORES_SEGUROS_FILA_0.length === 0) {
+        throw new Error('Configuración inválida: VALORES_SEGUROS_FILA_0 debe contener al menos un valor.');
+    }
+}
+
+function validarGrillaRectangular(grilla, config) {
+    if (!Array.isArray(grilla) || grilla.length === 0) {
+        throw new Error('Grilla inválida: se esperaba una matriz con contenido.');
+    }
+
+    if (config && Number.isInteger(config.FILAS) && grilla.length !== config.FILAS) {
+        throw new Error(`Grilla inválida: se esperaban ${config.FILAS} filas y se recibieron ${grilla.length}.`);
+    }
+
+    const columnasEsperadas = config?.COLUMNAS ?? grilla[0].length;
+
+    grilla.forEach((fila, indice) => {
+        if (!Array.isArray(fila) || fila.length !== columnasEsperadas) {
+            throw new Error(`Grilla inválida: la fila ${indice} no coincide con las columnas esperadas.`);
+        }
+    });
+}
+
+function transformarCalaverasEnPatrones(grilla, config) {
+    validarConfigBasica(config);
+    validarGrillaRectangular(grilla, config);
+
+    const nuevaGrilla = grilla.map(fila => [...fila]);
+    const matches = findMatches(nuevaGrilla, { skipValues: [] });
+
+    if (matches.size === 0) {
+        return nuevaGrilla;
+    }
+
+    const patrones = agruparPatronesConectados(matches, nuevaGrilla);
+
+    patrones.forEach(patron => {
+        if (esPatronDeCalaveras(patron, nuevaGrilla)) {
+            transformarUnaCalavera(patron, nuevaGrilla, config);
+        }
+    });
+
+    return nuevaGrilla;
+}
+
+function agruparPatronesConectados(matches, grilla) {
+    const visitado = new Set();
+    const patrones = [];
+
+    matches.forEach(coord => {
+        if (visitado.has(coord)) return;
+
+        const [fila, col] = coord.split(',').map(Number);
+        const color = grilla[fila][col];
+        const patron = new Set();
+        const stack = [[fila, col]];
+
+        while (stack.length > 0) {
+            const [r, c] = stack.pop();
+            const key = `${r},${c}`;
+
+            if (visitado.has(key)) continue;
+            if (grilla[r][c] !== color) continue;
+
+            visitado.add(key);
+            patron.add(key);
+
+            const direcciones = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+            direcciones.forEach(([dr, dc]) => {
+                const nr = r + dr;
+                const nc = c + dc;
+                if (nr >= 0 && nr < grilla.length && nc >= 0 && nc < grilla[0].length) {
+                    const nkey = `${nr},${nc}`;
+                    if (matches.has(nkey) && !visitado.has(nkey)) {
+                        stack.push([nr, nc]);
+                    }
+                }
+            });
+        }
+
+        if (patron.size >= 3) {
+            patrones.push(patron);
+        }
+    });
+
+    return patrones;
+}
+
+function esPatronDeCalaveras(patron, grilla) {
+    const primeraCoord = Array.from(patron)[0];
+    const [fila, col] = primeraCoord.split(',').map(Number);
+    return grilla[fila][col] === 'calavera';
+}
+
+function transformarUnaCalavera(patron, grilla, config) {
+    const calaverasEnPatron = Array.from(patron).filter(coord => {
+        const [fila, col] = coord.split(',').map(Number);
+        return grilla[fila][col] === 'calavera';
+    });
+
+    if (calaverasEnPatron.length === 0) return;
+
+    const calaveraElegida = calaverasEnPatron[Math.floor(Math.random() * calaverasEnPatron.length)];
+    const [fila, col] = calaveraElegida.split(',').map(Number);
+
+    const coloresSeguros = config.VALORES_SEGUROS_FILA_0;
+    const nuevoColor = coloresSeguros[Math.floor(Math.random() * coloresSeguros.length)];
+
+    grilla[fila][col] = nuevoColor;
+    console.log(`Transformada calavera en (${fila},${col}) a ${nuevoColor}`);
 }
 
 function eliminarMatches(grilla, matches) {
@@ -201,19 +331,22 @@ function aplicarGravedadCompactacion(grilla, config) {
 }
 
 async function estabilizarTableroParametrizado(grilla, config) {
-    let iteraciones = 0;
+    validarConfigBasica(config);
+    validarGrillaRectangular(grilla, config);
+
     while (true) {
+        grilla = transformarCalaverasEnPatrones(grilla, config);
+        validarGrillaRectangular(grilla, config);
+
         const matches = detectarPatrones(grilla, config);
         if (matches.size === 0) {
-            break;
+            return grilla;
         }
 
         grilla = eliminarMatches(grilla, matches);
         grilla = aplicarGravedadCompactacion(grilla, config);
-        iteraciones++;
+        validarGrillaRectangular(grilla, config);
     }
-
-    return grilla;
 }
 
 function validarEstadoInicialParametrizado(grilla, config) {
@@ -272,6 +405,7 @@ function actualizarVisualDesdeTablero() {
 
 async function generarTableroEstableUniversal(dificultad = 'MEDIO', intentos = 0) {
     const config = obtenerConfig(dificultad);
+    validarConfigBasica(config);
 
     let grilla = generarLlenadoParametrizado(config);
     grilla = await estabilizarTableroParametrizado(grilla, config);
@@ -317,7 +451,6 @@ function getCellDimensions() {
 function checkSelections() {
     const difficulty = document.getElementById('difficulty').value;
     console.log("Dificultad seleccionada:", difficulty);
-    document.getElementById('fill-grid-btn').disabled = !difficulty;
     document.getElementById('reset-game-btn').disabled = !difficulty;
 }
 
@@ -443,8 +576,7 @@ async function checkPatterns() {
     isProcessing = true;
     manageClock();
     const cells = document.querySelectorAll('.cell');
-    const skipValues = activeConfig?.VALOR_PELIGROSO ? [activeConfig.VALOR_PELIGROSO] : [];
-    const matches = findMatches(board, { skipValues });
+    const matches = findMatches(board, { skipValues: [] });
 
     if (matches.size > 0) {
         await handleCascade(matches);
@@ -455,12 +587,21 @@ async function checkPatterns() {
 }
 
 async function handleCascade(matches) {
-    // Previously the grid flashed here; effect removed
+    if (!(matches instanceof Set)) {
+        throw new Error('handleCascade requiere un Set de coincidencias.');
+    }
+
+    if (matches.size === 0) {
+        isProcessing = false;
+        return;
+    }
+
     matches.forEach(coord => {
         const [row, col] = coord.split(',').map(Number);
         const cell = cellReferences[row][col];
         cell.classList.add('matched');
     });
+
     await wait(700);
     await processMatchedCells(matches);
 }
@@ -748,6 +889,7 @@ async function fillGrid(forceRegeneration = false) {
 
     const dificultad = document.getElementById('difficulty').value || 'MEDIO';
     const config = obtenerConfig(dificultad);
+    validarConfigBasica(config);
     rows = config.FILAS;
     cols = config.COLUMNAS;
     activeConfig = config;
@@ -940,7 +1082,6 @@ document.addEventListener('DOMContentLoaded', () => {
     difficultySelect.addEventListener('change', () => {
         const difficulty = difficultySelect.value;
         console.log("Dificultad seleccionada:", difficulty);
-        document.getElementById('fill-grid-btn').disabled = !difficulty;
         document.getElementById('reset-game-btn').disabled = !difficulty;
 
         if (difficulty) {
