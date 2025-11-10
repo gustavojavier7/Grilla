@@ -115,10 +115,12 @@ function findMatches(grid, options = {}) {
 
     const shouldSkip = value => value == null || skipValues.has(value);
     const directions = [
-        { dr: 0, dc: 1 },   // Horizontal
-        { dr: 1, dc: 0 },   // Vertical
-        { dr: 1, dc: 1 },   // Diagonal descendente derecha
-        { dr: 1, dc: -1 }   // Diagonal descendente izquierda
+        { dr: 0, dc: 1 },   // Horizontal →
+        { dr: 1, dc: 0 },   // Vertical ↓
+        { dr: 1, dc: 1 },   // Diagonal descendente derecha ↘
+        { dr: 1, dc: -1 },  // Diagonal descendente izquierda ↙
+        { dr: -1, dc: 1 },  // Diagonal ascendente derecha ↗
+        { dr: -1, dc: -1 }  // Diagonal ascendente izquierda ↖
     ];
 
     for (let row = 0; row < rows; row++) {
@@ -127,18 +129,34 @@ function findMatches(grid, options = {}) {
             if (shouldSkip(color)) continue;
 
             for (const { dr, dc } of directions) {
-                const row2 = row + 2 * dr;
-                const col2 = col + 2 * dc;
+                const prevRow = row - dr;
+                const prevCol = col - dc;
 
-                if (row2 < 0 || row2 >= rows || col2 < 0 || col2 >= cols) continue;
+                if (
+                    prevRow >= 0 && prevRow < rows &&
+                    prevCol >= 0 && prevCol < cols &&
+                    grid[prevRow][prevCol] === color
+                ) {
+                    // Ya fue procesado en esta dirección
+                    continue;
+                }
 
-                const row1 = row + dr;
-                const col1 = col + dc;
+                const sequence = [];
+                let r = row;
+                let c = col;
 
-                if (grid[row1][col1] === color && grid[row2][col2] === color) {
-                    matches.add(`${row},${col}`);
-                    matches.add(`${row1},${col1}`);
-                    matches.add(`${row2},${col2}`);
+                while (
+                    r >= 0 && r < rows &&
+                    c >= 0 && c < cols &&
+                    grid[r][c] === color
+                ) {
+                    sequence.push(`${r},${c}`);
+                    r += dr;
+                    c += dc;
+                }
+
+                if (sequence.length >= 3) {
+                    sequence.forEach(cell => matches.add(cell));
                 }
             }
         }
