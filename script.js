@@ -1,5 +1,28 @@
 // Versión 4.8 - Algoritmo de generación mejorado (implementación parcial)
 const COLORS = ['jelly-rojo', 'gota-naranja', 'limon-amarillo', 'gota-verde', 'gota-azul', 'calavera'];
+const CONFIG = {
+    FILAS: 10,
+    COLUMNAS: 10,
+    VALORES_PERMITIDOS: COLORS,
+    VALOR_PELIGROSO: 'calavera',
+    VALORES_SEGUROS_FILA_0: COLORS.filter(color => color !== 'calavera'),
+    MAX_ITERACIONES_ESTABILIZACION: 3,
+    PROTECCION_ANTI_LOOP: 15
+};
+
+const DIFICULTADES = {
+    FACIL: { FILAS: 10, COLUMNAS: 10, MAX_ITERACIONES: 2 },
+    MEDIO: { FILAS: 15, COLUMNAS: 15, MAX_ITERACIONES: 3 },
+    DIFICIL: { FILAS: 20, COLUMNAS: 20, MAX_ITERACIONES: 4 },
+    EXPERTO: { FILAS: 25, COLUMNAS: 25, MAX_ITERACIONES: 5 }
+};
+
+const DIFICULTAD_LABELS = {
+    FACIL: 'Fácil',
+    MEDIO: 'Medio',
+    DIFICIL: 'Difícil',
+    EXPERTO: 'Experto'
+};
 const FALL_DURATION = 0.2; // duration in seconds for a single fall animation
 const FALL_STAGGER_DELAY = 0; // delay between consecutive cell falls in a column
 let gameContainer = document.getElementById('game-container');
@@ -36,19 +59,263 @@ COLORS.forEach(color => {
 });
 
 // ===== NUEVAS FUNCIONES DE GENERACIÓN MEJORADA =====
-function getRandomWeightedColor() {
-    return COLORS[Math.floor(Math.random() * COLORS.length)];
+function obtenerConfig(dificultad = 'MEDIO') {
+    const override = DIFICULTADES[dificultad] || {};
+    const filas = override.FILAS ?? CONFIG.FILAS;
+    const columnas = override.COLUMNAS ?? CONFIG.COLUMNAS;
+
+    return {
+        ...CONFIG,
+        ...override,
+        FILAS: filas,
+        COLUMNAS: columnas,
+        MAX_ITERACIONES_ESTABILIZACION: Math.ceil(filas / 5)
+    };
 }
 
-function generateRandomBoard(rows, cols) {
-    const newBoard = [];
-    for (let row = 0; row < rows; row++) {
-        newBoard[row] = [];
-        for (let col = 0; col < cols; col++) {
-            newBoard[row][col] = getRandomWeightedColor();
+function generarValorSeguro(config) {
+    const seguros = config.VALORES_SEGUROS_FILA_0;
+    return seguros[Math.floor(Math.random() * seguros.length)];
+}
+
+function generarValorAleatorio(rango) {
+    return rango[Math.floor(Math.random() * rango.length)];
+}
+
+function generarLlenadoParametrizado(config) {
+    const grilla = [];
+    const ultimaFila = config.FILAS - 1;
+
+    grilla[ultimaFila] = [];
+    for (let col = 0; col < config.COLUMNAS; col++) {
+        grilla[ultimaFila][col] = generarValorSeguro(config);
+    }
+
+    for (let fila = 0; fila < ultimaFila; fila++) {
+        grilla[fila] = [];
+        for (let col = 0; col < config.COLUMNAS; col++) {
+            grilla[fila][col] = generarValorAleatorio(config.VALORES_PERMITIDOS);
         }
     }
-    return newBoard;
+
+    return grilla;
+}
+
+function detectarPatrones(grilla, config) {
+    const matches = new Set();
+    const filas = grilla.length;
+    const columnas = grilla[0].length;
+    const peligroso = config.VALOR_PELIGROSO;
+
+    for (let fila = 0; fila < filas; fila++) {
+        for (let col = 0; col < columnas - 2; col++) {
+            const color = grilla[fila][col];
+            if (!color || color === peligroso) continue;
+            if (grilla[fila][col + 1] === color && grilla[fila][col + 2] === color) {
+                matches.add(`${fila},${col}`);
+                matches.add(`${fila},${col + 1}`);
+                matches.add(`${fila},${col + 2}`);
+            }
+        }
+    }
+
+    for (let fila = 0; fila < filas - 2; fila++) {
+        for (let col = 0; col < columnas; col++) {
+            const color = grilla[fila][col];
+            if (!color || color === peligroso) continue;
+            if (grilla[fila + 1][col] === color && grilla[fila + 2][col] === color) {
+                matches.add(`${fila},${col}`);
+                matches.add(`${fila + 1},${col}`);
+                matches.add(`${fila + 2},${col}`);
+            }
+        }
+    }
+
+    for (let fila = 0; fila < filas - 2; fila++) {
+        for (let col = 0; col < columnas - 2; col++) {
+            const color = grilla[fila][col];
+            if (!color || color === peligroso) continue;
+            if (grilla[fila + 1][col + 1] === color && grilla[fila + 2][col + 2] === color) {
+                matches.add(`${fila},${col}`);
+                matches.add(`${fila + 1},${col + 1}`);
+                matches.add(`${fila + 2},${col + 2}`);
+            }
+        }
+    }
+
+    for (let fila = 0; fila < filas - 2; fila++) {
+        for (let col = 2; col < columnas; col++) {
+            const color = grilla[fila][col];
+            if (!color || color === peligroso) continue;
+            if (grilla[fila + 1][col - 1] === color && grilla[fila + 2][col - 2] === color) {
+                matches.add(`${fila},${col}`);
+                matches.add(`${fila + 1},${col - 1}`);
+                matches.add(`${fila + 2},${col - 2}`);
+            }
+        }
+    }
+
+    for (let fila = 2; fila < filas; fila++) {
+        for (let col = 0; col < columnas - 2; col++) {
+            const color = grilla[fila][col];
+            if (!color || color === peligroso) continue;
+            if (grilla[fila - 1][col + 1] === color && grilla[fila - 2][col + 2] === color) {
+                matches.add(`${fila},${col}`);
+                matches.add(`${fila - 1},${col + 1}`);
+                matches.add(`${fila - 2},${col + 2}`);
+            }
+        }
+    }
+
+    for (let fila = 2; fila < filas; fila++) {
+        for (let col = 2; col < columnas; col++) {
+            const color = grilla[fila][col];
+            if (!color || color === peligroso) continue;
+            if (grilla[fila - 1][col - 1] === color && grilla[fila - 2][col - 2] === color) {
+                matches.add(`${fila},${col}`);
+                matches.add(`${fila - 1},${col - 1}`);
+                matches.add(`${fila - 2},${col - 2}`);
+            }
+        }
+    }
+
+    return matches;
+}
+
+function eliminarMatches(grilla, matches) {
+    const nuevaGrilla = grilla.map(fila => [...fila]);
+    matches.forEach(match => {
+        const [fila, col] = match.split(',').map(Number);
+        if (nuevaGrilla[fila]) {
+            nuevaGrilla[fila][col] = null;
+        }
+    });
+    return nuevaGrilla;
+}
+
+function aplicarGravedadCompactacion(grilla, config) {
+    const filas = grilla.length;
+    const columnas = grilla[0].length;
+    const nuevaGrilla = Array.from({ length: filas }, () => Array(columnas).fill(null));
+
+    for (let col = 0; col < columnas; col++) {
+        const existentes = [];
+        for (let fila = filas - 1; fila >= 0; fila--) {
+            const valor = grilla[fila][col];
+            if (valor !== null && valor !== undefined) {
+                existentes.push(valor);
+            }
+        }
+
+        let filaObjetivo = filas - 1;
+        for (const valorOriginal of existentes) {
+            let valor = valorOriginal;
+            if (filaObjetivo === filas - 1 && valor === config.VALOR_PELIGROSO) {
+                valor = generarValorSeguro(config);
+            }
+            nuevaGrilla[filaObjetivo][col] = valor;
+            filaObjetivo--;
+        }
+
+        while (filaObjetivo >= 0) {
+            let nuevoValor = generarValorAleatorio(config.VALORES_PERMITIDOS);
+            if (filaObjetivo === filas - 1 && nuevoValor === config.VALOR_PELIGROSO) {
+                nuevoValor = generarValorSeguro(config);
+            }
+            nuevaGrilla[filaObjetivo][col] = nuevoValor;
+            filaObjetivo--;
+        }
+    }
+
+    return nuevaGrilla;
+}
+
+async function estabilizarTableroParametrizado(grilla, config) {
+    const maxIter = Math.min(
+        config.MAX_ITERACIONES_ESTABILIZACION,
+        Math.ceil(config.FILAS / 7)
+    );
+
+    let iteraciones = 0;
+    while (iteraciones < maxIter) {
+        const matches = detectarPatrones(grilla, config);
+        if (matches.size === 0) {
+            break;
+        }
+
+        grilla = eliminarMatches(grilla, matches);
+        grilla = aplicarGravedadCompactacion(grilla, config);
+        iteraciones++;
+    }
+
+    if (detectarPatrones(grilla, config).size > 0) {
+        console.warn('Estabilización incompleta, aplicando fallback');
+        grilla = generarFallbackParametrizado(config);
+    }
+
+    return grilla;
+}
+
+function generarFallbackParametrizado(config) {
+    const grilla = [];
+    for (let fila = 0; fila < config.FILAS; fila++) {
+        grilla[fila] = [];
+        for (let col = 0; col < config.COLUMNAS; col++) {
+            const valores = fila === config.FILAS - 1
+                ? config.VALORES_SEGUROS_FILA_0
+                : config.VALORES_PERMITIDOS;
+            grilla[fila][col] = valores[(fila + col) % valores.length];
+        }
+    }
+    return grilla;
+}
+
+function validarEstadoInicialParametrizado(grilla, config) {
+    const ultimaFila = grilla[config.FILAS - 1];
+    const cerosEnBase = ultimaFila.filter(valor => valor === config.VALOR_PELIGROSO).length;
+    if (cerosEnBase > 0) {
+        console.error(`ERROR: ${cerosEnBase} valores peligrosos en fila base`);
+        return false;
+    }
+    return true;
+}
+
+function validarPuntoFijoParametrizado(grilla, config) {
+    const matches = detectarPatrones(grilla, config);
+    return matches.size === 0;
+}
+
+function inicializarContadores() {
+    cellCounts = {};
+    COLORS.forEach(color => {
+        cellCounts[color] = 0;
+    });
+}
+
+async function generarTableroEstableUniversal(dificultad = 'MEDIO', intentos = 0) {
+    const config = obtenerConfig(dificultad);
+
+    let grilla = generarLlenadoParametrizado(config);
+    grilla = await estabilizarTableroParametrizado(grilla, config);
+
+    if (!validarEstadoInicialParametrizado(grilla, config)) {
+        if (intentos >= config.PROTECCION_ANTI_LOOP) {
+            throw new Error('Violación de seguridad: valores peligrosos en base');
+        }
+        return generarTableroEstableUniversal(dificultad, intentos + 1);
+    }
+
+    if (!validarPuntoFijoParametrizado(grilla, config)) {
+        console.warn('Punto fijo no alcanzado, regenerando...');
+        if (intentos >= config.PROTECCION_ANTI_LOOP) {
+            throw new Error('No se pudo generar un tablero estable tras múltiples intentos');
+        }
+        return generarTableroEstableUniversal(dificultad, intentos + 1);
+    }
+
+    inicializarContadores();
+
+    return grilla;
 }
 
 function copyBoard(board) {
@@ -161,221 +428,6 @@ function detectPatternsInBoard(board) {
     return matches;
 }
 
-function removeMatchesFromBoard(board, matches) {
-    const newBoard = copyBoard(board);
-    matches.forEach(match => {
-        const [row, col] = match.split(',').map(Number);
-        newBoard[row][col] = null;
-    });
-    return newBoard;
-}
-
-function simulateFallAndGeneration(board) {
-    const rows = board.length;
-    const cols = board[0].length;
-    const newBoard = copyBoard(board);
-
-    // Simular caída por columna
-    for (let col = 0; col < cols; col++) {
-        const existingPieces = [];
-
-        // Recoger piezas existentes de abajo hacia arriba
-        for (let row = rows - 1; row >= 0; row--) {
-            if (newBoard[row][col] !== null) {
-                existingPieces.push(newBoard[row][col]);
-                newBoard[row][col] = null;
-            }
-        }
-
-        // Colocar piezas existentes en la parte inferior
-        for (let i = 0; i < existingPieces.length; i++) {
-            const targetRow = rows - 1 - i;
-            newBoard[targetRow][col] = existingPieces[i];
-        }
-
-        // Generar nuevas piezas para espacios vacíos
-        for (let row = 0; row < rows - existingPieces.length; row++) {
-            newBoard[row][col] = generateSafeColor(row, col, newBoard);
-        }
-    }
-
-    return newBoard;
-}
-
-function generateSafeColor(row, col, board) {
-    const availableColors = [...COLORS];
-
-    // Remover colores que crearían matches inmediatos
-    for (const color of COLORS) {
-        if (wouldCreateImmediateMatch(row, col, color, board)) {
-            const index = availableColors.indexOf(color);
-            if (index > -1) {
-                availableColors.splice(index, 1);
-            }
-        }
-    }
-
-    // Si todos los colores crean matches, usar uno aleatorio
-    if (availableColors.length === 0) {
-        return COLORS[Math.floor(Math.random() * COLORS.length)];
-    }
-
-    // Selección ponderada
-    return availableColors[Math.floor(Math.random() * availableColors.length)];
-}
-
-function wouldCreateImmediateMatch(row, col, color, board) {
-
-    const rows = board.length;
-    const cols = board[0].length;
-
-    // Verificar match horizontal
-    let horizontalCount = 1;
-
-    // Contar hacia la izquierda
-    for (let c = col - 1; c >= 0 && board[row][c] === color; c--) {
-        horizontalCount++;
-    }
-
-    // Contar hacia la derecha
-    for (let c = col + 1; c < cols && board[row][c] === color; c++) {
-        horizontalCount++;
-    }
-
-    if (horizontalCount >= 3) return true;
-
-    // Verificar match vertical
-    let verticalCount = 1;
-
-    // Contar hacia arriba
-    for (let r = row - 1; r >= 0 && board[r][col] === color; r--) {
-        verticalCount++;
-    }
-
-    // Contar hacia abajo
-    for (let r = row + 1; r < rows && board[r][col] === color; r++) {
-        verticalCount++;
-    }
-
-    return verticalCount >= 3;
-}
-
-function hasValidMoves(board) {
-    const rows = board.length;
-    const cols = board[0].length;
-
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-            // Verificar intercambio horizontal
-            if (col < cols - 1) {
-                if (isValidSwap(row, col, row, col + 1, board)) {
-                    return true;
-                }
-            }
-
-            // Verificar intercambio vertical
-            if (row < rows - 1) {
-                if (isValidSwap(row, col, row + 1, col, board)) {
-                    return true;
-                }
-            }
-        }
-    }
-
-    return false;
-}
-
-function isValidSwap(row1, col1, row2, col2, board) {
-    const testBoard = copyBoard(board);
-
-    // Simular intercambio
-    [testBoard[row1][col1], testBoard[row2][col2]] =
-    [testBoard[row2][col2], testBoard[row1][col1]];
-
-    // Verificar si se crean matches
-    const matches = detectPatternsInBoard(testBoard);
-    return matches.size > 0;
-}
-
-function validateFinalBoard(board) {
-    // Verificar que no hay calaveras en fila inferior
-    const bottomRow = board[board.length - 1];
-    if (bottomRow.some(color => color === 'calavera')) {
-        return false;
-    }
-
-    // Verificar que hay movimientos válidos
-    if (!hasValidMoves(board)) {
-        return false;
-    }
-
-    // Verificar que no quedan matches inmediatos
-    const remainingMatches = detectPatternsInBoard(board);
-    if (remainingMatches.size > 0) {
-        return false;
-    }
-
-    return true;
-}
-
-function generateSafeFallbackBoard() {
-    const newBoard = [];
-    const safeColors = COLORS.filter(color => color !== 'calavera');
-
-    for (let row = 0; row < rows; row++) {
-        newBoard[row] = [];
-        for (let col = 0; col < cols; col++) {
-            // Usar solo colores seguros en patrón alternado
-            const colorIndex = (row + col) % safeColors.length;
-            newBoard[row][col] = safeColors[colorIndex];
-        }
-    }
-
-    return newBoard;
-}
-
-async function generateStableBoardWithValidMoves() {
-    const MAX_GENERATION_ATTEMPTS = 50;
-    const MAX_CASCADE_DEPTH = 20;
-
-    console.log('Iniciando generación de tablero estable...');
-
-    for (let attempt = 1; attempt <= MAX_GENERATION_ATTEMPTS; attempt++) {
-        console.log(`Intento de generación ${attempt}/${MAX_GENERATION_ATTEMPTS}`);
-
-        // Fase 1: Generación inicial aleatoria
-        let simulatedBoard = generateRandomBoard(rows, cols);
-
-        // Fase 2: Simulación completa de cascadas
-        let cascadeCount = 0;
-        while (cascadeCount < MAX_CASCADE_DEPTH) {
-            const matches = detectPatternsInBoard(simulatedBoard);
-
-            if (matches.size === 0) {
-                break; // No más cascadas
-            }
-
-            // Simular eliminación y regeneración
-            simulatedBoard = removeMatchesFromBoard(simulatedBoard, matches);
-            simulatedBoard = simulateFallAndGeneration(simulatedBoard);
-
-            cascadeCount++;
-        }
-
-        // Fase 3: Verificaciones finales
-        if (validateFinalBoard(simulatedBoard)) {
-            console.log(`Tablero válido generado en intento ${attempt}`);
-            return simulatedBoard;
-        }
-
-        console.log(`Intento ${attempt} falló verificaciones`);
-    }
-
-    // Fallback: generar tablero seguro
-    console.warn('Usando tablero fallback sin calaveras en fila inferior');
-    return generateSafeFallbackBoard();
-
-}
 function checkSelections() {
     const difficulty = document.getElementById('difficulty').value;
     console.log("Dificultad seleccionada:", difficulty);
@@ -855,8 +907,13 @@ async function fillGrid() {
     isProcessing = true;
     document.getElementById('skull-risk').textContent = '0%';
     
-    // Usar el nuevo algoritmo de generación mejorada
-    board = await generateStableBoardWithValidMoves();
+    const dificultad = document.getElementById('difficulty').value || 'MEDIO';
+    const config = obtenerConfig(dificultad);
+    rows = config.FILAS;
+    cols = config.COLUMNAS;
+
+    // Usar el algoritmo universal parametrizado
+    board = await generarTableroEstableUniversal(dificultad);
     
     // Actualizar la visualización
     for (let row = 0; row < rows; row++) {
@@ -1011,18 +1068,24 @@ function contadorRegresivo() {
 
 document.addEventListener('DOMContentLoaded', () => {
     const difficultySelect = document.getElementById('difficulty');
-    const difficulties = [10, 15, 20];
-    difficultySelect.innerHTML = '<option value="">--Seleccionar--</option>' +
-        difficulties.map(d => `<option value="${d}">${d}x${d}</option>`).join('');
+    const difficultyOptions = Object.entries(DIFICULTADES)
+        .map(([key, value]) => {
+            const label = DIFICULTAD_LABELS[key] || key;
+            return `<option value="${key}">${label} (${value.FILAS}x${value.COLUMNAS})</option>`;
+        })
+        .join('');
+
+    difficultySelect.innerHTML = '<option value="">--Seleccionar--</option>' + difficultyOptions;
     difficultySelect.addEventListener('change', () => {
-        const difficulty = parseInt(difficultySelect.value, 10);
+        const difficulty = difficultySelect.value;
         console.log("Dificultad seleccionada:", difficulty);
         document.getElementById('fill-grid-btn').disabled = !difficulty;
         document.getElementById('reset-game-btn').disabled = !difficulty;
 
         if (difficulty) {
-            rows = difficulty;
-            cols = difficulty;
+            const config = obtenerConfig(difficulty);
+            rows = config.FILAS;
+            cols = config.COLUMNAS;
             resetGame();
         }
     });
