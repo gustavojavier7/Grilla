@@ -763,8 +763,7 @@ async function processMatchedCells(matches) {
 }
 
 function checkNewMatches() {
-    const skipValues = activeConfig?.VALOR_PELIGROSO ? [activeConfig.VALOR_PELIGROSO] : [];
-    return findMatches(board, { skipValues });
+    return findMatches(board, { skipValues: [] });
 }
 
 
