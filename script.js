@@ -13,15 +13,13 @@ const CONFIG = {
 const DIFICULTADES = {
     FACIL: { FILAS: 10, COLUMNAS: 10, MAX_ITERACIONES: 2 },
     MEDIO: { FILAS: 15, COLUMNAS: 15, MAX_ITERACIONES: 3 },
-    DIFICIL: { FILAS: 20, COLUMNAS: 20, MAX_ITERACIONES: 4 },
-    EXPERTO: { FILAS: 25, COLUMNAS: 25, MAX_ITERACIONES: 5 }
+    DIFICIL: { FILAS: 20, COLUMNAS: 20, MAX_ITERACIONES: 4 }
 };
 
 const DIFICULTAD_LABELS = {
     FACIL: 'Fácil',
     MEDIO: 'Medio',
-    DIFICIL: 'Difícil',
-    EXPERTO: 'Experto'
+    DIFICIL: 'Difícil'
 };
 const FALL_DURATION = 0.2; // duration in seconds for a single fall animation
 const FALL_STAGGER_DELAY = 0; // delay between consecutive cell falls in a column
@@ -290,6 +288,38 @@ function inicializarContadores() {
     COLORS.forEach(color => {
         cellCounts[color] = 0;
     });
+}
+
+function recalcularContadoresDesdeBoard() {
+    inicializarContadores();
+    if (!Array.isArray(board) || board.length === 0) {
+        return;
+    }
+
+    for (let row = 0; row < board.length; row++) {
+        for (let col = 0; col < board[row].length; col++) {
+            const color = board[row][col];
+            if (color && cellCounts.hasOwnProperty(color)) {
+                cellCounts[color]++;
+            }
+        }
+    }
+}
+
+function actualizarVisualDesdeTablero() {
+    if (!Array.isArray(cellReferences) || cellReferences.length === 0) {
+        return;
+    }
+
+    for (let row = 0; row < board.length; row++) {
+        for (let col = 0; col < board[row].length; col++) {
+            const cell = cellReferences[row] && cellReferences[row][col];
+            if (!cell) continue;
+
+            const color = board[row][col];
+            cell.className = color ? `cell ${color}` : 'cell';
+        }
+    }
 }
 
 async function generarTableroEstableUniversal(dificultad = 'MEDIO', intentos = 0) {
@@ -833,20 +863,15 @@ function resetGame() {
     updateCellsRemovedDisplay();
 
     // Restablece los contadores de colores
-    cellCounts = {};
-    COLORS.forEach(color => {
-        cellCounts[color] = 0;
-    });
+    inicializarContadores();
+    updateColorSamples();
 
     document.getElementById('current-average').textContent = '000.000';
     document.getElementById('skull-risk').textContent = '0%';
-    
+
     // Recrea la cuadrícula y la llena con colores aleatorios
     createGrid(rows, cols);
-    fillGrid();
-
-    // Actualiza la muestra de colores
-    updateColorSamples();
+    fillGrid(true);
 
     // Oculta el overlay de "GAME OVER" si está visible
     const overlay = document.getElementById('game-over-overlay');
@@ -901,36 +926,83 @@ function updateColorSamples() {
     });
 }
 
-async function fillGrid() {
+function rellenarCeldasVacias() {
+    let celdasRellenadas = 0;
+
+    for (let row = 0; row < board.length; row++) {
+        for (let col = 0; col < board[row].length; col++) {
+            if (board[row][col] === null) {
+                const nuevoColor = getNewWeightedColorOptimized(row, col);
+                board[row][col] = nuevoColor;
+                const cell = cellReferences[row] && cellReferences[row][col];
+                if (cell) {
+                    cell.className = `cell ${nuevoColor}`;
+                }
+                cellCounts[nuevoColor] = (cellCounts[nuevoColor] || 0) + 1;
+                celdasRellenadas++;
+            } else {
+                const cell = cellReferences[row] && cellReferences[row][col];
+                if (cell) {
+                    const colorActual = board[row][col];
+                    cell.className = colorActual ? `cell ${colorActual}` : 'cell';
+                }
+            }
+        }
+    }
+
+    return celdasRellenadas;
+}
+
+async function fillGrid(forceRegeneration = false) {
     if (isProcessing || !document.getElementById('difficulty').value) return;
-    
+
     isProcessing = true;
-    document.getElementById('skull-risk').textContent = '0%';
-    
+
     const dificultad = document.getElementById('difficulty').value || 'MEDIO';
     const config = obtenerConfig(dificultad);
     rows = config.FILAS;
     cols = config.COLUMNAS;
 
-    // Usar el algoritmo universal parametrizado
-    board = await generarTableroEstableUniversal(dificultad);
-    
-    // Actualizar la visualización
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-            const color = board[row][col];
-            cellReferences[row][col].className = `cell ${color}`;
-            cellCounts[color] = (cellCounts[color] || 0) + 1;
+    const boardTieneDimensiones =
+        Array.isArray(board) &&
+        board.length === rows &&
+        rows > 0 &&
+        Array.isArray(board[0]) &&
+        board[0].length === cols;
+
+    const hayCeldasVacias = boardTieneDimensiones && board.some(fila => fila.some(celda => celda === null));
+
+    let seGeneroNuevoTablero = false;
+    let celdasRellenadas = 0;
+
+    if (forceRegeneration || !boardTieneDimensiones) {
+        document.getElementById('skull-risk').textContent = '0%';
+        board = await generarTableroEstableUniversal(dificultad);
+        actualizarVisualDesdeTablero();
+        seGeneroNuevoTablero = true;
+        allowCalaveraGameOver = true;
+        countdownStarted = true;
+        lastUpdateTime = performance.now();
+    } else if (hayCeldasVacias) {
+        celdasRellenadas = rellenarCeldasVacias();
+        if (celdasRellenadas > 0) {
+            allowCalaveraGameOver = true;
         }
+    } else {
+        actualizarVisualDesdeTablero();
     }
-    
+
+    recalcularContadoresDesdeBoard();
     updateSkullRiskDisplay();
     updateColorSamples();
-    allowCalaveraGameOver = true;
-    countdownStarted = true;
-    lastUpdateTime = performance.now();
+
+    if (seGeneroNuevoTablero) {
+        console.log('Tablero estable generado exitosamente');
+    } else if (celdasRellenadas === 0 && !hayCeldasVacias) {
+        console.log('No hay celdas vacías para rellenar.');
+    }
+
     isProcessing = false;
-    console.log('Tablero estable generado exitosamente');
 }
 
 function getGameOverThreshold(rows, cols) {
