@@ -148,8 +148,93 @@ function findMatches(grid, options = {}) {
 }
 
 function detectarPatrones(grilla, config) {
-    const skipValues = config?.VALOR_PELIGROSO ? [config.VALOR_PELIGROSO] : [];
-    return findMatches(grilla, { skipValues });
+    return findMatches(grilla, { skipValues: [] });
+}
+
+function transformarCalaverasEnPatrones(grilla, config) {
+    const nuevaGrilla = grilla.map(fila => [...fila]);
+    const matches = findMatches(nuevaGrilla, { skipValues: [] });
+
+    if (matches.size === 0) {
+        return nuevaGrilla;
+    }
+
+    const patrones = agruparPatronesConectados(matches, nuevaGrilla);
+
+    patrones.forEach(patron => {
+        if (esPatronDeCalaveras(patron, nuevaGrilla)) {
+            transformarUnaCalavera(patron, nuevaGrilla, config);
+        }
+    });
+
+    return nuevaGrilla;
+}
+
+function agruparPatronesConectados(matches, grilla) {
+    const visitado = new Set();
+    const patrones = [];
+
+    matches.forEach(coord => {
+        if (visitado.has(coord)) return;
+
+        const [fila, col] = coord.split(',').map(Number);
+        const color = grilla[fila][col];
+        const patron = new Set();
+        const stack = [[fila, col]];
+
+        while (stack.length > 0) {
+            const [r, c] = stack.pop();
+            const key = `${r},${c}`;
+
+            if (visitado.has(key)) continue;
+            if (grilla[r][c] !== color) continue;
+
+            visitado.add(key);
+            patron.add(key);
+
+            const direcciones = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+            direcciones.forEach(([dr, dc]) => {
+                const nr = r + dr;
+                const nc = c + dc;
+                if (nr >= 0 && nr < grilla.length && nc >= 0 && nc < grilla[0].length) {
+                    const nkey = `${nr},${nc}`;
+                    if (matches.has(nkey) && !visitado.has(nkey)) {
+                        stack.push([nr, nc]);
+                    }
+                }
+            });
+        }
+
+        if (patron.size >= 3) {
+            patrones.push(patron);
+        }
+    });
+
+    return patrones;
+}
+
+function esPatronDeCalaveras(patron, grilla) {
+    const primeraCoord = Array.from(patron)[0];
+    const [fila, col] = primeraCoord.split(',').map(Number);
+    return grilla[fila][col] === 'calavera';
+}
+
+function transformarUnaCalavera(patron, grilla, config) {
+    const calaverasEnPatron = Array.from(patron).filter(coord => {
+        const [fila, col] = coord.split(',').map(Number);
+        return grilla[fila][col] === 'calavera';
+    });
+
+    if (calaverasEnPatron.length === 0) return;
+
+    const calaveraElegida = calaverasEnPatron[Math.floor(Math.random() * calaverasEnPatron.length)];
+    const [fila, col] = calaveraElegida.split(',').map(Number);
+
+    const coloresSeguros = config.VALORES_SEGUROS_FILA_0;
+    const nuevoColor = coloresSeguros[Math.floor(Math.random() * coloresSeguros.length)];
+
+    grilla[fila][col] = nuevoColor;
+    console.log(`Transformada calavera en (${fila},${col}) a ${nuevoColor}`);
 }
 
 function eliminarMatches(grilla, matches) {
@@ -203,6 +288,8 @@ function aplicarGravedadCompactacion(grilla, config) {
 async function estabilizarTableroParametrizado(grilla, config) {
     let iteraciones = 0;
     while (true) {
+        grilla = transformarCalaverasEnPatrones(grilla, config);
+
         const matches = detectarPatrones(grilla, config);
         if (matches.size === 0) {
             break;
@@ -211,6 +298,11 @@ async function estabilizarTableroParametrizado(grilla, config) {
         grilla = eliminarMatches(grilla, matches);
         grilla = aplicarGravedadCompactacion(grilla, config);
         iteraciones++;
+
+        if (iteraciones >= config.PROTECCION_ANTI_LOOP) {
+            console.warn('Protección anti-loop activada en estabilización');
+            break;
+        }
     }
 
     return grilla;
@@ -443,8 +535,7 @@ async function checkPatterns() {
     isProcessing = true;
     manageClock();
     const cells = document.querySelectorAll('.cell');
-    const skipValues = activeConfig?.VALOR_PELIGROSO ? [activeConfig.VALOR_PELIGROSO] : [];
-    const matches = findMatches(board, { skipValues });
+    const matches = findMatches(board, { skipValues: [] });
 
     if (matches.size > 0) {
         await handleCascade(matches);
@@ -455,14 +546,24 @@ async function checkPatterns() {
 }
 
 async function handleCascade(matches) {
-    // Previously the grid flashed here; effect removed
-    matches.forEach(coord => {
+    board = transformarCalaverasEnPatrones(board, activeConfig);
+    actualizarVisualDesdeTablero();
+
+    const matchesActualizados = findMatches(board, { skipValues: [] });
+
+    if (matchesActualizados.size === 0) {
+        isProcessing = false;
+        return;
+    }
+
+    matchesActualizados.forEach(coord => {
         const [row, col] = coord.split(',').map(Number);
         const cell = cellReferences[row][col];
         cell.classList.add('matched');
     });
+
     await wait(700);
-    await processMatchedCells(matches);
+    await processMatchedCells(matchesActualizados);
 }
 
 function getNewWeightedColorOptimized(row, col) {
