@@ -6,14 +6,13 @@ const CONFIG = {
     VALORES_PERMITIDOS: COLORS,
     VALOR_PELIGROSO: 'calavera',
     VALORES_SEGUROS_FILA_0: COLORS.filter(color => color !== 'calavera'),
-    MAX_ITERACIONES_ESTABILIZACION: 3,
     PROTECCION_ANTI_LOOP: 15
 };
 
 const DIFICULTADES = {
-    FACIL: { FILAS: 10, COLUMNAS: 10, MAX_ITERACIONES: 2 },
-    MEDIO: { FILAS: 15, COLUMNAS: 15, MAX_ITERACIONES: 3 },
-    DIFICIL: { FILAS: 20, COLUMNAS: 20, MAX_ITERACIONES: 4 }
+    FACIL: { FILAS: 10, COLUMNAS: 10 },
+    MEDIO: { FILAS: 15, COLUMNAS: 15 },
+    DIFICIL: { FILAS: 20, COLUMNAS: 20 }
 };
 
 const DIFICULTAD_LABELS = {
@@ -66,8 +65,7 @@ function obtenerConfig(dificultad = 'MEDIO') {
         ...CONFIG,
         ...override,
         FILAS: filas,
-        COLUMNAS: columnas,
-        MAX_ITERACIONES_ESTABILIZACION: Math.ceil(filas / 5)
+        COLUMNAS: columnas
     };
 }
 
@@ -229,13 +227,8 @@ function aplicarGravedadCompactacion(grilla, config) {
 }
 
 async function estabilizarTableroParametrizado(grilla, config) {
-    const maxIter = Math.min(
-        config.MAX_ITERACIONES_ESTABILIZACION,
-        Math.ceil(config.FILAS / 7)
-    );
-
     let iteraciones = 0;
-    while (iteraciones < maxIter) {
+    while (true) {
         const matches = detectarPatrones(grilla, config);
         if (matches.size === 0) {
             break;
@@ -246,25 +239,6 @@ async function estabilizarTableroParametrizado(grilla, config) {
         iteraciones++;
     }
 
-    if (detectarPatrones(grilla, config).size > 0) {
-        console.warn('Estabilización incompleta, aplicando fallback');
-        grilla = generarFallbackParametrizado(config);
-    }
-
-    return grilla;
-}
-
-function generarFallbackParametrizado(config) {
-    const grilla = [];
-    for (let fila = 0; fila < config.FILAS; fila++) {
-        grilla[fila] = [];
-        for (let col = 0; col < config.COLUMNAS; col++) {
-            const valores = fila === config.FILAS - 1
-                ? config.VALORES_SEGUROS_FILA_0
-                : config.VALORES_PERMITIDOS;
-            grilla[fila][col] = valores[(fila + col) % valores.length];
-        }
-    }
     return grilla;
 }
 
