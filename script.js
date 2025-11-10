@@ -23,6 +23,8 @@ const DIFICULTAD_LABELS = {
 const FALL_DURATION = 0.2; // duration in seconds for a single fall animation
 const FALL_STAGGER_DELAY = 0; // delay between consecutive cell falls in a column
 let gameContainer = document.getElementById('game-container');
+// El tablero utiliza la convención estándar de matrices: fila 0 es la parte superior
+// y la fila (FILAS - 1) es la base visible para el jugador.
 let board = [];
 let cellReferences = [];
 let firstSelected = null;
@@ -30,6 +32,7 @@ let isProcessing = false;
 let contadorDeCeldasEnRonda = 0;
 let rows = 10;
 let cols = 10;
+let activeConfig = { ...CONFIG };
 let cellCounts = {};
 let totalCellsRemoved = 0;
 let mainSeparatorVisible = true;
@@ -80,14 +83,14 @@ function generarValorAleatorio(rango) {
 
 function generarLlenadoParametrizado(config) {
     const grilla = [];
-    const ultimaFila = config.FILAS - 1;
+    const bottomRowIndex = config.FILAS - 1;
 
-    grilla[ultimaFila] = [];
+    grilla[bottomRowIndex] = [];
     for (let col = 0; col < config.COLUMNAS; col++) {
-        grilla[ultimaFila][col] = generarValorSeguro(config);
+        grilla[bottomRowIndex][col] = generarValorSeguro(config);
     }
 
-    for (let fila = 0; fila < ultimaFila; fila++) {
+    for (let fila = 0; fila < bottomRowIndex; fila++) {
         grilla[fila] = [];
         for (let col = 0; col < config.COLUMNAS; col++) {
             grilla[fila][col] = generarValorAleatorio(config.VALORES_PERMITIDOS);
@@ -97,85 +100,56 @@ function generarLlenadoParametrizado(config) {
     return grilla;
 }
 
-function detectarPatrones(grilla, config) {
+function findMatches(grid, options = {}) {
+    if (!Array.isArray(grid) || grid.length === 0 || !Array.isArray(grid[0])) {
+        return new Set();
+    }
+
+    const rows = grid.length;
+    const cols = grid[0].length;
     const matches = new Set();
-    const filas = grilla.length;
-    const columnas = grilla[0].length;
-    const peligroso = config.VALOR_PELIGROSO;
+    const skipValues = new Set(options.skipValues || []);
 
-    for (let fila = 0; fila < filas; fila++) {
-        for (let col = 0; col < columnas - 2; col++) {
-            const color = grilla[fila][col];
-            if (!color || color === peligroso) continue;
-            if (grilla[fila][col + 1] === color && grilla[fila][col + 2] === color) {
-                matches.add(`${fila},${col}`);
-                matches.add(`${fila},${col + 1}`);
-                matches.add(`${fila},${col + 2}`);
-            }
-        }
+    if (options.peligroso) {
+        skipValues.add(options.peligroso);
     }
 
-    for (let fila = 0; fila < filas - 2; fila++) {
-        for (let col = 0; col < columnas; col++) {
-            const color = grilla[fila][col];
-            if (!color || color === peligroso) continue;
-            if (grilla[fila + 1][col] === color && grilla[fila + 2][col] === color) {
-                matches.add(`${fila},${col}`);
-                matches.add(`${fila + 1},${col}`);
-                matches.add(`${fila + 2},${col}`);
-            }
-        }
-    }
+    const shouldSkip = value => value == null || skipValues.has(value);
+    const directions = [
+        { dr: 0, dc: 1 },   // Horizontal
+        { dr: 1, dc: 0 },   // Vertical
+        { dr: 1, dc: 1 },   // Diagonal descendente derecha
+        { dr: 1, dc: -1 }   // Diagonal descendente izquierda
+    ];
 
-    for (let fila = 0; fila < filas - 2; fila++) {
-        for (let col = 0; col < columnas - 2; col++) {
-            const color = grilla[fila][col];
-            if (!color || color === peligroso) continue;
-            if (grilla[fila + 1][col + 1] === color && grilla[fila + 2][col + 2] === color) {
-                matches.add(`${fila},${col}`);
-                matches.add(`${fila + 1},${col + 1}`);
-                matches.add(`${fila + 2},${col + 2}`);
-            }
-        }
-    }
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const color = grid[row][col];
+            if (shouldSkip(color)) continue;
 
-    for (let fila = 0; fila < filas - 2; fila++) {
-        for (let col = 2; col < columnas; col++) {
-            const color = grilla[fila][col];
-            if (!color || color === peligroso) continue;
-            if (grilla[fila + 1][col - 1] === color && grilla[fila + 2][col - 2] === color) {
-                matches.add(`${fila},${col}`);
-                matches.add(`${fila + 1},${col - 1}`);
-                matches.add(`${fila + 2},${col - 2}`);
-            }
-        }
-    }
+            for (const { dr, dc } of directions) {
+                const row2 = row + 2 * dr;
+                const col2 = col + 2 * dc;
 
-    for (let fila = 2; fila < filas; fila++) {
-        for (let col = 0; col < columnas - 2; col++) {
-            const color = grilla[fila][col];
-            if (!color || color === peligroso) continue;
-            if (grilla[fila - 1][col + 1] === color && grilla[fila - 2][col + 2] === color) {
-                matches.add(`${fila},${col}`);
-                matches.add(`${fila - 1},${col + 1}`);
-                matches.add(`${fila - 2},${col + 2}`);
-            }
-        }
-    }
+                if (row2 < 0 || row2 >= rows || col2 < 0 || col2 >= cols) continue;
 
-    for (let fila = 2; fila < filas; fila++) {
-        for (let col = 2; col < columnas; col++) {
-            const color = grilla[fila][col];
-            if (!color || color === peligroso) continue;
-            if (grilla[fila - 1][col - 1] === color && grilla[fila - 2][col - 2] === color) {
-                matches.add(`${fila},${col}`);
-                matches.add(`${fila - 1},${col - 1}`);
-                matches.add(`${fila - 2},${col - 2}`);
+                const row1 = row + dr;
+                const col1 = col + dc;
+
+                if (grid[row1][col1] === color && grid[row2][col2] === color) {
+                    matches.add(`${row},${col}`);
+                    matches.add(`${row1},${col1}`);
+                    matches.add(`${row2},${col2}`);
+                }
             }
         }
     }
 
     return matches;
+}
+
+function detectarPatrones(grilla, config) {
+    return findMatches(grilla, { peligroso: config?.VALOR_PELIGROSO });
 }
 
 function eliminarMatches(grilla, matches) {
@@ -243,8 +217,8 @@ async function estabilizarTableroParametrizado(grilla, config) {
 }
 
 function validarEstadoInicialParametrizado(grilla, config) {
-    const ultimaFila = grilla[config.FILAS - 1];
-    const cerosEnBase = ultimaFila.filter(valor => valor === config.VALOR_PELIGROSO).length;
+    const bottomRow = grilla[config.FILAS - 1];
+    const cerosEnBase = bottomRow.filter(valor => valor === config.VALOR_PELIGROSO).length;
     if (cerosEnBase > 0) {
         console.error(`ERROR: ${cerosEnBase} valores peligrosos en fila base`);
         return false;
@@ -338,98 +312,6 @@ function getCellDimensions() {
     }
     // Fallback si la celda no se ha renderizado
     return { size: 40, gap: 2 };
-}
-
-function detectPatternsInBoard(board) {
-    const matches = new Set();
-    const rows = board.length;
-    const cols = board[0].length;
-
-    // Detectar matches horizontales
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols - 2; col++) {
-            const color = board[row][col];
-            if (color &&
-                board[row][col + 1] === color &&
-                board[row][col + 2] === color) {
-                matches.add(`${row},${col}`);
-                matches.add(`${row},${col + 1}`);
-                matches.add(`${row},${col + 2}`);
-            }
-        }
-    }
-
-    // Detectar matches verticales
-    for (let row = 0; row < rows - 2; row++) {
-        for (let col = 0; col < cols; col++) {
-            const color = board[row][col];
-            if (color &&
-                board[row + 1][col] === color &&
-                board[row + 2][col] === color) {
-                matches.add(`${row},${col}`);
-                matches.add(`${row + 1},${col}`);
-                matches.add(`${row + 2},${col}`);
-            }
-        }
-    }
-
-    // Detectar matches diagonales (Descendente Derecha)
-    for (let row = 0; row < rows - 2; row++) {
-        for (let col = 0; col < cols - 2; col++) {
-            const color = board[row][col];
-            if (color &&
-                board[row + 1][col + 1] === color &&
-                board[row + 2][col + 2] === color) {
-                matches.add(`${row},${col}`);
-                matches.add(`${row + 1},${col + 1}`);
-                matches.add(`${row + 2},${col + 2}`);
-            }
-        }
-    }
-
-    // Detectar matches diagonales (Descendente Izquierda)
-    for (let row = 0; row < rows - 2; row++) {
-        for (let col = 2; col < cols; col++) {
-            const color = board[row][col];
-            if (color &&
-                board[row + 1][col - 1] === color &&
-                board[row + 2][col - 2] === color) {
-                matches.add(`${row},${col}`);
-                matches.add(`${row + 1},${col - 1}`);
-                matches.add(`${row + 2},${col - 2}`);
-            }
-        }
-    }
-
-    // Detectar matches diagonales (Ascendente Derecha)
-    for (let row = 2; row < rows; row++) {
-        for (let col = 0; col < cols - 2; col++) {
-            const color = board[row][col];
-            if (color &&
-                board[row - 1][col + 1] === color &&
-                board[row - 2][col + 2] === color) {
-                matches.add(`${row},${col}`);
-                matches.add(`${row - 1},${col + 1}`);
-                matches.add(`${row - 2},${col + 2}`);
-            }
-        }
-    }
-
-    // Detectar matches diagonales (Ascendente Izquierda)
-    for (let row = 2; row < rows; row++) {
-        for (let col = 2; col < cols; col++) {
-            const color = board[row][col];
-            if (color &&
-                board[row - 1][col - 1] === color &&
-                board[row - 2][col - 2] === color) {
-                matches.add(`${row},${col}`);
-                matches.add(`${row - 1},${col - 1}`);
-                matches.add(`${row - 2},${col - 2}`);
-            }
-        }
-    }
-
-    return matches;
 }
 
 function checkSelections() {
@@ -556,51 +438,12 @@ function swapColors(cell1, cell2) {
     allowCalaveraGameOver = true; // A partir de aquí, la calavera en la última fila puede provocar GAME OVER
 }
 
-function checkLine(startRow, startCol, deltaRow, deltaCol) {
-    const color = board[startRow][startCol];
-    for (let i = 1; i < 3; i++) {
-        const row = startRow + i * deltaRow;
-        const col = startCol + i * deltaCol;
-        if (board[row][col] !== color) return false;
-    }
-    return true;
-}
-
 async function checkPatterns() {
     if (isProcessing) return;
     isProcessing = true;
     manageClock();
     const cells = document.querySelectorAll('.cell');
-    const rows = board.length;
-    const cols = board[0].length;
-    const matches = new Set();
-
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-            if (board[row][col]) {
-                if (col < cols - 2 && checkLine(row, col, 0, 1)) {
-                    matches.add(`${row},${col}`);
-                    matches.add(`${row},${col + 1}`);
-                    matches.add(`${row},${col + 2}`);
-                }
-                if (row < rows - 2 && checkLine(row, col, 1, 0)) {
-                    matches.add(`${row},${col}`);
-                    matches.add(`${row + 1},${col}`);
-                    matches.add(`${row + 2},${col}`);
-                }
-                if (row < rows - 2 && col < cols - 2 && checkLine(row, col, 1, 1)) {
-                    matches.add(`${row},${col}`);
-                    matches.add(`${row + 1},${col + 1}`);
-                    matches.add(`${row + 2},${col + 2}`);
-                }
-                if (row > 1 && col < cols - 2 && checkLine(row, col, -1, 1)) {
-                    matches.add(`${row},${col}`);
-                    matches.add(`${row - 1},${col + 1}`);
-                    matches.add(`${row - 2},${col + 2}`);
-                }
-            }
-        }
-    }
+    const matches = findMatches(board, { peligroso: activeConfig?.VALOR_PELIGROSO });
 
     if (matches.size > 0) {
         await handleCascade(matches);
@@ -778,38 +621,7 @@ async function processMatchedCells(matches) {
 }
 
 function checkNewMatches() {
-    const rows = board.length;
-    const cols = board[0].length;
-    const newMatches = new Set();
-
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-            if (board[row][col]) {
-                if (col < cols - 2 && checkLine(row, col, 0, 1)) {
-                    newMatches.add(`${row},${col}`);
-                    newMatches.add(`${row},${col + 1}`);
-                    newMatches.add(`${row},${col + 2}`);
-                }
-                if (row < rows - 2 && checkLine(row, col, 1, 0)) {
-                    newMatches.add(`${row},${col}`);
-                    newMatches.add(`${row + 1},${col}`);
-                    newMatches.add(`${row + 2},${col}`);
-                }
-                if (row < rows - 2 && col < cols - 2 && checkLine(row, col, 1, 1)) {
-                    newMatches.add(`${row},${col}`);
-                    newMatches.add(`${row + 1},${col + 1}`);
-                    newMatches.add(`${row + 2},${col + 2}`);
-                }
-                if (row > 1 && col < cols - 2 && checkLine(row, col, -1, 1)) {
-                    newMatches.add(`${row},${col}`);
-                    newMatches.add(`${row - 1},${col + 1}`);
-                    newMatches.add(`${row - 2},${col + 2}`);
-                }
-            }
-        }
-    }
-
-    return newMatches;
+    return findMatches(board, { peligroso: activeConfig?.VALOR_PELIGROSO });
 }
 
 
@@ -936,6 +748,7 @@ async function fillGrid(forceRegeneration = false) {
     const config = obtenerConfig(dificultad);
     rows = config.FILAS;
     cols = config.COLUMNAS;
+    activeConfig = config;
 
     const boardTieneDimensiones =
         Array.isArray(board) &&
