@@ -734,8 +734,8 @@ async function processMatchedCells(matches) {
 
     await wait((maxDelay + FALL_DURATION) * 1000);
 
-    const riesgo = calcularRRC_SimpleAbierto(board, activeConfig);
-    actualizarIndicadorRiesgoSimpleAbierto(riesgo);
+    const riesgoActual = calcularRRC_Nuevo(board, activeConfig);
+    updateSkullRiskDisplay(riesgoActual);
 
     newMatches = checkNewMatches();
 
@@ -771,8 +771,7 @@ async function processMatchedCells(matches) {
             cell.classList.remove('processing');
         });
 
-        const riesgoFinal = calcularRRC_SimpleAbierto(board, activeConfig);
-        skullRiskHistory.push(Math.round(riesgoFinal * 100));
+        skullRiskHistory.push(Math.round(riesgoActual));
         if (skullRiskHistory.length > 5) {
             skullRiskHistory.shift();
         }
@@ -814,7 +813,7 @@ function resetGame() {
     updateColorSamples();
 
     document.getElementById('current-average').textContent = '000.000';
-    document.getElementById('skull-risk').textContent = '0% (Abierto)';
+    document.getElementById('skull-risk').textContent = '0% (Nuevo)';
 
     // Recrea la cuadrícula y la llena con colores aleatorios
     createGrid(rows, cols);
@@ -925,7 +924,7 @@ async function fillGrid(forceRegeneration = false) {
     let celdasRellenadas = 0;
 
     if (forceRegeneration || !boardTieneDimensiones) {
-        document.getElementById('skull-risk').textContent = '0% (Abierto)';
+        document.getElementById('skull-risk').textContent = '0% (Nuevo)';
         board = await generarTableroEstableUniversal(dificultad);
         actualizarVisualDesdeTablero();
         seGeneroNuevoTablero = true;
@@ -1022,8 +1021,8 @@ function obtenerSwapsLegales(tablero, config) {
     return swaps;
 }
 
-function updateSkullRiskDisplay() {
-    const risk = calcularRRC_Nuevo(board, activeConfig);
+function updateSkullRiskDisplay(riskOverride) {
+    const risk = Number.isFinite(riskOverride) ? riskOverride : calcularRRC_Nuevo(board, activeConfig);
     const riskElement = document.getElementById('skull-risk');
     const porcentaje = Math.round(risk);
     riskElement.textContent = `${porcentaje}% (Nuevo)`;
