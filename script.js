@@ -527,6 +527,18 @@ function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function setProcessingState(active) {
+    isProcessing = active;
+    const cells = document.querySelectorAll('.cell');
+    cells.forEach(cell => {
+        if (active) {
+            cell.classList.add('processing');
+        } else {
+            cell.classList.remove('processing');
+        }
+    });
+}
+
 
 function createGrid(rows, cols) {
     gameContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
@@ -591,16 +603,14 @@ function swapColors(cell1, cell2) {
 
 async function checkPatterns() {
     if (isProcessing) return;
-    isProcessing = true;
+    setProcessingState(true);
     manageClock();
-    const cells = document.querySelectorAll('.cell');
     const matches = findMatches(board, { skipValues: [] });
 
     if (matches.size > 0) {
         await handleCascade(matches);
     } else {
-        isProcessing = false;
-        cells.forEach(cell => cell.classList.remove('processing'));
+        setProcessingState(false);
     }
 }
 
@@ -610,7 +620,7 @@ async function handleCascade(matches) {
     }
 
     if (matches.size === 0) {
-        isProcessing = false;
+        setProcessingState(false);
         return;
     }
 
@@ -739,7 +749,7 @@ async function processMatchedCells(matches) {
     if (newMatches.size > 0) {
         await handleCascade(newMatches);
     } else {
-        isProcessing = false;
+        setProcessingState(false);
         manageClock();
 
         cellsRemovedHistory.push(contadorDeCeldasEnRonda);
@@ -762,11 +772,6 @@ async function processMatchedCells(matches) {
         }
 
         contadorDeCeldasEnRonda = 0;
-        isProcessing = false;
-        manageClock();
-        document.querySelectorAll('.cell').forEach(cell => {
-            cell.classList.remove('processing');
-        });
 
         try {
             const riesgoFinal = calcularRRC_Nuevo(board, activeConfig);
@@ -805,6 +810,8 @@ function resetGame() {
     clearAllTimeouts();
     clearAllIntervals();
 
+    setProcessingState(false);
+
     // Restablece los contadores
     countdown = 60;
     countdownStarted = false;
@@ -831,7 +838,7 @@ function resetGame() {
     }
 
     // Asegúrate de que el juego puede ser jugado de nuevo
-    isProcessing = false;
+    setProcessingState(false);
 
     // Habilita botones basados en la selección de dificultad
     checkSelections();
@@ -907,7 +914,7 @@ function rellenarCeldasVacias() {
 async function fillGrid(forceRegeneration = false) {
     if (isProcessing || !document.getElementById('difficulty').value) return;
 
-    isProcessing = true;
+    setProcessingState(true);
 
     const dificultad = document.getElementById('difficulty').value || 'MEDIO';
     const config = obtenerConfig(dificultad);
@@ -955,7 +962,7 @@ async function fillGrid(forceRegeneration = false) {
         console.log('No hay celdas vacías para rellenar.');
     }
 
-    isProcessing = false;
+    setProcessingState(false);
 }
 
 function getGameOverThreshold(rows, cols) {
@@ -986,8 +993,7 @@ function showGameOver(reason) {
     }
 
     overlay.style.display = 'flex';
-    isProcessing = true; // Asegúrate de que esto está en true para evitar nuevas interacciones
-    document.querySelectorAll('.cell').forEach(cell => cell.classList.add('processing'));
+    setProcessingState(true); // Asegúrate de que esto está en true para evitar nuevas interacciones
 }
 
 function updateSkullRiskDisplay(riskOverride) {
