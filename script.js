@@ -734,7 +734,8 @@ async function processMatchedCells(matches) {
 
     await wait((maxDelay + FALL_DURATION) * 1000);
 
-    updateSkullRiskDisplay();
+    const riesgo = calcularRRC_SimpleAbierto(board, activeConfig);
+    actualizarIndicadorRiesgoSimpleAbierto(riesgo);
 
     newMatches = checkNewMatches();
 
@@ -770,8 +771,8 @@ async function processMatchedCells(matches) {
             cell.classList.remove('processing');
         });
 
-        const risk = calculateSkullRisk();
-        skullRiskHistory.push(risk);
+        const riesgoFinal = calcularRRC_SimpleAbierto(board, activeConfig);
+        skullRiskHistory.push(Math.round(riesgoFinal * 100));
         if (skullRiskHistory.length > 5) {
             skullRiskHistory.shift();
         }
@@ -813,7 +814,7 @@ function resetGame() {
     updateColorSamples();
 
     document.getElementById('current-average').textContent = '000.000';
-    document.getElementById('skull-risk').textContent = '0%';
+    document.getElementById('skull-risk').textContent = '0% (Abierto)';
 
     // Recrea la cuadrícula y la llena con colores aleatorios
     createGrid(rows, cols);
@@ -924,7 +925,7 @@ async function fillGrid(forceRegeneration = false) {
     let celdasRellenadas = 0;
 
     if (forceRegeneration || !boardTieneDimensiones) {
-        document.getElementById('skull-risk').textContent = '0%';
+        document.getElementById('skull-risk').textContent = '0% (Abierto)';
         board = await generarTableroEstableUniversal(dificultad);
         actualizarVisualDesdeTablero();
         seGeneroNuevoTablero = true;
@@ -985,47 +986,103 @@ function showGameOver(reason) {
     document.querySelectorAll('.cell').forEach(cell => cell.classList.add('processing'));
 }
 
-function calculateSkullRisk() {
-    const rows = board.length;
-    const cols = board[0].length;
+function contarCalaverasPorColumna(tablero, config) {
+    const calaverasPorCol = new Array(config.COLUMNAS).fill(0);
+    const peligrosos = [];
 
-    if (rows === 0 || cols === 0) {
-        return 0;
-    }
-
-    let totalDepthWeight = 0;
-    let skullCount = 0;
-
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-            if (board[row][col] === 'calavera') {
-                skullCount++;
-                const depthWeight = rows === 1 ? 1 : row / (rows - 1);
-                totalDepthWeight += depthWeight;
-                console.log(`Calavera en (${row}, ${col}) con peso de profundidad ${depthWeight.toFixed(2)}`);
+    for (let r = 0; r < config.FILAS; r++) {
+        for (let c = 0; c < config.COLUMNAS; c++) {
+            if (tablero[r][c] === config.VALOR_PELIGROSO) {
+                calaverasPorCol[c]++;
+                peligrosos.push({ r, c });
             }
         }
     }
 
-    if (skullCount === 0) {
-        console.log('No hay calaveras. Riesgo = 0%');
-        return 0;
-    }
+    const numColumnasConCalaveras = calaverasPorCol.filter(count => count > 0).length;
+    return { calaverasPorCol, numColumnasConCalaveras, peligrosos };
+}
 
-    const averageDepth = totalDepthWeight / skullCount;
-    const riskScore = averageDepth * 100;
-    const risk = Math.min(100, Math.round(riskScore));
-    console.log(`Total calaveras: ${skullCount}, Profundidad promedio: ${averageDepth.toFixed(4)}, Riesgo: ${risk}%`);
-    return risk;
+function obtenerSwapsLegales(tablero, config) {
+    const swaps = [];
+    const valorPeligroso = config.VALOR_PELIGROSO;
+
+    for (let r = 0; r < config.FILAS; r++) {
+        for (let c = 0; c < config.COLUMNAS; c++) {
+            if (tablero[r][c] === null || tablero[r][c] === valorPeligroso) continue;
+
+            if (c < config.COLUMNAS - 1 && tablero[r][c + 1] !== valorPeligroso && tablero[r][c + 1] !== null) {
+                swaps.push({ r1: r, c1: c, r2: r, c2: c + 1 });
+            }
+            if (r < config.FILAS - 1 && tablero[r + 1][c] !== valorPeligroso && tablero[r + 1][c] !== null) {
+                swaps.push({ r1: r, c1: c, r2: r + 1, c2: c });
+            }
+        }
+    }
+    return swaps;
 }
 
 function updateSkullRiskDisplay() {
-    const risk = calculateSkullRisk();
+    const riesgo = calcularRRC_SimpleAbierto(board, activeConfig);
+    actualizarIndicadorRiesgoSimpleAbierto(riesgo);
+}
+
+function calcularRRC_SimpleAbierto(tablero, config) {
+    const filas = config.FILAS;
+    const columnas = config.COLUMNAS;
+    if (filas === 0 || columnas === 0) return 0;
+
+    const { calaverasPorCol, numColumnasConCalaveras, peligrosos } = contarCalaverasPorColumna(tablero, config);
+    if (peligrosos.length === 0) return 0;
+
+    const swapsLegales = obtenerSwapsLegales(tablero, config);
+    const numSwaps = swapsLegales.length || 1;
+
+    let sumaRiesgoInd = 0;
+    for (const peligroso of peligrosos) {
+        const r = peligroso.r;
+        const c = peligroso.c;
+        const distanciaABase = filas - 1 - r;
+        if (distanciaABase <= 0) return Infinity;
+
+        const margenNormalizado = distanciaABase / (filas - 1);
+        const numEnColumna = calaverasPorCol[c];
+        const riesgoInd = (1 - margenNormalizado) / numEnColumna;
+        sumaRiesgoInd += riesgoInd;
+    }
+
+    const rrc = (sumaRiesgoInd * numColumnasConCalaveras) / numSwaps;
+    const porcentaje = Math.round(rrc * 100);
+
+    console.log(`RRC-Simple Abierto: ${porcentaje}% | Calaveras: ${peligrosos.length} | Columnas riesgo: ${numColumnasConCalaveras} | Swaps: ${numSwaps} | Suma ind: ${sumaRiesgoInd.toFixed(2)}`);
+
+    return rrc;
+}
+
+function actualizarIndicadorRiesgoSimpleAbierto(riesgo) {
     const riskElement = document.getElementById('skull-risk');
-    riskElement.textContent = `${risk}%`;
-    if (risk > 75) {
+    const porcentaje = Math.round(riesgo * 100);
+    riskElement.textContent = `${porcentaje}% (Abierto)`;
+
+    riskElement.classList.remove('bajo', 'medio', 'alto', 'critico', 'explosivo');
+    riskElement.classList.remove('blink-risk');
+    if (riesgo < 0.01) {
+        riskElement.classList.add('bajo');
+        riskElement.style.color = '#4CAF50';
+    } else if (riesgo < 0.03) {
+        riskElement.classList.add('medio');
+        riskElement.style.color = '#FF9800';
+    } else if (riesgo < 0.07) {
+        riskElement.classList.add('alto');
+        riskElement.style.color = '#F44336';
+    } else if (riesgo < 0.20) {
+        riskElement.classList.add('critico');
+        riskElement.style.color = '#9C27B0';
         riskElement.classList.add('blink-risk');
-        setTimeout(() => riskElement.classList.remove('blink-risk'), 1000);
+    } else {
+        riskElement.classList.add('explosivo');
+        riskElement.style.color = '#FF0000';
+        riskElement.classList.add('blink-risk');
     }
 }
 
