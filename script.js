@@ -735,7 +735,7 @@ async function processMatchedCells(matches) {
     await wait((maxDelay + FALL_DURATION) * 1000);
 
     const riesgoActual = calcularRRC_Nuevo(board, activeConfig);
-    updateSkullRiskDisplay();
+    updateSkullRiskDisplay(riesgoActual);
 
     newMatches = checkNewMatches();
 
@@ -1021,8 +1021,8 @@ function obtenerSwapsLegales(tablero, config) {
     return swaps;
 }
 
-function updateSkullRiskDisplay() {
-    const risk = calcularRRC_Nuevo(board, activeConfig);
+function updateSkullRiskDisplay(riskOverride) {
+    const risk = Number.isFinite(riskOverride) ? riskOverride : calcularRRC_Nuevo(board, activeConfig);
     const riskElement = document.getElementById('skull-risk');
     const porcentaje = Math.round(risk);
     riskElement.textContent = `${porcentaje}% (Nuevo)`;
@@ -1116,11 +1116,6 @@ function calcularRRC_Nuevo(tablero, config) {
     const rrc = pa + pc + pl; // Abierta: sin límite
     console.log(`RRC Nuevo Abierto: ${Math.round(rrc)} | Asim: ${pa.toFixed(1)} | Cerc: ${pc.toFixed(1)} | Linea: ${pl}`);
     return rrc;
-}
-
-// Compatibilidad con versiones anteriores: alias al cálculo actual
-function calcularRRC_SimpleAbierto(tablero, config) {
-    return calcularRRC_Nuevo(tablero, config);
 }
 
 function updateCellsRemovedDisplay() {
