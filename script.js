@@ -734,9 +734,6 @@ async function processMatchedCells(matches) {
 
     await wait((maxDelay + FALL_DURATION) * 1000);
 
-    const riesgoActual = calcularRRC_Nuevo(board, activeConfig);
-    updateSkullRiskDisplay(riesgoActual);
-
     newMatches = checkNewMatches();
 
     if (newMatches.size > 0) {
@@ -771,7 +768,15 @@ async function processMatchedCells(matches) {
             cell.classList.remove('processing');
         });
 
-        skullRiskHistory.push(Math.round(riesgoActual));
+        try {
+            const riesgoFinal = calcularRRC_Nuevo(board, activeConfig);
+            updateSkullRiskDisplay(riesgoFinal);
+            skullRiskHistory.push(Math.round(riesgoFinal));
+        } catch (e) {
+            console.error('Error en RRC:', e);
+            updateSkullRiskDisplay(0);
+            skullRiskHistory.push(0);
+        }
         if (skullRiskHistory.length > 5) {
             skullRiskHistory.shift();
         }
@@ -983,42 +988,6 @@ function showGameOver(reason) {
     overlay.style.display = 'flex';
     isProcessing = true; // Asegúrate de que esto está en true para evitar nuevas interacciones
     document.querySelectorAll('.cell').forEach(cell => cell.classList.add('processing'));
-}
-
-function contarCalaverasPorColumna(tablero, config) {
-    const calaverasPorCol = new Array(config.COLUMNAS).fill(0);
-    const peligrosos = [];
-
-    for (let r = 0; r < config.FILAS; r++) {
-        for (let c = 0; c < config.COLUMNAS; c++) {
-            if (tablero[r][c] === config.VALOR_PELIGROSO) {
-                calaverasPorCol[c]++;
-                peligrosos.push({ r, c });
-            }
-        }
-    }
-
-    const numColumnasConCalaveras = calaverasPorCol.filter(count => count > 0).length;
-    return { calaverasPorCol, numColumnasConCalaveras, peligrosos };
-}
-
-function obtenerSwapsLegales(tablero, config) {
-    const swaps = [];
-    const valorPeligroso = config.VALOR_PELIGROSO;
-
-    for (let r = 0; r < config.FILAS; r++) {
-        for (let c = 0; c < config.COLUMNAS; c++) {
-            if (tablero[r][c] === null || tablero[r][c] === valorPeligroso) continue;
-
-            if (c < config.COLUMNAS - 1 && tablero[r][c + 1] !== valorPeligroso && tablero[r][c + 1] !== null) {
-                swaps.push({ r1: r, c1: c, r2: r, c2: c + 1 });
-            }
-            if (r < config.FILAS - 1 && tablero[r + 1][c] !== valorPeligroso && tablero[r + 1][c] !== null) {
-                swaps.push({ r1: r, c1: c, r2: r + 1, c2: c });
-            }
-        }
-    }
-    return swaps;
 }
 
 function updateSkullRiskDisplay(riskOverride) {
