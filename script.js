@@ -1,4 +1,4 @@
-// Versión 4.8 - Algoritmo de generación mejorado (implementación parcial)
+// Versión 5.0 - Corrección de duplicado en generación de bloques
 const COLORS = ['jelly-rojo', 'gota-naranja', 'limon-amarillo', 'gota-verde', 'gota-azul', 'calavera'];
 const CONFIG = {
     FILAS: 10,
@@ -637,8 +637,7 @@ async function handleCascade(matches) {
         cell.classList.add('matched');
     });
 
-    await wait(700); 
-    await processMatchedCells(matches);
+    await wait(700);
     await processMatchedCells(matches);
 }
 
