@@ -122,8 +122,8 @@ body {
 }
 
 .cell.processing {
-    pointer-events: none;
-    opacity: 0.6;
+    pointer-events: none !important;
+    opacity: 0.6 !important;
 }
 
 #controls-container {
