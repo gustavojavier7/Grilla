@@ -1006,7 +1006,7 @@ function updateSkullRiskDisplay(riskOverride) {
     const risk = Number.isFinite(riskOverride) ? riskOverride : calcularRRC_Nuevo(board, activeConfig);
     const riskElement = document.getElementById('skull-risk');
     const porcentaje = Math.round(risk);
-    riskElement.textContent = `${porcentaje}% (Nuevo)`;
+    riskElement.textContent = `${porcentaje} (Nuevo)`;
 
     // UI escalada: clases para umbrales
     riskElement.classList.remove('bajo', 'medio', 'alto', 'critico', 'explosivo');
