@@ -624,6 +624,12 @@ async function handleCascade(matches) {
         setProcessingState(false);
         return;
     }
+    
+    // RE-APLICA LA ATENUACIÓN A TODO EL TABLERO
+    // Esto asegura que las celdas estáticas que perdieron la clase 
+    // por algún motivo o que simplemente no fueron tocadas en la
+    // cascada anterior, vuelvan a atenuarse al iniciar C2, C3, etc.
+    setProcessingState(true); 
 
     matches.forEach(coord => {
         const [row, col] = coord.split(',').map(Number);
@@ -631,7 +637,8 @@ async function handleCascade(matches) {
         cell.classList.add('matched');
     });
 
-    await wait(700);
+    await wait(700); 
+    await processMatchedCells(matches);
     await processMatchedCells(matches);
 }
 
@@ -1176,3 +1183,4 @@ document.addEventListener('DOMContentLoaded', () => {
     resetGame();
     requestAnimationFrame(contadorRegresivo);
 });
+

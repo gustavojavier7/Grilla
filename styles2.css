@@ -131,10 +131,6 @@ body {
     opacity: 1 !important; /* Fuerza la opacidad completa (brillante) */
 }
 
-.cell.processing.falling {
-    opacity: 1 !important;
-}
-
 #controls-container {
     display: flex;
     flex-direction: column;
