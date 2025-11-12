@@ -637,6 +637,10 @@ async function handleCascade(matches) {
         cell.classList.add('matched');
     });
     
+    // Llamada al procesador de celdas coincidentes y cierre de función
+    await processMatchedCells(matches);
+}
+
 function getNewWeightedColorOptimized(row, col) {
     // Ordenar colores por conteo (menor a mayor para priorizar los menos comunes)
     const sortedColors = COLORS.slice().sort((a, b) => {
@@ -1179,4 +1183,3 @@ document.addEventListener('DOMContentLoaded', () => {
     resetGame();
     requestAnimationFrame(contadorRegresivo);
 });
-
