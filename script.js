@@ -1,4 +1,4 @@
-// Versión 4.8 - Algoritmo de generación mejorado (implementación parcial)
+// Versión 4.9 - Algoritmo de generación mejorado (implementación parcial)
 const COLORS = ['jelly-rojo', 'gota-naranja', 'limon-amarillo', 'gota-verde', 'gota-azul', 'calavera'];
 const CONFIG = {
     FILAS: 10,
