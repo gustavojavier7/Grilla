@@ -519,7 +519,6 @@ function addFallAnimation(cell, delay = 0, initialOffset = 0, isNewCell = false)
         cell.style.transition = ''; // Remove inline transition
         cell.style.transform = ''; // Remove inline transform
         cell.style.opacity = ''; // Remove inline opacity
-        cell.classList.remove('falling');
         cell.removeEventListener('transitionend', transitionEndHandler);
     };
     cell.addEventListener('transitionend', transitionEndHandler);
