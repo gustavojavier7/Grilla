@@ -636,8 +636,9 @@ async function handleCascade(matches) {
         const cell = cellReferences[row][col];
         cell.classList.add('matched');
     });
-    
-    // Llamada al procesador de celdas coincidentes y cierre de función
+
+    await wait(700); 
+    await processMatchedCells(matches);
     await processMatchedCells(matches);
 }
 
@@ -1183,3 +1184,4 @@ document.addEventListener('DOMContentLoaded', () => {
     resetGame();
     requestAnimationFrame(contadorRegresivo);
 });
+
