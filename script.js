@@ -831,7 +831,7 @@ function resetGame() {
     updateColorSamples();
 
     document.getElementById('current-average').textContent = '000.000';
-    document.getElementById('skull-risk').textContent = '0% (Nuevo)';
+    document.getElementById('skull-risk').textContent = '0 (Nuevo)';
 
     // Recrea la cuadrícula y la llena con colores aleatorios
     createGrid(rows, cols);
@@ -1182,4 +1182,5 @@ document.addEventListener('DOMContentLoaded', () => {
     resetGame();
     requestAnimationFrame(contadorRegresivo);
 });
+
 
