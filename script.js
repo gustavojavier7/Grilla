@@ -682,7 +682,7 @@ async function processMatchedCells(matches) {
         cell.classList.remove('matched');
         const color = board[row][col];
         board[row][col] = null;
-        cell.className = 'cell'; // Clear visual of old cell
+        cell.className = 'cell processing'; // Clear visual of old cell but keep processing state
         cellCounts[color]--;
         totalCellsRemoved++;
         contadorDeCeldasEnRonda++;
@@ -713,8 +713,8 @@ async function processMatchedCells(matches) {
                 const targetCellElement = cellReferences[newRow][col];
                 const oldCellElement = cellReferences[oldRow][col];
 
-                oldCellElement.className = 'cell';
-                targetCellElement.className = `cell ${fallingColor}`;
+                oldCellElement.className = 'cell processing';
+                targetCellElement.className = `cell ${fallingColor} processing`;
 
                 const distanceToMoveUp = emptySpaceCount * cellTotalSpace;
                 addFallAnimation(targetCellElement, delayIndex * FALL_STAGGER_DELAY, -distanceToMoveUp, false);
@@ -732,7 +732,7 @@ async function processMatchedCells(matches) {
             const newColor = getNewWeightedColorOptimized(targetRow, col);
             
             board[targetRow][col] = newColor;
-            cellReferences[targetRow][col].className = `cell ${newColor}`;
+            cellReferences[targetRow][col].className = `cell ${newColor} processing`;
             
             const distanceToFall = (emptySpaceCount - i) * cellTotalSpace;
             addFallAnimation(cellReferences[targetRow][col], delayIndex * FALL_STAGGER_DELAY, -distanceToFall, true);
