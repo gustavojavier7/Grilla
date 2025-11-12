@@ -497,6 +497,7 @@ function manageClock() {
 
 function addFallAnimation(cell, delay = 0, initialOffset = 0, isNewCell = false) {
     // Set initial state (hidden above or at original position)
+    cell.classList.add('falling');
     cell.style.transition = 'none'; // Disable transition for initial positioning
     cell.style.transform = `translateY(${initialOffset}px)`;
     if (isNewCell) {
