@@ -126,6 +126,15 @@ body {
     opacity: 0.6;
 }
 
+/* Regla para asegurar que las celdas en el patrón no se atenúen */
+.cell.processing.matched {
+    opacity: 1 !important; /* Fuerza la opacidad completa (brillante) */
+}
+
+.cell.processing.falling {
+    opacity: 1 !important;
+}
+
 #controls-container {
     display: flex;
     flex-direction: column;
