@@ -768,7 +768,7 @@ async function processMatchedCells(matches) {
 
         if (cellsRemovedHistory.length > 1) {
             const averageCellsRemoved = cellsRemovedHistory.reduce((sum, value) => sum + value, 0) / cellsRemovedHistory.length;
-            document.getElementById('current-average').textContent = averageCellsRemoved;
+            document.getElementById('current-average').textContent = Number(averageCellsRemoved.toFixed(4));
             console.log(`Promedio de celdas removidas: ${averageCellsRemoved.toFixed(2)}`);
 
             if (contadorDeCeldasEnRonda > averageCellsRemoved) {
@@ -777,7 +777,7 @@ async function processMatchedCells(matches) {
                 console.log(`Tiempo extendido por ${extraTime} segundos. Nuevo tiempo: ${countdown} segundos.`);
             }
         } else if (cellsRemovedHistory.length === 1) {
-            document.getElementById('current-average').textContent = cellsRemovedHistory[0];
+            document.getElementById('current-average').textContent = Number(cellsRemovedHistory[0].toFixed(4));
         }
 
         contadorDeCeldasEnRonda = 0;
@@ -833,7 +833,7 @@ function resetGame() {
     inicializarContadores();
     updateColorSamples();
 
-    document.getElementById('current-average').textContent = '0';
+    document.getElementById('current-average').textContent = Number((0).toFixed(4));
     document.getElementById('skull-risk').textContent = '0 (Nuevo)';
 
     // Recrea la cuadrícula y la llena con colores aleatorios
