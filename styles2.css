@@ -269,6 +269,12 @@ label {
     color: #333;
 }
 
+#current-average {
+    font-size: 48px;
+    font-weight: bold;
+    line-height: 1;
+}
+
 #skull-risk {
     font-family: Arial, sans-serif;
     font-size: 14px;
