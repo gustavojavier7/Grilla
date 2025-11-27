@@ -35,7 +35,6 @@ let cols = 10;
 let activeConfig = { ...CONFIG };
 let cellCounts = {};
 let totalCellsRemoved = 0;
-let mainSeparatorVisible = true;
 let secondarySeparatorVisible = true;
 let lastUpdateTime = 0;
 let countdown = 60; // 1 minuto en segundos
@@ -483,9 +482,13 @@ function initializeSeparators() {
 
 function toggleSeparators() {
     secondarySeparatorVisible = !secondarySeparatorVisible;
+    const blinkColor = secondarySeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
+
     document.querySelectorAll('.separador-sec').forEach(separator => {
-        separator.style.color = secondarySeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
+        separator.style.color = blinkColor;
     });
+
+    return blinkColor;
 }
 
 function manageClock() {
@@ -765,7 +768,7 @@ async function processMatchedCells(matches) {
 
         if (cellsRemovedHistory.length > 1) {
             const averageCellsRemoved = cellsRemovedHistory.reduce((sum, value) => sum + value, 0) / cellsRemovedHistory.length;
-            document.getElementById('current-average').textContent = averageCellsRemoved.toFixed(3).padStart(7, '0');
+            document.getElementById('current-average').textContent = Number(averageCellsRemoved.toFixed(4));
             console.log(`Promedio de celdas removidas: ${averageCellsRemoved.toFixed(2)}`);
 
             if (contadorDeCeldasEnRonda > averageCellsRemoved) {
@@ -774,7 +777,7 @@ async function processMatchedCells(matches) {
                 console.log(`Tiempo extendido por ${extraTime} segundos. Nuevo tiempo: ${countdown} segundos.`);
             }
         } else if (cellsRemovedHistory.length === 1) {
-            document.getElementById('current-average').textContent = cellsRemovedHistory[0].toFixed(3).padStart(7, '0');
+            document.getElementById('current-average').textContent = Number(cellsRemovedHistory[0].toFixed(4));
         }
 
         contadorDeCeldasEnRonda = 0;
@@ -830,7 +833,7 @@ function resetGame() {
     inicializarContadores();
     updateColorSamples();
 
-    document.getElementById('current-average').textContent = '000.000';
+    document.getElementById('current-average').textContent = Number((0).toFixed(4));
     document.getElementById('skull-risk').textContent = '0 (Nuevo)';
 
     // Recrea la cuadrícula y la llena con colores aleatorios
@@ -1122,6 +1125,8 @@ function contadorRegresivo() {
     if (now - lastUpdateTime > updateInterval) {
         const separadorPrincipal = document.getElementById('separador-principal');
 
+        const blinkColor = toggleSeparators();
+
         if (countdownStarted && countdown > 0 && !isProcessing) {
             countdown--;
             const minutes = Math.floor(countdown / 60).toString().padStart(2, '0');
@@ -1130,14 +1135,11 @@ function contadorRegresivo() {
             document.getElementById('segundos').textContent = seconds;
 
             if (separadorPrincipal) {
-                mainSeparatorVisible = !mainSeparatorVisible;
-                separadorPrincipal.style.color = mainSeparatorVisible ? SEPARATOR_COLORS.ON : SEPARATOR_COLORS.OFF;
-                console.log('Separador Principal (activo): ', separadorPrincipal.style.color);
+                separadorPrincipal.style.color = blinkColor;
             }
         } else {
             if (separadorPrincipal) {
                 separadorPrincipal.style.color = SEPARATOR_COLORS.ON;
-                console.log('Separador Principal (pausado/terminado): ', separadorPrincipal.style.color);
             }
         }
 
@@ -1148,8 +1150,7 @@ function contadorRegresivo() {
         document.getElementById('horas-sec').textContent = new Date().getHours().toString().padStart(2, '0');
         document.getElementById('minutos-sec').textContent = new Date().getMinutes().toString().padStart(2, '0');
         document.getElementById('segundos-sec').textContent = new Date().getSeconds().toString().padStart(2, '0');
-        
-        toggleSeparators();
+
         lastUpdateTime = now;
     }
 

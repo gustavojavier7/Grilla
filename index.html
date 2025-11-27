@@ -38,10 +38,16 @@
 
             <div class="separator-line"></div>
             <div id="rrc-display">RRC: <span id="skull-risk">0</span></div>
-            <div id="average-cells-removed">Promedio de Celdas Removidas: <span id="current-average">0.00</span></div>
+            <div id="average-cells-removed" class="metric-block">
+                <div class="metric-label">Promedio de Celdas Removidas</div>
+                <div class="metric-value" id="current-average">0</div>
+            </div>
+            <div id="cells-removed-round" class="metric-block">
+                <div class="metric-label">Celdas Eliminadas en esta Ronda</div>
+                <div class="metric-value" id="cells-removed-in-round">0</div>
+            </div>
             <div class="separator-line"></div>
             <div id="cells-removed-counter">Celdas Eliminadas: <span id="cells-removed">0</span></div>
-            <div id="cells-removed-round">Celdas Eliminadas en esta Ronda: <span id="cells-removed-in-round">0</span></div>
 
             <!-- Muestra de colores -->
             <div id="color-samples">
