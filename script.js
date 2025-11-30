@@ -45,7 +45,6 @@ let cellsRemovedHistory = []; // Historial de celdas removidas en las últimas 5
 let timeoutIds = []; // Array para almacenar los IDs de los timeouts
 let intervalIds = []; // Array para almacenar los IDs de los intervals
 let allowCalaveraGameOver = false; // Controla si la calavera en la última fila provoca GAME OVER
-let skullRiskHistory = [];
 const updateInterval = 1000; // 1s
 const SEPARATOR_COLORS = {
     ON: 'black',    // Visible: texto negro
@@ -782,18 +781,6 @@ async function processMatchedCells(matches) {
 
         contadorDeCeldasEnRonda = 0;
 
-        try {
-            const riesgoFinal = calcularRRC_Nuevo(board, activeConfig);
-            updateSkullRiskDisplay(riesgoFinal);
-            skullRiskHistory.push(Math.round(riesgoFinal));
-        } catch (e) {
-            console.error('Error en RRC:', e);
-            updateSkullRiskDisplay(0);
-            skullRiskHistory.push(0);
-        }
-        if (skullRiskHistory.length > 5) {
-            skullRiskHistory.shift();
-        }
     }
     updateColorSamples();
     checkForCalavera();
@@ -834,7 +821,6 @@ function resetGame() {
     updateColorSamples();
 
     document.getElementById('current-average').textContent = Number((0).toFixed(4));
-    document.getElementById('skull-risk').textContent = '0 (Nuevo)';
 
     // Recrea la cuadrícula y la llena con colores aleatorios
     createGrid(rows, cols);
@@ -945,7 +931,6 @@ async function fillGrid(forceRegeneration = false) {
     let celdasRellenadas = 0;
 
     if (forceRegeneration || !boardTieneDimensiones) {
-        document.getElementById('skull-risk').textContent = '0% (Nuevo)';
         board = await generarTableroEstableUniversal(dificultad);
         actualizarVisualDesdeTablero();
         seGeneroNuevoTablero = true;
@@ -962,7 +947,6 @@ async function fillGrid(forceRegeneration = false) {
     }
 
     recalcularContadoresDesdeBoard();
-    updateSkullRiskDisplay();
     updateColorSamples();
 
     if (seGeneroNuevoTablero) {
@@ -1003,103 +987,6 @@ function showGameOver(reason) {
 
     overlay.style.display = 'flex';
     setProcessingState(true); // Asegúrate de que esto está en true para evitar nuevas interacciones
-}
-
-function updateSkullRiskDisplay(riskOverride) {
-    const risk = Number.isFinite(riskOverride) ? riskOverride : calcularRRC_Nuevo(board, activeConfig);
-    const riskElement = document.getElementById('skull-risk');
-    const porcentaje = Math.round(risk);
-    riskElement.textContent = `${porcentaje} (Nuevo)`;
-
-    // UI escalada: clases para umbrales
-    riskElement.classList.remove('bajo', 'medio', 'alto', 'critico', 'explosivo');
-    if (risk < 50) {
-        riskElement.classList.add('bajo');
-        riskElement.style.color = '#4CAF50'; // Verde
-    } else if (risk < 100) {
-        riskElement.classList.add('medio');
-        riskElement.style.color = '#FF9800'; // Naranja
-    } else if (risk < 200) {
-        riskElement.classList.add('alto');
-        riskElement.style.color = '#F44336'; // Rojo
-    } else if (risk < 500) {
-        riskElement.classList.add('critico');
-        riskElement.style.color = '#9C27B0'; // Púrpura
-        riskElement.classList.add('blink-risk');
-    } else {
-        riskElement.classList.add('explosivo');
-        riskElement.style.color = '#FF0000'; // Rojo intenso
-        riskElement.classList.add('blink-risk');
-    }
-}
-
-// Componente 1: Asimetría (simplificada con skewness manual)
-function calcularAsimetria(tablero, config) {
-    const totalCeldas = config.FILAS * config.COLUMNAS;
-    const conteos = {};
-    COLORS.forEach(color => conteos[color] = 0);
-    for (let r = 0; r < config.FILAS; r++) {
-        for (let c = 0; c < config.COLUMNAS; c++) {
-            const color = tablero[r][c];
-            if (conteos[color] !== undefined) conteos[color]++;
-        }
-    }
-    const frecuencias = Object.values(conteos).map(count => count / totalCeldas);
-    const esperado = 1 / COLORS.length;
-    const diffs = frecuencias.map(f => f - esperado);
-    const media3 = diffs.reduce((sum, d) => sum + Math.pow(d, 3), 0) / frecuencias.length;
-    const var2 = diffs.reduce((sum, d) => sum + Math.pow(d, 2), 0) / frecuencias.length;
-    const skewness = media3 / Math.pow(var2, 1.5) || 0;
-    return Math.abs(skewness) * 10; // Penalización escalada
-}
-
-// Componente 2: Cercanía vertical
-function calcularCercania(tablero, config) {
-    const calPorFila = new Array(config.FILAS).fill(0);
-    for (let r = 0; r < config.FILAS; r++) {
-        for (let c = 0; c < config.COLUMNAS; c++) {
-            if (tablero[r][c] === config.VALOR_PELIGROSO) calPorFila[r]++;
-        }
-    }
-    let raw = 0;
-    let totalCal = 0;
-    for (let f = 0; f < config.FILAS - 1; f++) { // Excluye base
-        raw += calPorFila[f] * ((config.FILAS - 1) - f);
-        totalCal += calPorFila[f];
-    }
-    const norm = totalCal > 0 ? raw / (totalCal * (config.FILAS - 1)) : 0;
-    return norm * 100; // Escala a porcentaje-like
-}
-
-// Componente 3: Proximidad en línea recta
-function calcularLineaRecta(tablero, config) {
-    const dirs = [[0,1],[1,0],[1,1],[1,-1],[-1,1],[-1,-1]];
-    let total = 0;
-    for (let r = 0; r < config.FILAS; r++) {
-        for (let c = 0; c < config.COLUMNAS; c++) {
-            if (tablero[r][c] !== config.VALOR_PELIGROSO) continue;
-            for (let [dr, dc] of dirs) {
-                let count = 0;
-                for (let d = 1; d <= 3; d++) {
-                    const nr = r + d * dr, nc = c + d * dc;
-                    if (nr >= 0 && nr < config.FILAS && nc >= 0 && nc < config.COLUMNAS &&
-                        tablero[nr][nc] === config.VALOR_PELIGROSO) count++;
-                }
-                total += count;
-            }
-        }
-    }
-    return total * 5; // Escala para amplificar agrupaciones
-}
-
-// Fórmula total abierta: suma de componentes
-function calcularRRC_Nuevo(tablero, config) {
-    const pa = calcularAsimetria(tablero, config);
-    const pc = calcularCercania(tablero, config);
-    const pl = calcularLineaRecta(tablero, config);
-    const rrc = pa + pc + pl; // Abierta: sin límite
-    console.log(`RRC Nuevo Abierto: ${Math.round(rrc)} | Asim: ${pa.toFixed(1)} | Cerc: ${pc.toFixed(1)} | Linea: ${pl}`);
-    return rrc;
 }
 
 function updateCellsRemovedDisplay() {
