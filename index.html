@@ -20,13 +20,6 @@
                 <button id="reset-game-btn" onclick="resetGame()" disabled>Reiniciar Juego</button>
             </div>
 
-            <!-- Conteo Regresivo (Reloj Principal) -->
-            <div id="countdown">
-                <span id="minutos">01</span>
-                <span id="separador-principal" class="separador-principal">:</span>
-                <span id="segundos">00</span>
-            </div>
-
             <!-- Reloj Secundario -->
             <div id="reloj-secundario">
                 <span id="horas-sec">15</span>
@@ -36,8 +29,14 @@
                 <span id="segundos-sec">30</span>
             </div>
 
+            <!-- Conteo Regresivo (Reloj Principal) -->
+            <div id="countdown">
+                <span id="minutos">01</span>
+                <span id="separador-principal" class="separador-principal">:</span>
+                <span id="segundos">00</span>
+            </div>
+
             <div class="separator-line"></div>
-            <div id="rrc-display">RRC: <span id="skull-risk">0</span></div>
             <div id="average-cells-removed" class="metric-block">
                 <div class="metric-label">Promedio de Celdas Removidas</div>
                 <div class="metric-value" id="current-average">0</div>
