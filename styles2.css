@@ -438,6 +438,8 @@ label {
 
 #continue-button {
     display: none;
+    align-items: center;
+    justify-content: center;
     background-color: #2196F3;
     color: white;
     padding: 15px 30px;
@@ -445,6 +447,7 @@ label {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    min-height: 54px;
 }
 
 #continue-button:hover {
@@ -452,6 +455,9 @@ label {
 }
 
 #restart-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background-color: #4CAF50;
     color: white;
     padding: 15px 30px;
@@ -459,6 +465,7 @@ label {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    min-height: 54px;
 }
 
 #restart-button:hover {

@@ -987,7 +987,7 @@ function showGameOver(reason) {
         gameOverThreshold.style.display = 'none';
 
         if (reason.includes('Muerte') && continueBtn) {
-            continueBtn.style.display = 'inline-block';
+            continueBtn.style.display = 'inline-flex';
         } else if (continueBtn) {
             continueBtn.style.display = 'none';
         }
@@ -1047,8 +1047,6 @@ function continueGame() {
     }
 }
 
-window.continueGame = continueGame;
-
 function updateCellsRemovedDisplay() {
     // Mostrar el total de celdas eliminadas
     const totalCellsRemovedElement = document.getElementById('cells-removed');
@@ -1106,6 +1104,7 @@ function contadorRegresivo() {
 
 document.addEventListener('DOMContentLoaded', () => {
     const difficultySelect = document.getElementById('difficulty');
+    const continueButton = document.getElementById('continue-button');
     const difficultyOptions = Object.entries(DIFICULTADES)
         .map(([key, value]) => {
             const label = DIFICULTAD_LABELS[key] || key;
@@ -1127,8 +1126,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    if (continueButton) {
+        continueButton.addEventListener('click', continueGame);
+    }
+
     resetGame();
     requestAnimationFrame(contadorRegresivo);
 });
+
+window.continueGame = continueGame;
 
 
