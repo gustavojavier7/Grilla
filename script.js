@@ -976,17 +976,75 @@ function showGameOver(reason) {
     const message = document.getElementById('game-over-message');
     const gameOverReason = document.getElementById('game-over-reason');
     const gameOverThreshold = document.getElementById('game-over-threshold');
+    const continueBtn = document.getElementById('continue-button');
 
     if (reason === 'Tiempo agotado') {
         gameOverReason.textContent = '¡Se acabó el tiempo!';
         gameOverThreshold.style.display = 'none';
+        if (continueBtn) continueBtn.style.display = 'none';
     } else if (reason) {
         gameOverReason.textContent = reason;
         gameOverThreshold.style.display = 'none';
+
+        if (reason.includes('Muerte') && continueBtn) {
+            continueBtn.style.display = 'inline-flex';
+        } else if (continueBtn) {
+            continueBtn.style.display = 'none';
+        }
     }
 
     overlay.style.display = 'flex';
     setProcessingState(true); // Asegúrate de que esto está en true para evitar nuevas interacciones
+}
+
+function continueGame() {
+    const bottomRowIndex = board.length - 1;
+    const safeColors = CONFIG.VALORES_SEGUROS_FILA_0;
+
+    let replacedCount = 0;
+
+    for (let col = 0; col < cols; col++) {
+        if (board[bottomRowIndex][col] === 'calavera') {
+            let bestColor = null;
+            const shuffledColors = [...safeColors].sort(() => Math.random() - 0.5);
+
+            for (let color of shuffledColors) {
+                if (!createsMatchAtPosition(bottomRowIndex, col, color)) {
+                    bestColor = color;
+                    break;
+                }
+            }
+
+            if (!bestColor) {
+                bestColor = shuffledColors[0];
+            }
+
+            board[bottomRowIndex][col] = bestColor;
+
+            const cell = cellReferences[bottomRowIndex][col];
+            if (cell) {
+                cell.className = `cell ${bestColor}`;
+                cell.style.animation = 'none';
+                cell.offsetHeight;
+                cell.style.animation = 'blink-highlight 0.5s ease-in-out';
+            }
+
+            replacedCount++;
+        }
+    }
+
+    if (replacedCount > 0) {
+        console.log(`Juego continuado: ${replacedCount} calaveras reemplazadas.`);
+
+        recalcularContadoresDesdeBoard();
+        updateColorSamples();
+
+        document.getElementById('game-over-overlay').style.display = 'none';
+
+        setProcessingState(false);
+
+        allowCalaveraGameOver = true;
+    }
 }
 
 function updateCellsRemovedDisplay() {
@@ -1046,6 +1104,7 @@ function contadorRegresivo() {
 
 document.addEventListener('DOMContentLoaded', () => {
     const difficultySelect = document.getElementById('difficulty');
+    const continueButton = document.getElementById('continue-button');
     const difficultyOptions = Object.entries(DIFICULTADES)
         .map(([key, value]) => {
             const label = DIFICULTAD_LABELS[key] || key;
@@ -1067,8 +1126,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    if (continueButton) {
+        continueButton.addEventListener('click', continueGame);
+    }
+
     resetGame();
     requestAnimationFrame(contadorRegresivo);
 });
+
+window.continueGame = continueGame;
 
 
