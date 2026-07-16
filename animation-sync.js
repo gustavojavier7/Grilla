@@ -19,9 +19,20 @@ function waitForCssAnimation(element) {
     );
 }
 
+function calculateFallDuration(initialOffset) {
+    const { size: cellSize, gap: cellGap } = getCellDimensions();
+    const cellTotalSpace = Math.max(1, cellSize + cellGap);
+    const rowsTravelled = Math.max(1, Math.abs(initialOffset) / cellTotalSpace);
+
+    // Caídas cortas ágiles; las largas ganan tiempo gradualmente,
+    // con un límite para no ralentizar demasiado las cascadas.
+    return Math.min(0.32, 0.10 + rowsTravelled * 0.035);
+}
+
 function addFallAnimation(cell, delay = 0, initialOffset = 0, isNewCell = false) {
     return new Promise(resolve => {
         let finished = false;
+        const fallDuration = calculateFallDuration(initialOffset);
 
         const cleanup = () => {
             if (finished) return;
@@ -52,7 +63,7 @@ function addFallAnimation(cell, delay = 0, initialOffset = 0, isNewCell = false)
         void cell.offsetWidth;
 
         cell.addEventListener('transitionend', transitionEndHandler);
-        cell.style.transition = `transform ${FALL_DURATION}s cubic-bezier(0.42, 0, 1.0, 1.0) ${delay}s, opacity ${FALL_DURATION}s linear ${delay}s`;
+        cell.style.transition = `transform ${fallDuration}s cubic-bezier(0.42, 0, 1.0, 1.0) ${delay}s, opacity ${fallDuration}s linear ${delay}s`;
         cell.style.transform = 'translateY(0)';
 
         if (isNewCell) {
@@ -63,7 +74,7 @@ function addFallAnimation(cell, delay = 0, initialOffset = 0, isNewCell = false)
         // cambio de pestaña o reducción de movimiento.
         const fallbackTimer = setTimeout(
             cleanup,
-            (delay + FALL_DURATION) * 1000 + 150
+            (delay + fallDuration) * 1000 + 150
         );
     });
 }
