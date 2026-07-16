@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles2.css">
+    <style>
+        /* Mantiene fijos los números y traslada el titileo a la muestra de color. */
+        .cell-sample > span.highlight-max-count {
+            animation: none;
+        }
+
+        .cell-sample:has(> span.highlight-max-count)::before {
+            animation: blink-highlight 0.5s step-end infinite;
+        }
+    </style>
 </head>
 <body>
     <div id="main-container">
