@@ -13,6 +13,11 @@
         .cell-sample:has(> span.highlight-max-count)::before {
             animation: blink-highlight 0.5s step-end infinite;
         }
+
+        /* Cuatro ciclos de 0,2 s: duración total de 0,8 s. */
+        .cell.matched {
+            animation-iteration-count: 4;
+        }
     </style>
 </head>
 <body>
